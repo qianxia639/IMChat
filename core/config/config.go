@@ -11,7 +11,6 @@ type Config struct {
 }
 
 type Postgres struct {
-	Driver     string `mapstructure:"driver"`
 	Source     string `mapstructure:"source"`
 	MigrateUrl string `mapstructure:"migrate_url"`
 }

@@ -5,7 +5,6 @@ import (
 	"IMChat/pb"
 	"IMChat/utils"
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -13,7 +12,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/rs/zerolog/log"
 
-	"github.com/lib/pq"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -37,7 +35,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	// 获取用户信息
 	user, err := userService.store.GetUser(ctx, req.GetUsername())
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")
 		}
 		return nil, status.Errorf(codes.Internal, "failed to find user")
@@ -124,11 +122,8 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 
 	_, err = userService.store.CreateUser(ctx, arg)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			switch pqErr.Code.Name() {
-			case "unique_violation":
-				return nil, status.Errorf(codes.AlreadyExists, "username already exists: %v", err)
-			}
+		if db.ErrorCode(err) == db.UniqueViolation {
+			return nil, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
@@ -215,7 +210,7 @@ func (userService *UserService) UpdateUser(ctx context.Context, req *pb.UpdateUs
 
 	user, err := userService.store.UpdateUser(ctx, arg)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")
 		}
 		return nil, status.Errorf(codes.Internal, "failed to update user: %s", err)
@@ -335,8 +330,6 @@ func (userService *UserService) Logout(ctx context.Context, req *pb.EmptyRequest
 	if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get user info: %v", err)
 	}
-
-	// _ = userService.store.UpdateLastUserLoginLog(ctx, sql.NullInt32{Int32: user.ID, Valid: true})
 
 	_ = userService.cache.Del(ctx, userInfoKey).Err()
 

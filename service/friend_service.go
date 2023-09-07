@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lib/pq"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -56,13 +55,9 @@ func (friendService *FriendService) AddFriend(ctx context.Context, req *pb.AddFr
 
 	_, err = friendService.store.AddFriendTx(ctx, arg)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			switch pqErr.Code {
-			case "23503":
-				return nil, status.Errorf(codes.AlreadyExists, "faile add friend error: %v", err)
-			case "23505":
-				return nil, status.Errorf(codes.AlreadyExists, "faile add friend error: %v", err)
-			}
+		pgErr := db.ErrorCode(err)
+		if pgErr == db.ForeignKeyViolation || pgErr == db.UniqueViolation {
+			return nil, status.Errorf(codes.AlreadyExists, "faile add friend error: %v", err)
 		}
 		return nil, status.Errorf(codes.Internal, "filaed to add friend: %v", err)
 	}
