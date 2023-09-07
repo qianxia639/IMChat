@@ -8,10 +8,7 @@ proto:
 		proto/*.proto
 
 server:
-	go run cmd/server/main.go
-
-client:
-	go run cmd/client/main.go
+	go run main.go
 
 postgres:
 	docker run -d -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root --restart=always --name postgres postgres:14-alpine
@@ -46,4 +43,4 @@ mock:
 test:
 	go test -cover -race ./... -count=1
 
-.PHONY: proto server client postgres createdb migrateup migrateup1 migratedown migratedown1 new_migrate sqlc evans mock test
+.PHONY: proto server postgres createdb migrateup migrateup1 migratedown migratedown1 new_migrate sqlc evans mock test
