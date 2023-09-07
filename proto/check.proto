@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package qianxia.IMChat;
+
+option go_package = "IMChar/pb";
+
+import "google/protobuf/timestamp.proto";
+
+enum CheckStatus {
+    NOT = 0;
+    AGREE = 1;
+    REFUSE = 2;
+}
+
+enum CheckType {
+    FRIENDS = 0;
+    CLUSTER = 1;
+}
+
+message Check {
+    // 主键Id
+    uint32 id = 1;
+    // 所有者Id
+    uint32 owner_id = 2;
+    // 目标对象Id
+    uint32 target_id = 3;
+    // 审核状态 0 未审核, 1 通过, 2 未通过
+    CheckStatus check_status = 4;
+    // 审核类型 0 好友, 1 群组
+    CheckType check_type = 5;
+    // 创建时间
+    google.protobuf.Timestamp created_at = 6;
+    // 审核时间
+    google.protobuf.Timestamp checked_at = 7;
+}

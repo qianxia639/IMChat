@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package qianxia.IMChat;
+
+option go_package = "IMChar/pb";
+
+import "command.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service FriendApplyService {
+    rpc CreateFriendApply (CreateFriendApplyRequest) returns (CreateFriendApplyResponse) {
+        option (google.api.http) = {
+            post: "/v1/friend/apply"
+            body: "*"
+        };
+    };
+
+    rpc ListFriendApply (EmptyRequest) returns (stream ListFriendApplyResponse) {
+        option (google.api.http) = {
+            get: "/v1/friend/apply"
+        };
+    };
+}
+
+message CreateFriendApplyRequest {
+    int32 reply_id = 1;
+    string apply_desc = 2;
+    string note = 3;
+}
+
+message CreateFriendApplyResponse {
+    string message = 1;
+}
+
+message ListFriendApplyResponse {
+    int32 reply_id = 1;
+    string nickname = 2;
+    string apply_desc = 3;
+    google.protobuf.Timestamp created_at = 4;
+}

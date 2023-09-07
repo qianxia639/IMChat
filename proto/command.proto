@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package qianxia.IMChat;
+
+option go_package = "IMChar/pb";
+
+message EmptyRequest {}

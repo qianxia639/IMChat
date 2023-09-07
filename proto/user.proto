@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package qianxia.IMChat;
+
+option go_package = "IMChar/pb";
+
+import "google/protobuf/timestamp.proto";
+
+enum Gender {
+    UNKNOWN = 0;
+    MAN = 1;
+    WOMAN = 2;
+}
+
+message User {
+    // 用户名
+    string username = 1;
+    // 用户昵称
+    string nickname = 2;
+    // 用户邮箱
+    string email = 3;
+    // 头像
+    string avatar = 4;
+    // 性别 0 未知, 1 男, 2 女
+    Gender gender = 5;
+    // 密码更新时间
+    google.protobuf.Timestamp password_change_at = 6;
+    // 创建时间
+    google.protobuf.Timestamp created_at = 7;
+    // 更新时间
+    google.protobuf.Timestamp updated_at = 8;
+}

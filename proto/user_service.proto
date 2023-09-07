@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package qianxia.IMChat;
+
+option go_package = "IMChar/pb";
+
+import "user.proto";
+import "command.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/any.proto";
+
+service UserService {
+    rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {
+        option (google.api.http) = {
+            post: "/v1/user/login"
+            body: "*"
+        };
+    };
+    
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+        option (google.api.http) = {
+            post: "/v1/user"
+            body: "*"
+        };
+    };
+
+    rpc GetUser (EmptyRequest) returns (GetUserResponse) {
+        option (google.api.http) = {
+            get: "/v1/user"
+        };
+    };
+
+    rpc SearchUser (SearchUserRequest) returns (SearchUserResponse) {
+        option (google.api.http) = {
+            get: "/v1/user/search"
+        };
+    };
+
+    rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+        option (google.api.http) = {
+            put: "/v1/user"
+            body: "*"
+        };
+    };
+
+    rpc DeleteUser (EmptyRequest) returns (DeleteUserResponse) {
+        option (google.api.http) = {
+            delete: "/v1/user"
+        };
+    };
+
+    rpc UpdateUserPassword (UpdateUserPasswordRequest) returns (UpdateUserPasswordResponse) {
+        option (google.api.http) = {
+            put: "/v1/user/password"
+            body: "*"
+        };
+    };
+
+    rpc Logout (EmptyRequest) returns (LogoutResponse) {
+        option (google.api.http) = {
+            delete: "/v1/user/logout"
+        };
+    };
+}
+
+message LoginUserRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message LoginUserResponse {
+    string access_token = 1;
+}
+
+message CreateUserRequest {
+    string username = 1;
+    string password = 2;
+    string email = 3;
+    optional Gender gender = 4;
+}
+
+message CreateUserResponse {
+    string message = 1;
+}
+
+message GetUserResponse {
+    User user = 1;
+}
+
+message UpdateUserRequest {
+    string username = 1;
+    optional string nickname = 2;
+    optional string avatar = 3;
+    optional Gender gender = 4;
+}
+
+message UpdateUserResponse {
+    User user = 1;
+}
+
+message DeleteUserResponse {
+    string message = 1;
+}
+
+message UpdateUserPasswordRequest {
+    string user_password = 1;
+    string user_confirm_password = 2;
+    string email_code = 3;
+}
+
+message UpdateUserPasswordResponse {
+    string message = 1;
+}
+
+message LogoutResponse {
+    string message = 1;
+}
+
+message SearchUserRequest {
+    uint32 type = 1;
+    string query = 2;
+}
+
+message SearchUserResponse {
+    google.protobuf.Any data = 1;   
+}
