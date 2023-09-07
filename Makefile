@@ -31,6 +31,9 @@ migratedown:
 migratedown1:
 	migrate -path db/migration -database "${DB_URL}" -verbose down 1
 
+new_migrate:
+	migrate create -ext sql -dir db/migration -seq $(name)
+
 sqlc:
 	sqlc generate
 
@@ -43,4 +46,4 @@ mock:
 test:
 	go test -cover -race ./... -count=1
 
-.PHONY: proto server client postgres createdb migrateup migrateup1 migratedown migratedown1 sqlc evans mock test
+.PHONY: proto server client postgres createdb migrateup migrateup1 migratedown migratedown1 new_migrate sqlc evans mock test
