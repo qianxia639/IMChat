@@ -2,16 +2,14 @@ package db
 
 import (
 	"IMChat/core/config"
-	"database/sql"
+	"context"
 	"log"
 	"os"
 	"testing"
 
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var testQueries *Queries
-var testDB *sql.DB
 var testStore Store
 
 func TestMain(m *testing.M) {
@@ -21,14 +19,12 @@ func TestMain(m *testing.M) {
 		log.Fatal("load config err: ", err)
 	}
 
-	testDB, err = sql.Open(conf.Postgres.Driver, conf.Postgres.Source)
+	connPool, err := pgxpool.New(context.Background(), conf.Postgres.Source)
 	if err != nil {
 		log.Fatal("cannot connect to db: ", err)
 	}
 
-	testQueries = New(testDB)
-
-	testStore = NewStore(testDB)
+	testStore = NewStore(connPool)
 
 	os.Exit(m.Run())
 }

@@ -7,12 +7,12 @@ import (
 	"IMChat/service"
 	"IMChat/service/interceptor"
 	"context"
-	"database/sql"
 	"net"
 	"net/http"
 	"os"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
@@ -34,14 +34,14 @@ func main() {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
-	dbConn, err := sql.Open(conf.Postgres.Driver, conf.Postgres.Source)
+	connPool, err := pgxpool.New(context.Background(), conf.Postgres.Source)
 	if err != nil {
 		log.Fatal().Err(err).Msg("can't connect to db")
 	}
 
 	runDBMigration(conf.Postgres.MigrateUrl, conf.Postgres.Source)
 
-	store := db.NewStore(dbConn)
+	store := db.NewStore(connPool)
 
 	go runGatewayServer(conf, store)
 	runGrpcServer(conf, store)

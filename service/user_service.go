@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/rs/zerolog/log"
 
 	"github.com/lib/pq"
@@ -198,15 +199,15 @@ func (userService *UserService) UpdateUser(ctx context.Context, req *pb.UpdateUs
 	arg := &db.UpdateUserParams{
 		Username:  req.GetUsername(),
 		UpdatedAt: time.Now(),
-		Nickname: sql.NullString{
+		Nickname: pgtype.Text{
 			String: req.GetNickname(),
 			Valid:  req.Nickname != nil,
 		},
-		Avatar: sql.NullString{
+		Avatar: pgtype.Text{
 			String: req.GetAvatar(),
 			Valid:  req.Avatar != nil,
 		},
-		Gender: sql.NullInt16{
+		Gender: pgtype.Int2{
 			Int16: int16(req.GetGender()),
 			Valid: req.Gender != nil,
 		},
