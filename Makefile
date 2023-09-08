@@ -41,6 +41,6 @@ mock:
 	mockgen -package mockdb -destination db/mock/store.go IMChat/db/sqlc Store
 
 test:
-	go test -cover -race ./... -count=1
+	go test -cover -race -short -count=1 ./... 
 
 .PHONY: proto server postgres createdb migrateup migrateup1 migratedown migratedown1 new_migrate sqlc evans mock test

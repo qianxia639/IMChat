@@ -7,6 +7,10 @@ import (
 )
 
 func TestMail(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
+
 	to := "2274000859@qq.com"
 	subject := "使用Golang发送邮件"
 	body := "测试邮件"
