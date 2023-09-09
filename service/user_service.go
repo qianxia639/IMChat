@@ -133,18 +133,21 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 	}, nil
 }
 
-func (userService *UserService) GetUser(ctx context.Context, req *pb.EmptyRequest) (*pb.GetUserResponse, error) {
+// TODO 该接口后期需要优化
+func (userService *UserService) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 
-	payload, err := userService.authorization(ctx)
+	_, err := userService.authorization(ctx)
 	if err != nil {
 		return nil, unauthenticatedError(err)
 	}
 
-	userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
+	userInfoKey := fmt.Sprintf("userInfo:%s", req.Username)
 
 	var user db.User
-	if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get user: %v", err)
+	_ = userService.cache.Get(ctx, userInfoKey).Scan(&user)
+
+	if user.ID <= 0 {
+		user, _ = userService.store.GetUser(ctx, req.Username)
 	}
 
 	resp := &pb.GetUserResponse{
@@ -154,6 +157,7 @@ func (userService *UserService) GetUser(ctx context.Context, req *pb.EmptyReques
 	return resp, nil
 }
 
+// TODO 该接口后期需要进行重构
 func (userService *UserService) SearchUser(ctx context.Context, req *pb.SearchUserRequest) (*pb.SearchUserResponse, error) {
 	switch req.GetType() {
 	case 1:

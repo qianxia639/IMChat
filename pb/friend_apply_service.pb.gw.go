@@ -96,7 +96,7 @@ func RegisterFriendApplyServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/qianxia.IMChat.FriendApplyService/CreateFriendApply", runtime.WithHTTPPathPattern("/v1/friend/pply"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/qianxia.IMChat.FriendApplyService/CreateFriendApply", runtime.WithHTTPPathPattern("/v1/friend/apply"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -167,7 +167,7 @@ func RegisterFriendApplyServiceHandlerClient(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendApplyService/CreateFriendApply", runtime.WithHTTPPathPattern("/v1/friend/pply"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendApplyService/CreateFriendApply", runtime.WithHTTPPathPattern("/v1/friend/apply"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -209,7 +209,7 @@ func RegisterFriendApplyServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_FriendApplyService_CreateFriendApply_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "friend", "pply"}, ""))
+	pattern_FriendApplyService_CreateFriendApply_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "friend", "apply"}, ""))
 
 	pattern_FriendApplyService_ListFriendApply_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "friend", "apply"}, ""))
 )

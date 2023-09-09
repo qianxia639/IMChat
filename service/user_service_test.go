@@ -206,3 +206,111 @@ func TestCreateUser(t *testing.T) {
 		})
 	}
 }
+
+func TestLoginUser(t *testing.T) {
+	user, password := randomUser(t)
+
+	testCases := []struct {
+		name          string
+		req           *pb.LoginUserRequest
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, res *pb.LoginUserResponse, err error)
+	}{
+		{
+			name: "OK",
+			req: &pb.LoginUserRequest{
+				Username: user.Username,
+				Password: password,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUser(gomock.Any(), gomock.Eq(user.Username)).
+					Times(1).
+					Return(user, nil)
+				store.EXPECT().
+					GetLastUserLoginLog(gomock.Any(), user.ID).
+					Times(1).
+					Return(db.UserLoginLog{}, nil)
+				store.EXPECT().
+					AddUserLoginLog(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.UserLoginLog{}, nil)
+			},
+			checkResponse: func(t *testing.T, res *pb.LoginUserResponse, err error) {
+				require.NoError(t, err)
+				require.NotZero(t, res.AccessToken)
+			},
+		},
+		{
+			name: "UserNotFound",
+			req: &pb.LoginUserRequest{
+				Username: user.Username,
+				Password: password,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUser(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.User{}, db.ErrRecordNotFound)
+			},
+			checkResponse: func(t *testing.T, res *pb.LoginUserResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.True(t, ok)
+				require.Equal(t, codes.NotFound, st.Code())
+			},
+		},
+		{
+			name: "IncorrectPassword",
+			req: &pb.LoginUserRequest{
+				Username: user.Username,
+				Password: "incorrect",
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUser(gomock.Any(), gomock.Eq(user.Username)).
+					Times(1).
+					Return(user, nil)
+			},
+			checkResponse: func(t *testing.T, res *pb.LoginUserResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.True(t, ok)
+				require.Equal(t, codes.Unauthenticated, st.Code())
+			},
+		},
+		{
+			name: "InternalError",
+			req: &pb.LoginUserRequest{
+				Username: user.Username,
+				Password: password,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUser(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.User{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, res *pb.LoginUserResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.True(t, ok)
+				require.Equal(t, codes.Internal, st.Code())
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+		t.Run(tc.name, func(t *testing.T) {
+			storeCtrl := gomock.NewController(t)
+			defer storeCtrl.Finish()
+			store := mockdb.NewMockStore(storeCtrl)
+
+			tc.buildStubs(store)
+			userService := newTestUserService(t, store)
+			res, err := userService.LoginUser(context.Background(), tc.req)
+			tc.checkResponse(t, res, err)
+		})
+	}
+}

@@ -24,7 +24,7 @@ service UserService {
         };
     };
 
-    rpc GetUser (EmptyRequest) returns (GetUserResponse) {
+    rpc GetUser (GetUserRequest) returns (GetUserResponse) {
         option (google.api.http) = {
             get: "/v1/user"
         };
@@ -81,6 +81,10 @@ message CreateUserRequest {
 
 message CreateUserResponse {
     string message = 1;
+}
+
+message GetUserRequest {
+    string username = 1;
 }
 
 message GetUserResponse {
