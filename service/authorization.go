@@ -2,11 +2,13 @@ package service
 
 import (
 	"IMChat/core/token"
+	db "IMChat/db/sqlc"
 	"context"
 	"fmt"
 
-	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 const authorizationHeader = "authorization"
@@ -34,31 +36,18 @@ func (server *Server) authorization(ctx context.Context) (*token.Payload, error)
 	return payload, nil
 }
 
-func (server *Server) GrpcUnaryAuthorization(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return handler(ctx, req)
-		// return nil, fmt.Errorf("missing metadata")
-	}
-
-	values := md.Get(authorizationHeader)
-	if len(values) == 0 {
-		return nil, fmt.Errorf("missing authorization header")
-	}
-
-	authHeader := values[0]
-	if len(authHeader) < 1 {
-		return nil, fmt.Errorf("invalid authorization header format")
-	}
-
-	payload, err := server.maker.VerifyToken(authHeader)
+func (server *Server) getUserInfo(ctx context.Context) (*db.User, error) {
+	payload, err := server.authorization(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("invalid access token: %v", err)
+		return nil, unauthenticatedError(err)
 	}
 
-	// TODO 暂时先这样，目前未使用
-	key := fmt.Sprintf(":%s", payload.Username)
-	server.cache.Set(ctx, key, payload, 0)
+	userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
+	var user *db.User
+	err = server.cache.Get(ctx, userInfoKey).Scan(user)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get cache: %v", err)
+	}
 
-	return handler(ctx, req)
+	return user, nil
 }

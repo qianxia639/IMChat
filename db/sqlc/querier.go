@@ -10,6 +10,7 @@ import (
 
 type Querier interface {
 	AddFriend(ctx context.Context, arg *AddFriendParams) (Friend, error)
+	AddMessage(ctx context.Context, arg *AddMessageParams) (Message, error)
 	AddUserLoginLog(ctx context.Context, arg *AddUserLoginLogParams) (UserLoginLog, error)
 	CreateFriendApply(ctx context.Context, arg *CreateFriendApplyParams) (FriendApply, error)
 	CreateUser(ctx context.Context, arg *CreateUserParams) (User, error)

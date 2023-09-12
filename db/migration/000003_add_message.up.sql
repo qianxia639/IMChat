@@ -1,0 +1,8 @@
+CREATE TABLE messages (
+    id BIGSERIAL PRIMARy KEY,
+    send_id INTEGER NOT NULL,
+    receive_id INTEGER NOT NULL,
+    content VARCHAR(255) NOT NULL,
+    send_time TIMESTAMPTZ NOT NULL DEFAULT now(),
+    receive_time TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z'
+);

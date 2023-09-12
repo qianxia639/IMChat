@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package qianxia.IMChat;
+
+option go_package = "IMChat/pb";
+
+import "google/protobuf/timestamp.proto";
+
+message Message {
+    int32 send_id = 1;
+    int32 receive_id = 2;
+    string content = 3;
+    google.protobuf.Timestamp send_time = 4;
+    google.protobuf.Timestamp receive_time = 5;
+}

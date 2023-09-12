@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package qianxia.IMChat;
 
-option go_package = "IMChar/pb";
+option go_package = "IMChat/pb";
 
 import "command.proto";
 import "google/api/annotations.proto";

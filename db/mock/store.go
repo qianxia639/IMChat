@@ -65,6 +65,21 @@ func (mr *MockStoreMockRecorder) AddFriendTx(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddFriendTx", reflect.TypeOf((*MockStore)(nil).AddFriendTx), arg0, arg1)
 }
 
+// AddMessage mocks base method.
+func (m *MockStore) AddMessage(arg0 context.Context, arg1 *db.AddMessageParams) (db.Message, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddMessage", arg0, arg1)
+	ret0, _ := ret[0].(db.Message)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddMessage indicates an expected call of AddMessage.
+func (mr *MockStoreMockRecorder) AddMessage(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMessage", reflect.TypeOf((*MockStore)(nil).AddMessage), arg0, arg1)
+}
+
 // AddUserLoginLog mocks base method.
 func (m *MockStore) AddUserLoginLog(arg0 context.Context, arg1 *db.AddUserLoginLogParams) (db.UserLoginLog, error) {
 	m.ctrl.T.Helper()

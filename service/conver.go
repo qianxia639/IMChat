@@ -18,3 +18,13 @@ func converUser(user db.User) *pb.User {
 		UpdatedAt: timestamppb.New(user.UpdatedAt),
 	}
 }
+
+func converMesagge(message db.Message) *pb.Message {
+	return &pb.Message{
+		SendId:      message.SendID,
+		ReceiveId:   message.ReceiveID,
+		Content:     message.Content,
+		SendTime:    timestamppb.New(message.SendTime),
+		ReceiveTime: timestamppb.New(message.ReceiveTime),
+	}
+}

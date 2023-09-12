@@ -32,6 +32,15 @@ type FriendApply struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type Message struct {
+	ID          int64     `json:"id"`
+	SendID      int32     `json:"send_id"`
+	ReceiveID   int32     `json:"receive_id"`
+	Content     string    `json:"content"`
+	SendTime    time.Time `json:"send_time"`
+	ReceiveTime time.Time `json:"receive_time"`
+}
+
 type User struct {
 	// 用户Id
 	ID int32 `json:"id"`

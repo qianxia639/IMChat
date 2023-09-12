@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package qianxia.IMChat;
+
+option go_package = "IMChat/pb";
+
+import "message.proto";
+
+service MessageService {
+
+    rpc SendMessage(stream SendMessageRequest) returns (stream SendMessageResponse) {}
+
+}
+
+message SendMessageRequest {
+    int32 receive_id = 1;
+    string content = 2;
+}
+
+message SendMessageResponse {
+    Message message = 1;
+}
