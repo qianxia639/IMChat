@@ -11,27 +11,28 @@ import (
 
 const addMessage = `-- name: AddMessage :one
 INSERT INTO messages (
-    send_id, receive_id, content
+    sender_id, receiver_id, content
 ) VALUES (
     $1, $2, $3
 )
-RETURNING id, send_id, receive_id, content, send_time, receive_time
+RETURNING id, sender_id, receiver_id, content, type, send_time, receive_time
 `
 
 type AddMessageParams struct {
-	SendID    int32  `json:"send_id"`
-	ReceiveID int32  `json:"receive_id"`
-	Content   string `json:"content"`
+	SenderID   int32  `json:"sender_id"`
+	ReceiverID int32  `json:"receiver_id"`
+	Content    string `json:"content"`
 }
 
 func (q *Queries) AddMessage(ctx context.Context, arg *AddMessageParams) (Message, error) {
-	row := q.db.QueryRow(ctx, addMessage, arg.SendID, arg.ReceiveID, arg.Content)
+	row := q.db.QueryRow(ctx, addMessage, arg.SenderID, arg.ReceiverID, arg.Content)
 	var i Message
 	err := row.Scan(
 		&i.ID,
-		&i.SendID,
-		&i.ReceiveID,
+		&i.SenderID,
+		&i.ReceiverID,
 		&i.Content,
+		&i.Type,
 		&i.SendTime,
 		&i.ReceiveTime,
 	)

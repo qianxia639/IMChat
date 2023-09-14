@@ -29,21 +29,21 @@ func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) 
 			return err
 		}
 
-		err = q.DeleteFriendApply(ctx, &DeleteFriendApplyParams{
-			ApplyID: arg.UserID,
-			ReplyID: arg.FriendID,
-		})
-		if err != nil {
-			return err
-		}
+		// err = q.DeleteFriendApply(ctx, &DeleteFriendApplyParams{
+		// 	ApplyID: arg.UserID,
+		// 	ReplyID: arg.FriendID,
+		// })
+		// if err != nil {
+		// 	return err
+		// }
 
-		err = q.DeleteFriendApply(ctx, &DeleteFriendApplyParams{
-			ApplyID: arg.FriendID,
-			ReplyID: arg.UserID,
-		})
-		if err != nil {
-			return err
-		}
+		// err = q.DeleteFriendApply(ctx, &DeleteFriendApplyParams{
+		// 	ApplyID: arg.FriendID,
+		// 	ReplyID: arg.UserID,
+		// })
+		// if err != nil {
+		// 	return err
+		// }
 
 		return err
 	})

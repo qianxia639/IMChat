@@ -13,31 +13,47 @@ type Friend struct {
 	UserID int32 `json:"user_id"`
 	// 好友Id
 	FriendID int32 `json:"friend_id"`
+	// 好友状态, 1: 在线, 2: 离线
+	Status int16 `json:"status"`
 	// 好友备注
 	Note string `json:"note"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
 }
 
-type FriendApply struct {
-	// 所有者Id
+type FriendClusterApply struct {
+	// 主键Id
+	ID int64 `json:"id"`
+	// 申请者的用户Id
 	ApplyID int32 `json:"apply_id"`
-	// 目标对象Id
-	ReplyID int32 `json:"reply_id"`
+	// 接收者的用户或群组Id
+	ReceiverID int32 `json:"receiver_id"`
 	// 申请描述
 	ApplyDesc string `json:"apply_desc"`
-	// 备注
-	Note string `json:"note"`
-	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	// 申请状态, 0: 等待中, 1: 同意, 2: 拒绝
+	Status int16 `json:"status"`
+	// 申请标识, 0: 好友, 1: 群组
+	Flag int16 `json:"flag"`
+	// 申请时间
+	ApplyTime time.Time `json:"apply_time"`
+	// 响应时间
+	ResponseTime time.Time `json:"response_time"`
 }
 
 type Message struct {
-	ID          int64     `json:"id"`
-	SendID      int32     `json:"send_id"`
-	ReceiveID   int32     `json:"receive_id"`
-	Content     string    `json:"content"`
-	SendTime    time.Time `json:"send_time"`
+	// 主键Id
+	ID int64 `json:"id"`
+	// 消息发送者Id
+	SenderID int32 `json:"sender_id"`
+	// 消息接收者Id
+	ReceiverID int32 `json:"receiver_id"`
+	// 消息内容
+	Content string `json:"content"`
+	// 消息类型
+	Type int16 `json:"type"`
+	// 消息发送时间
+	SendTime time.Time `json:"send_time"`
+	// 消息读取时间
 	ReceiveTime time.Time `json:"receive_time"`
 }
 

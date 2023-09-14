@@ -12,7 +12,7 @@ import (
 const addFriend = `-- name: AddFriend :one
 INSERT INTO friends (user_id, friend_id, note)
 VALUEs ($1, $2, $3) 
-RETURNING user_id, friend_id, note, created_at
+RETURNING user_id, friend_id, status, note, created_at
 `
 
 type AddFriendParams struct {
@@ -27,6 +27,7 @@ func (q *Queries) AddFriend(ctx context.Context, arg *AddFriendParams) (Friend, 
 	err := row.Scan(
 		&i.UserID,
 		&i.FriendID,
+		&i.Status,
 		&i.Note,
 		&i.CreatedAt,
 	)
@@ -50,7 +51,7 @@ func (q *Queries) DeleteFriend(ctx context.Context, arg *DeleteFriendParams) err
 }
 
 const getFriend = `-- name: GetFriend :one
-SELECT user_id, friend_id, note, created_at FROM friends
+SELECT user_id, friend_id, status, note, created_at FROM friends
 WHERE 
     user_id = $1 AND friend_id = $2
 `
@@ -66,6 +67,7 @@ func (q *Queries) GetFriend(ctx context.Context, arg *GetFriendParams) (Friend, 
 	err := row.Scan(
 		&i.UserID,
 		&i.FriendID,
+		&i.Status,
 		&i.Note,
 		&i.CreatedAt,
 	)
@@ -110,7 +112,7 @@ SET
     note = $1
 WHERE
     user_id = $2 AND friend_id = $3
-RETURNING user_id, friend_id, note, created_at
+RETURNING user_id, friend_id, status, note, created_at
 `
 
 type UpdateFriendNoteParams struct {
@@ -125,6 +127,7 @@ func (q *Queries) UpdateFriendNote(ctx context.Context, arg *UpdateFriendNotePar
 	err := row.Scan(
 		&i.UserID,
 		&i.FriendID,
+		&i.Status,
 		&i.Note,
 		&i.CreatedAt,
 	)

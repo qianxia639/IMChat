@@ -1,2 +1,2 @@
 DROP TABLE IF EXISTS friends;
-DROP TABLE IF EXISTS friend_checks;
+DROP TABLE IF EXISTS friend_cluster_applys;

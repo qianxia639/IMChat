@@ -12,16 +12,14 @@ type Querier interface {
 	AddFriend(ctx context.Context, arg *AddFriendParams) (Friend, error)
 	AddMessage(ctx context.Context, arg *AddMessageParams) (Message, error)
 	AddUserLoginLog(ctx context.Context, arg *AddUserLoginLogParams) (UserLoginLog, error)
-	CreateFriendApply(ctx context.Context, arg *CreateFriendApplyParams) (FriendApply, error)
+	CreateFriendClsuterApply(ctx context.Context, arg *CreateFriendClsuterApplyParams) (FriendClusterApply, error)
 	CreateUser(ctx context.Context, arg *CreateUserParams) (User, error)
 	DeleteFriend(ctx context.Context, arg *DeleteFriendParams) error
-	DeleteFriendApply(ctx context.Context, arg *DeleteFriendApplyParams) error
 	DeleteUser(ctx context.Context, id int32) error
+	ExistsFriendClusterApply(ctx context.Context, arg *ExistsFriendClusterApplyParams) (int64, error)
 	GetFriend(ctx context.Context, arg *GetFriendParams) (Friend, error)
-	GetFriendApply(ctx context.Context, arg *GetFriendApplyParams) (FriendApply, error)
 	GetLastUserLoginLog(ctx context.Context, userID int32) (UserLoginLog, error)
 	GetUser(ctx context.Context, username string) (User, error)
-	ListFriendApply(ctx context.Context, replyID int32) ([]ListFriendApplyRow, error)
 	ListFriends(ctx context.Context, id int32) ([]ListFriendsRow, error)
 	UpdateFriendNote(ctx context.Context, arg *UpdateFriendNoteParams) (Friend, error)
 	UpdateLastUserLoginLog(ctx context.Context, userID int32) error

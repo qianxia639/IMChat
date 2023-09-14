@@ -39,13 +39,14 @@ func (friendService *FriendService) AddFriend(ctx context.Context, req *pb.AddFr
 		return nil, status.Error(codes.InvalidArgument, "不能添加自己为好友")
 	}
 
-	friend, err := friendService.store.GetFriendApply(ctx, &db.GetFriendApplyParams{
-		ApplyID: req.GetFriendId(),
-		ReplyID: user.ID,
-	})
-	if friend.ReplyID != user.ID && err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get friend apply: %v", err)
-	}
+	// TOTO 需要更改
+	// friend, err := friendService.store.GetFriendApply(ctx, &db.GetFriendApplyParams{
+	// 	ApplyID: req.GetFriendId(),
+	// 	ReplyID: user.ID,
+	// })
+	// if friend.ReplyID != user.ID && err != nil {
+	// 	return nil, status.Errorf(codes.Internal, "failed to get friend apply: %v", err)
+	// }
 
 	arg := &db.AddFriendTxParams{
 		UserID:   user.ID,

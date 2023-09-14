@@ -8,32 +8,32 @@ import "command.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
-service FriendApplyService {
-    rpc CreateFriendApply (CreateFriendApplyRequest) returns (CreateFriendApplyResponse) {
+service FriendClusterApplyService {
+    rpc CreateFriendClusterApply (CreateFriendClusterApplyRequest) returns (CreateFriendClusterApplyResponse) {
         option (google.api.http) = {
             post: "/v1/friend/apply"
             body: "*"
         };
     };
 
-    rpc ListFriendApply (EmptyRequest) returns (stream ListFriendApplyResponse) {
+    rpc ListFriendClusterApply (EmptyRequest) returns (stream ListFriendClusterApplyResponse) {
         option (google.api.http) = {
             get: "/v1/friend/apply"
         };
     };
 }
 
-message CreateFriendApplyRequest {
-    int32 reply_id = 1;
+message CreateFriendClusterApplyRequest {
+    int32 receiver_id = 1;
     string apply_desc = 2;
-    string note = 3;
+    int32 flag = 3;
 }
 
-message CreateFriendApplyResponse {
+message CreateFriendClusterApplyResponse {
     string message = 1;
 }
 
-message ListFriendApplyResponse {
+message ListFriendClusterApplyResponse {
     int32 reply_id = 1;
     string nickname = 2;
     string apply_desc = 3;

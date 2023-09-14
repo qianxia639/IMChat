@@ -95,19 +95,19 @@ func (mr *MockStoreMockRecorder) AddUserLoginLog(arg0, arg1 interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddUserLoginLog", reflect.TypeOf((*MockStore)(nil).AddUserLoginLog), arg0, arg1)
 }
 
-// CreateFriendApply mocks base method.
-func (m *MockStore) CreateFriendApply(arg0 context.Context, arg1 *db.CreateFriendApplyParams) (db.FriendApply, error) {
+// CreateFriendClsuterApply mocks base method.
+func (m *MockStore) CreateFriendClsuterApply(arg0 context.Context, arg1 *db.CreateFriendClsuterApplyParams) (db.FriendClusterApply, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateFriendApply", arg0, arg1)
-	ret0, _ := ret[0].(db.FriendApply)
+	ret := m.ctrl.Call(m, "CreateFriendClsuterApply", arg0, arg1)
+	ret0, _ := ret[0].(db.FriendClusterApply)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CreateFriendApply indicates an expected call of CreateFriendApply.
-func (mr *MockStoreMockRecorder) CreateFriendApply(arg0, arg1 interface{}) *gomock.Call {
+// CreateFriendClsuterApply indicates an expected call of CreateFriendClsuterApply.
+func (mr *MockStoreMockRecorder) CreateFriendClsuterApply(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFriendApply", reflect.TypeOf((*MockStore)(nil).CreateFriendApply), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFriendClsuterApply", reflect.TypeOf((*MockStore)(nil).CreateFriendClsuterApply), arg0, arg1)
 }
 
 // CreateUser mocks base method.
@@ -139,20 +139,6 @@ func (mr *MockStoreMockRecorder) DeleteFriend(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFriend", reflect.TypeOf((*MockStore)(nil).DeleteFriend), arg0, arg1)
 }
 
-// DeleteFriendApply mocks base method.
-func (m *MockStore) DeleteFriendApply(arg0 context.Context, arg1 *db.DeleteFriendApplyParams) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteFriendApply", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeleteFriendApply indicates an expected call of DeleteFriendApply.
-func (mr *MockStoreMockRecorder) DeleteFriendApply(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFriendApply", reflect.TypeOf((*MockStore)(nil).DeleteFriendApply), arg0, arg1)
-}
-
 // DeleteFriendTx mocks base method.
 func (m *MockStore) DeleteFriendTx(arg0 context.Context, arg1 *db.DeleteFriendTxParams) error {
 	m.ctrl.T.Helper()
@@ -181,6 +167,21 @@ func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1)
 }
 
+// ExistsFriendClusterApply mocks base method.
+func (m *MockStore) ExistsFriendClusterApply(arg0 context.Context, arg1 *db.ExistsFriendClusterApplyParams) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExistsFriendClusterApply", arg0, arg1)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExistsFriendClusterApply indicates an expected call of ExistsFriendClusterApply.
+func (mr *MockStoreMockRecorder) ExistsFriendClusterApply(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsFriendClusterApply", reflect.TypeOf((*MockStore)(nil).ExistsFriendClusterApply), arg0, arg1)
+}
+
 // GetFriend mocks base method.
 func (m *MockStore) GetFriend(arg0 context.Context, arg1 *db.GetFriendParams) (db.Friend, error) {
 	m.ctrl.T.Helper()
@@ -194,21 +195,6 @@ func (m *MockStore) GetFriend(arg0 context.Context, arg1 *db.GetFriendParams) (d
 func (mr *MockStoreMockRecorder) GetFriend(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriend", reflect.TypeOf((*MockStore)(nil).GetFriend), arg0, arg1)
-}
-
-// GetFriendApply mocks base method.
-func (m *MockStore) GetFriendApply(arg0 context.Context, arg1 *db.GetFriendApplyParams) (db.FriendApply, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFriendApply", arg0, arg1)
-	ret0, _ := ret[0].(db.FriendApply)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetFriendApply indicates an expected call of GetFriendApply.
-func (mr *MockStoreMockRecorder) GetFriendApply(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendApply", reflect.TypeOf((*MockStore)(nil).GetFriendApply), arg0, arg1)
 }
 
 // GetLastUserLoginLog mocks base method.
@@ -239,21 +225,6 @@ func (m *MockStore) GetUser(arg0 context.Context, arg1 string) (db.User, error) 
 func (mr *MockStoreMockRecorder) GetUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockStore)(nil).GetUser), arg0, arg1)
-}
-
-// ListFriendApply mocks base method.
-func (m *MockStore) ListFriendApply(arg0 context.Context, arg1 int32) ([]db.ListFriendApplyRow, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListFriendApply", arg0, arg1)
-	ret0, _ := ret[0].([]db.ListFriendApplyRow)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListFriendApply indicates an expected call of ListFriendApply.
-func (mr *MockStoreMockRecorder) ListFriendApply(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFriendApply", reflect.TypeOf((*MockStore)(nil).ListFriendApply), arg0, arg1)
 }
 
 // ListFriends mocks base method.

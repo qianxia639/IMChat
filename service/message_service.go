@@ -36,9 +36,9 @@ func (messageService *MessageService) SendMessage(stream pb.MessageService_SendM
 
 		// 持久化消息
 		arg := &db.AddMessageParams{
-			SendID:    user.ID,
-			ReceiveID: in.ReceiveId,
-			Content:   in.Content,
+			SenderID:   user.ID,
+			ReceiverID: in.ReceiveId,
+			Content:    in.Content,
 		}
 		msg, err := messageService.store.AddMessage(ctx, arg)
 		if err != nil {

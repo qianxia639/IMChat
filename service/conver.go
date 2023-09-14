@@ -21,8 +21,8 @@ func converUser(user db.User) *pb.User {
 
 func converMesagge(message db.Message) *pb.Message {
 	return &pb.Message{
-		SendId:      message.SendID,
-		ReceiveId:   message.ReceiveID,
+		SendId:      message.SenderID,
+		ReceiveId:   message.ReceiverID,
 		Content:     message.Content,
 		SendTime:    timestamppb.New(message.SendTime),
 		ReceiveTime: timestamppb.New(message.ReceiveTime),

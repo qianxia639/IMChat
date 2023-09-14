@@ -1,6 +1,6 @@
 -- name: AddMessage :one
 INSERT INTO messages (
-    send_id, receive_id, content
+    sender_id, receiver_id, content
 ) VALUES (
     $1, $2, $3
 )
