@@ -227,6 +227,21 @@ func (mr *MockStoreMockRecorder) GetUser(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockStore)(nil).GetUser), arg0, arg1)
 }
 
+// ListFriendClusterApply mocks base method.
+func (m *MockStore) ListFriendClusterApply(arg0 context.Context, arg1 int32) ([]db.ListFriendClusterApplyRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListFriendClusterApply", arg0, arg1)
+	ret0, _ := ret[0].([]db.ListFriendClusterApplyRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFriendClusterApply indicates an expected call of ListFriendClusterApply.
+func (mr *MockStoreMockRecorder) ListFriendClusterApply(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFriendClusterApply", reflect.TypeOf((*MockStore)(nil).ListFriendClusterApply), arg0, arg1)
+}
+
 // ListFriends mocks base method.
 func (m *MockStore) ListFriends(arg0 context.Context, arg1 int32) ([]db.ListFriendsRow, error) {
 	m.ctrl.T.Helper()

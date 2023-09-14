@@ -4,10 +4,10 @@ import (
 	db "IMChat/db/sqlc"
 	"IMChat/pb"
 	"context"
-	"fmt"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type FriendClusterApplyService struct {
@@ -80,33 +80,26 @@ func (friendClusterApplyService *FriendClusterApplyService) CreateFriendClusterA
 	}, nil
 }
 
-func (friendClusterApplyService *FriendClusterApplyService) ListFriendApply(req *pb.EmptyRequest, stream pb.FriendClusterApplyService_ListFriendClusterApplyServer) error {
+func (friendClusterApplyService *FriendClusterApplyService) ListFriendClusterApply(req *pb.EmptyRequest, stream pb.FriendClusterApplyService_ListFriendClusterApplyServer) error {
 	ctx := stream.Context()
-	payload, err := friendClusterApplyService.authorization(ctx)
+	user, err := friendClusterApplyService.getUserInfo(ctx)
 	if err != nil {
-		return unauthenticatedError(err)
+		return err
 	}
 
-	var user db.User
-	userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
-	err = friendClusterApplyService.cache.Get(ctx, userInfoKey).Scan(&user)
-	if err != nil {
-		return status.Errorf(codes.Internal, "get cache error: %v", err)
+	friendClusterApplys, _ := friendClusterApplyService.store.ListFriendClusterApply(ctx, user.ID)
+	for _, friendClusterApply := range friendClusterApplys {
+		res := &pb.ListFriendClusterApplyResponse{
+			ApplyId:   friendClusterApply.ApplyID,
+			Nickname:  friendClusterApply.Nickname,
+			ApplyDesc: friendClusterApply.ApplyDesc,
+			Flag:      int32(friendClusterApply.Flag),
+			ApplyTime: timestamppb.New(friendClusterApply.ApplyTime),
+		}
+		if err := stream.Send(res); err != nil {
+			return err
+		}
 	}
-
-	// TODO 需要更改
-	// friendApplys, _ := friendClusterApplyService.store.ListFriendApply(ctx, user.ID)
-	// for _, friendApply := range friendApplys {
-	// 	res := &pb.ListFriendClusterApplyResponse{
-	// 		ReplyId:   friendApply.ApplyID,
-	// 		Nickname:  friendApply.Nickname,
-	// 		ApplyDesc: friendApply.ApplyDesc,
-	// 		CreatedAt: timestamppb.New(friendApply.CreatedAt),
-	// 	}
-	// 	if err := stream.Send(res); err != nil {
-	// 		return err
-	// 	}
-	// }
 
 	return nil
 }

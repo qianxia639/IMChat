@@ -10,11 +10,11 @@ SELECT COUNT(*) FROM friend_cluster_apply
 WHERE
     apply_id = $1 AND receiver_id = $2 AND status = 0 AND flag = $3;
 
--- name: ListFriendApply :many
--- SELECt 
---     fp.apply_id, u.nickname, fp.apply_desc, fp.created_at
--- FROM friend_apply AS fp
--- JOIN users AS u ON fp.apply_id = u.id AND fp.reply_id = $1;
+-- name: ListFriendClusterApply :many
+SELECT fca.apply_id, u.nickname, fca.apply_desc,  fca.flag, fca.apply_time
+FROM friend_cluster_apply fca
+JOIN users u ON fca.apply_id = u.id
+WHERE fca.receiver_id = $1 AND fca.status = 0;
 
 -- name: DeleteFriendApply :exec
 -- DELETE FROM friend_apply 

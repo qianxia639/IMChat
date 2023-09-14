@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const createFriendClsuterApply = `-- name: CreateFriendClsuterApply :one
@@ -62,4 +63,45 @@ func (q *Queries) ExistsFriendClusterApply(ctx context.Context, arg *ExistsFrien
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const listFriendClusterApply = `-- name: ListFriendClusterApply :many
+SELECT fca.apply_id, u.nickname, fca.apply_desc, fca.apply_time, fca.flag
+FROM friend_cluster_apply fca
+JOIN users u ON fca.apply_id = u.id
+WHERE fca.receiver_id = $1 AND fca.status = 0
+`
+
+type ListFriendClusterApplyRow struct {
+	ApplyID   int32     `json:"apply_id"`
+	Nickname  string    `json:"nickname"`
+	ApplyDesc string    `json:"apply_desc"`
+	ApplyTime time.Time `json:"apply_time"`
+	Flag      int16     `json:"flag"`
+}
+
+func (q *Queries) ListFriendClusterApply(ctx context.Context, receiverID int32) ([]ListFriendClusterApplyRow, error) {
+	rows, err := q.db.Query(ctx, listFriendClusterApply, receiverID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListFriendClusterApplyRow
+	for rows.Next() {
+		var i ListFriendClusterApplyRow
+		if err := rows.Scan(
+			&i.ApplyID,
+			&i.Nickname,
+			&i.ApplyDesc,
+			&i.ApplyTime,
+			&i.Flag,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

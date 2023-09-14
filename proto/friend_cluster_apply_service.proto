@@ -34,8 +34,9 @@ message CreateFriendClusterApplyResponse {
 }
 
 message ListFriendClusterApplyResponse {
-    int32 reply_id = 1;
+    int32 apply_id = 1;
     string nickname = 2;
     string apply_desc = 3;
-    google.protobuf.Timestamp created_at = 4;
+    int32 flag = 4;
+    google.protobuf.Timestamp apply_time = 5;
 }
