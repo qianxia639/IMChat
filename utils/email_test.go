@@ -18,3 +18,8 @@ func TestMail(t *testing.T) {
 	err := SendMail(to, subject, body)
 	require.NoError(t, err)
 }
+
+func TestDesensitizationEmail(t *testing.T) {
+	res := DesensitizationEmail("example@example.com")
+	t.Logf("res: %s", res)
+}
