@@ -22,6 +22,9 @@ type Querier interface {
 	GetUser(ctx context.Context, username string) (User, error)
 	ListFriendClusterApply(ctx context.Context, receiverID int32) ([]ListFriendClusterApplyRow, error)
 	ListFriends(ctx context.Context, id int32) ([]ListFriendsRow, error)
+	// DELETE FROM friend_cluster_apply
+	// WHERE apply_id = $1 AND reply_id = $2;
+	UpdateFriendClusterApply(ctx context.Context, arg *UpdateFriendClusterApplyParams) error
 	UpdateFriendNote(ctx context.Context, arg *UpdateFriendNoteParams) (Friend, error)
 	UpdateLastUserLoginLog(ctx context.Context, userID int32) error
 	UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, error)

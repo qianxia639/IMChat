@@ -26,7 +26,11 @@ service FriendClusterApplyService {
 message CreateFriendClusterApplyRequest {
     int32 receiver_id = 1;
     string apply_desc = 2;
-    int32 flag = 3;
+    enum Flag {
+        FRIEND = 0;
+        CLUSTER = 1;
+    }
+    Flag flag = 3;
 }
 
 message CreateFriendClusterApplyResponse {

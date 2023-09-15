@@ -257,6 +257,20 @@ func (mr *MockStoreMockRecorder) ListFriends(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFriends", reflect.TypeOf((*MockStore)(nil).ListFriends), arg0, arg1)
 }
 
+// UpdateFriendClusterApply mocks base method.
+func (m *MockStore) UpdateFriendClusterApply(arg0 context.Context, arg1 *db.UpdateFriendClusterApplyParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateFriendClusterApply", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateFriendClusterApply indicates an expected call of UpdateFriendClusterApply.
+func (mr *MockStoreMockRecorder) UpdateFriendClusterApply(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFriendClusterApply", reflect.TypeOf((*MockStore)(nil).UpdateFriendClusterApply), arg0, arg1)
+}
+
 // UpdateFriendNote mocks base method.
 func (m *MockStore) UpdateFriendNote(arg0 context.Context, arg1 *db.UpdateFriendNoteParams) (db.Friend, error) {
 	m.ctrl.T.Helper()

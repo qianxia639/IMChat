@@ -66,7 +66,7 @@ func (q *Queries) ExistsFriendClusterApply(ctx context.Context, arg *ExistsFrien
 }
 
 const listFriendClusterApply = `-- name: ListFriendClusterApply :many
-SELECT fca.apply_id, u.nickname, fca.apply_desc, fca.apply_time, fca.flag
+SELECT fca.apply_id, u.nickname, fca.apply_desc,  fca.flag, fca.apply_time
 FROM friend_cluster_apply fca
 JOIN users u ON fca.apply_id = u.id
 WHERE fca.receiver_id = $1 AND fca.status = 0
@@ -76,8 +76,8 @@ type ListFriendClusterApplyRow struct {
 	ApplyID   int32     `json:"apply_id"`
 	Nickname  string    `json:"nickname"`
 	ApplyDesc string    `json:"apply_desc"`
-	ApplyTime time.Time `json:"apply_time"`
 	Flag      int16     `json:"flag"`
+	ApplyTime time.Time `json:"apply_time"`
 }
 
 func (q *Queries) ListFriendClusterApply(ctx context.Context, receiverID int32) ([]ListFriendClusterApplyRow, error) {
@@ -93,8 +93,8 @@ func (q *Queries) ListFriendClusterApply(ctx context.Context, receiverID int32) 
 			&i.ApplyID,
 			&i.Nickname,
 			&i.ApplyDesc,
-			&i.ApplyTime,
 			&i.Flag,
+			&i.ApplyTime,
 		); err != nil {
 			return nil, err
 		}
@@ -104,4 +104,27 @@ func (q *Queries) ListFriendClusterApply(ctx context.Context, receiverID int32) 
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateFriendClusterApply = `-- name: UpdateFriendClusterApply :exec
+UPDATE friend_cluster_apply
+SET
+    status = $1
+WHERE 
+    (apply_id = $2 AND receiver_id = $3 AND status = 0)
+    OR
+    (apply_id = $3 AND receiver_id = $2 AND status = 0)
+`
+
+type UpdateFriendClusterApplyParams struct {
+	Status     int16 `json:"status"`
+	ApplyID    int32 `json:"apply_id"`
+	ReceiverID int32 `json:"receiver_id"`
+}
+
+// DELETE FROM friend_cluster_apply
+// WHERE apply_id = $1 AND reply_id = $2;
+func (q *Queries) UpdateFriendClusterApply(ctx context.Context, arg *UpdateFriendClusterApplyParams) error {
+	_, err := q.db.Exec(ctx, updateFriendClusterApply, arg.Status, arg.ApplyID, arg.ReceiverID)
+	return err
 }

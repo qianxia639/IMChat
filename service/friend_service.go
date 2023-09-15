@@ -23,23 +23,16 @@ func NewFriendService(server Server) pb.FriendServiceServer {
 
 func (friendService *FriendService) AddFriend(ctx context.Context, req *pb.AddFriendRequest) (*pb.AddFriendResponse, error) {
 
-	payload, err := friendService.authorization(ctx)
+	user, err := friendService.getUserInfo(ctx)
 	if err != nil {
-		return nil, unauthenticatedError(err)
-	}
-
-	userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
-	var user db.User
-	err = friendService.cache.Get(ctx, userInfoKey).Scan(&user)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "faile to get cache: %v", err)
+		return nil, err
 	}
 
 	if user.ID == req.GetFriendId() {
 		return nil, status.Error(codes.InvalidArgument, "不能添加自己为好友")
 	}
 
-	// TOTO 需要更改
+	// TODO 需要更改
 	// friend, err := friendService.store.GetFriendApply(ctx, &db.GetFriendApplyParams{
 	// 	ApplyID: req.GetFriendId(),
 	// 	ReplyID: user.ID,
@@ -48,9 +41,20 @@ func (friendService *FriendService) AddFriend(ctx context.Context, req *pb.AddFr
 	// 	return nil, status.Errorf(codes.Internal, "failed to get friend apply: %v", err)
 	// }
 
+	// 判断是否是申请列表中的数据
+	count, _ := friendService.store.ExistsFriendClusterApply(ctx, &db.ExistsFriendClusterApplyParams{
+		ApplyID:    req.FriendId,
+		ReceiverID: user.ID,
+		Flag:       0,
+	})
+	if count < 1 {
+		return nil, status.Errorf(codes.Internal, "数据不匹配")
+	}
+
 	arg := &db.AddFriendTxParams{
 		UserID:   user.ID,
 		FriendID: req.GetFriendId(),
+		Status:   req.GetStatus(),
 		Note:     req.Note,
 	}
 

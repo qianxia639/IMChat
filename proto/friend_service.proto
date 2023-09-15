@@ -37,7 +37,8 @@ service FriendService {
 
 message AddFriendRequest {
     int32 friend_id = 1;
-    string note = 2;
+    int32 status = 2;
+    string note = 3;
 }
 
 message AddFriendResponse {

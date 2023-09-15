@@ -5,6 +5,7 @@ import "context"
 type AddFriendTxParams struct {
 	UserID   int32  `json:"user_id"`
 	FriendID int32  `json:"friend_id"`
+	Status   int32  `json:"status"`
 	Note     string `json:"note"`
 }
 
@@ -29,6 +30,24 @@ func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) 
 			return err
 		}
 
+		// 更新申请表中的状态
+		err = q.UpdateFriendClusterApply(ctx, &UpdateFriendClusterApplyParams{
+			Status:     int16(arg.Status),
+			ApplyID:    arg.UserID,
+			ReceiverID: arg.FriendID,
+		})
+		if err != nil {
+			return err
+		}
+
+		// err = q.UpdateFriendClusterApply(ctx, &UpdateFriendClusterApplyParams{
+		// 	Status:     int16(arg.Status),
+		// 	ApplyID:    arg.FriendID,
+		// 	ReceiverID: arg.UserID,
+		// })
+		// if err != nil {
+		// 	return err
+		// }
 		// err = q.DeleteFriendApply(ctx, &DeleteFriendApplyParams{
 		// 	ApplyID: arg.UserID,
 		// 	ReplyID: arg.FriendID,
