@@ -1,16 +1,33 @@
 package db
 
-import "context"
+import (
+	"context"
 
-type AddFriendTxParams struct {
+	"github.com/rs/zerolog/log"
+)
+
+type ReplyFriendClusterApplyTxTxParams struct {
 	UserID   int32  `json:"user_id"`
 	FriendID int32  `json:"friend_id"`
 	Status   int32  `json:"status"`
+	Flag     int32  `json:"flag"`
 	Note     string `json:"note"`
 }
 
-func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) (friend Friend, err error) {
+func (store *SQLStore) ReplyFriendClusterApplyTx(ctx context.Context, arg *ReplyFriendClusterApplyTxTxParams) (friend Friend, err error) {
 	err = store.execTx(ctx, func(q *Queries) error {
+		if arg.Status == 2 { // 拒绝
+			// 更新申请表中的状态
+			return q.UpdateFriendClusterApply(ctx, &UpdateFriendClusterApplyParams{
+				Status:     int16(arg.Status),
+				ApplyID:    arg.UserID,
+				ReceiverID: arg.FriendID,
+			})
+			// if err != nil {
+			// 	log.Error().Err(err).Int("applyId", int(arg.FriendID)).Int("receiverId", int(arg.UserID)).Int("status", int(arg.Status)).Msg("update friend cluster apply error")
+			// 	return err
+			// }
+		}
 		var err error
 		friend, err = q.AddFriend(ctx, &AddFriendParams{
 			UserID:   arg.UserID,
@@ -18,6 +35,7 @@ func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) 
 			Note:     arg.Note,
 		})
 		if err != nil {
+			log.Error().Err(err).Int("userId", int(arg.UserID)).Int("friendId", int(arg.FriendID)).Msg("add friend error 1")
 			return err
 		}
 
@@ -27,6 +45,7 @@ func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) 
 			Note:     arg.Note,
 		})
 		if err != nil {
+			log.Error().Err(err).Int("userId", int(arg.FriendID)).Int("friendId", int(arg.UserID)).Msg("add friend error 2")
 			return err
 		}
 
@@ -37,6 +56,7 @@ func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) 
 			ReceiverID: arg.FriendID,
 		})
 		if err != nil {
+			log.Error().Err(err).Int("applyId", int(arg.FriendID)).Int("receiverId", int(arg.UserID)).Int("status", int(arg.Status)).Msg("update friend cluster apply error")
 			return err
 		}
 
@@ -44,21 +64,6 @@ func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) 
 		// 	Status:     int16(arg.Status),
 		// 	ApplyID:    arg.FriendID,
 		// 	ReceiverID: arg.UserID,
-		// })
-		// if err != nil {
-		// 	return err
-		// }
-		// err = q.DeleteFriendApply(ctx, &DeleteFriendApplyParams{
-		// 	ApplyID: arg.UserID,
-		// 	ReplyID: arg.FriendID,
-		// })
-		// if err != nil {
-		// 	return err
-		// }
-
-		// err = q.DeleteFriendApply(ctx, &DeleteFriendApplyParams{
-		// 	ApplyID: arg.FriendID,
-		// 	ReplyID: arg.UserID,
 		// })
 		// if err != nil {
 		// 	return err

@@ -9,7 +9,7 @@ import (
 
 type Store interface {
 	Querier
-	AddFriendTx(ctx context.Context, arg *AddFriendTxParams) (Friend, error)
+	ReplyFriendClusterApplyTx(ctx context.Context, arg *ReplyFriendClusterApplyTxTxParams) (Friend, error)
 	DeleteFriendTx(ctx context.Context, arg *DeleteFriendTxParams) error
 }
 

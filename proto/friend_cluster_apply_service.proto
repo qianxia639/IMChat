@@ -16,6 +16,13 @@ service FriendClusterApplyService {
         };
     };
 
+    rpc ReplyFriendClusterApply (ReplyFriendClusterApplyRequest) returns (ReplyFriendClusterApplyResponse) {
+        option (google.api.http) = {
+            post: "/v1/friend/reply"
+            body: "*"
+        };
+    };
+
     rpc ListFriendClusterApply (EmptyRequest) returns (stream ListFriendClusterApplyResponse) {
         option (google.api.http) = {
             get: "/v1/friend/apply"
@@ -23,17 +30,29 @@ service FriendClusterApplyService {
     };
 }
 
+enum Flag {
+    FRIEND = 0;
+    CLUSTER = 1;
+}
+
 message CreateFriendClusterApplyRequest {
     int32 receiver_id = 1;
     string apply_desc = 2;
-    enum Flag {
-        FRIEND = 0;
-        CLUSTER = 1;
-    }
     Flag flag = 3;
 }
 
 message CreateFriendClusterApplyResponse {
+    string message = 1;
+}
+
+message ReplyFriendClusterApplyRequest {
+    int32 friend_id = 1;
+    int32 status = 2;
+    Flag flag = 3;
+    string note = 4;
+}
+
+message ReplyFriendClusterApplyResponse {
     string message = 1;
 }
 

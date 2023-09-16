@@ -50,21 +50,6 @@ func (mr *MockStoreMockRecorder) AddFriend(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddFriend", reflect.TypeOf((*MockStore)(nil).AddFriend), arg0, arg1)
 }
 
-// AddFriendTx mocks base method.
-func (m *MockStore) AddFriendTx(arg0 context.Context, arg1 *db.AddFriendTxParams) (db.Friend, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddFriendTx", arg0, arg1)
-	ret0, _ := ret[0].(db.Friend)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AddFriendTx indicates an expected call of AddFriendTx.
-func (mr *MockStoreMockRecorder) AddFriendTx(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddFriendTx", reflect.TypeOf((*MockStore)(nil).AddFriendTx), arg0, arg1)
-}
-
 // AddMessage mocks base method.
 func (m *MockStore) AddMessage(arg0 context.Context, arg1 *db.AddMessageParams) (db.Message, error) {
 	m.ctrl.T.Helper()
@@ -255,6 +240,21 @@ func (m *MockStore) ListFriends(arg0 context.Context, arg1 int32) ([]db.ListFrie
 func (mr *MockStoreMockRecorder) ListFriends(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFriends", reflect.TypeOf((*MockStore)(nil).ListFriends), arg0, arg1)
+}
+
+// ReplyFriendClusterApplyTx mocks base method.
+func (m *MockStore) ReplyFriendClusterApplyTx(arg0 context.Context, arg1 *db.ReplyFriendClusterApplyTxTxParams) (db.Friend, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReplyFriendClusterApplyTx", arg0, arg1)
+	ret0, _ := ret[0].(db.Friend)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ReplyFriendClusterApplyTx indicates an expected call of ReplyFriendClusterApplyTx.
+func (mr *MockStoreMockRecorder) ReplyFriendClusterApplyTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReplyFriendClusterApplyTx", reflect.TypeOf((*MockStore)(nil).ReplyFriendClusterApplyTx), arg0, arg1)
 }
 
 // UpdateFriendClusterApply mocks base method.

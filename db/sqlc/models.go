@@ -13,8 +13,6 @@ type Friend struct {
 	UserID int32 `json:"user_id"`
 	// 好友Id
 	FriendID int32 `json:"friend_id"`
-	// 好友状态, 1: 在线, 2: 离线
-	Status int16 `json:"status"`
 	// 好友备注
 	Note string `json:"note"`
 	// 创建时间
@@ -37,7 +35,7 @@ type FriendClusterApply struct {
 	// 申请时间
 	ApplyTime time.Time `json:"apply_time"`
 	// 响应时间
-	ResponseTime time.Time `json:"response_time"`
+	ReplyTime time.Time `json:"reply_time"`
 }
 
 type Message struct {

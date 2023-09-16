@@ -80,6 +80,61 @@ func (friendClusterApplyService *FriendClusterApplyService) CreateFriendClusterA
 	}, nil
 }
 
+func (friendClusterApplyService *FriendClusterApplyService) ReplyFriendClusterApply(ctx context.Context, req *pb.ReplyFriendClusterApplyRequest) (*pb.ReplyFriendClusterApplyResponse, error) {
+	user, err := friendClusterApplyService.getUserInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.ID == req.GetFriendId() && req.Flag == pb.Flag_FRIEND {
+		return nil, status.Error(codes.InvalidArgument, "不能添加自己为好友")
+	}
+
+	// 判断该申请是否存在与申请表中
+
+	// 判断是否已经是好友或意在群组中
+
+	// 添加记录
+
+	// TODO 需要更改
+	// friend, err := friendService.store.GetFriendApply(ctx, &db.GetFriendApplyParams{
+	// 	ApplyID: req.GetFriendId(),
+	// 	ReplyID: user.ID,
+	// })
+	// if friend.ReplyID != user.ID && err != nil {
+	// 	return nil, status.Errorf(codes.Internal, "failed to get friend apply: %v", err)
+	// }
+
+	// 判断是否是申请列表中的数据
+	count, _ := friendClusterApplyService.store.ExistsFriendClusterApply(ctx, &db.ExistsFriendClusterApplyParams{
+		ApplyID:    req.FriendId,
+		ReceiverID: user.ID,
+		Flag:       int16(req.GetFlag()),
+	})
+	if count < 1 {
+		return nil, status.Errorf(codes.InvalidArgument, "非法的数据")
+	}
+
+	arg := &db.ReplyFriendClusterApplyTxTxParams{
+		UserID:   user.ID,
+		FriendID: req.GetFriendId(),
+		Status:   req.GetStatus(),
+		Flag:     int32(req.GetFlag()),
+		Note:     req.Note,
+	}
+
+	_, err = friendClusterApplyService.store.ReplyFriendClusterApplyTx(ctx, arg)
+	if err != nil {
+		pgErr := db.ErrorCode(err)
+		if pgErr == db.ForeignKeyViolation || pgErr == db.UniqueViolation {
+			return nil, status.Errorf(codes.AlreadyExists, "faile add friend error: %v", err)
+		}
+		return nil, status.Errorf(codes.Internal, "filaed to add friend: %v", err)
+	}
+
+	return &pb.ReplyFriendClusterApplyResponse{Message: "Successfully..."}, nil
+}
+
 func (friendClusterApplyService *FriendClusterApplyService) ListFriendClusterApply(req *pb.EmptyRequest, stream pb.FriendClusterApplyService_ListFriendClusterApplyServer) error {
 	ctx := stream.Context()
 	user, err := friendClusterApplyService.getUserInfo(ctx)

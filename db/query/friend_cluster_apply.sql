@@ -23,9 +23,9 @@ UPDATE friend_cluster_apply
 SET
     status = @status
 WHERE 
-    (apply_id = @apply_id AND receiver_id = @receiver_id AND status = 0)
+    (apply_id = @apply_id AND receiver_id = @receiver_id AND status = 0 AND flag = @flag)
     OR
-    (apply_id = @receiver_id AND receiver_id = @apply_id AND status = 0);
+    (apply_id = @receiver_id AND receiver_id = @apply_id AND status = 0 AND flag = @flag);
 
 -- name: GetFriendApply :one
 -- SELECT * FROM friend_apply

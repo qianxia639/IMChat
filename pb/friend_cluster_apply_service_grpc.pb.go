@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FriendClusterApplyServiceClient interface {
 	CreateFriendClusterApply(ctx context.Context, in *CreateFriendClusterApplyRequest, opts ...grpc.CallOption) (*CreateFriendClusterApplyResponse, error)
+	ReplyFriendClusterApply(ctx context.Context, in *ReplyFriendClusterApplyRequest, opts ...grpc.CallOption) (*ReplyFriendClusterApplyResponse, error)
 	ListFriendClusterApply(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (FriendClusterApplyService_ListFriendClusterApplyClient, error)
 }
 
@@ -37,6 +38,15 @@ func NewFriendClusterApplyServiceClient(cc grpc.ClientConnInterface) FriendClust
 func (c *friendClusterApplyServiceClient) CreateFriendClusterApply(ctx context.Context, in *CreateFriendClusterApplyRequest, opts ...grpc.CallOption) (*CreateFriendClusterApplyResponse, error) {
 	out := new(CreateFriendClusterApplyResponse)
 	err := c.cc.Invoke(ctx, "/qianxia.IMChat.FriendClusterApplyService/CreateFriendClusterApply", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *friendClusterApplyServiceClient) ReplyFriendClusterApply(ctx context.Context, in *ReplyFriendClusterApplyRequest, opts ...grpc.CallOption) (*ReplyFriendClusterApplyResponse, error) {
+	out := new(ReplyFriendClusterApplyResponse)
+	err := c.cc.Invoke(ctx, "/qianxia.IMChat.FriendClusterApplyService/ReplyFriendClusterApply", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,6 +90,7 @@ func (x *friendClusterApplyServiceListFriendClusterApplyClient) Recv() (*ListFri
 // for forward compatibility
 type FriendClusterApplyServiceServer interface {
 	CreateFriendClusterApply(context.Context, *CreateFriendClusterApplyRequest) (*CreateFriendClusterApplyResponse, error)
+	ReplyFriendClusterApply(context.Context, *ReplyFriendClusterApplyRequest) (*ReplyFriendClusterApplyResponse, error)
 	ListFriendClusterApply(*EmptyRequest, FriendClusterApplyService_ListFriendClusterApplyServer) error
 	mustEmbedUnimplementedFriendClusterApplyServiceServer()
 }
@@ -90,6 +101,9 @@ type UnimplementedFriendClusterApplyServiceServer struct {
 
 func (UnimplementedFriendClusterApplyServiceServer) CreateFriendClusterApply(context.Context, *CreateFriendClusterApplyRequest) (*CreateFriendClusterApplyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateFriendClusterApply not implemented")
+}
+func (UnimplementedFriendClusterApplyServiceServer) ReplyFriendClusterApply(context.Context, *ReplyFriendClusterApplyRequest) (*ReplyFriendClusterApplyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReplyFriendClusterApply not implemented")
 }
 func (UnimplementedFriendClusterApplyServiceServer) ListFriendClusterApply(*EmptyRequest, FriendClusterApplyService_ListFriendClusterApplyServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListFriendClusterApply not implemented")
@@ -126,6 +140,24 @@ func _FriendClusterApplyService_CreateFriendClusterApply_Handler(srv interface{}
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FriendClusterApplyService_ReplyFriendClusterApply_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReplyFriendClusterApplyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FriendClusterApplyServiceServer).ReplyFriendClusterApply(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/qianxia.IMChat.FriendClusterApplyService/ReplyFriendClusterApply",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FriendClusterApplyServiceServer).ReplyFriendClusterApply(ctx, req.(*ReplyFriendClusterApplyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _FriendClusterApplyService_ListFriendClusterApply_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(EmptyRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -157,6 +189,10 @@ var FriendClusterApplyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateFriendClusterApply",
 			Handler:    _FriendClusterApplyService_CreateFriendClusterApply_Handler,
+		},
+		{
+			MethodName: "ReplyFriendClusterApply",
+			Handler:    _FriendClusterApplyService_ReplyFriendClusterApply_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

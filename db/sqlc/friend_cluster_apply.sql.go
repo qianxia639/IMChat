@@ -15,7 +15,7 @@ INSERT INTO friend_cluster_apply(
     apply_id, receiver_id, apply_desc, flag
 ) VALUES (
     $1, $2, $3, $4
-) RETURNING id, apply_id, receiver_id, apply_desc, status, flag, apply_time, response_time
+) RETURNING id, apply_id, receiver_id, apply_desc, status, flag, apply_time, reply_time
 `
 
 type CreateFriendClsuterApplyParams struct {
@@ -41,7 +41,7 @@ func (q *Queries) CreateFriendClsuterApply(ctx context.Context, arg *CreateFrien
 		&i.Status,
 		&i.Flag,
 		&i.ApplyTime,
-		&i.ResponseTime,
+		&i.ReplyTime,
 	)
 	return i, err
 }
@@ -111,20 +111,26 @@ UPDATE friend_cluster_apply
 SET
     status = $1
 WHERE 
-    (apply_id = $2 AND receiver_id = $3 AND status = 0)
+    (apply_id = $2 AND receiver_id = $3 AND status = 0 AND flag = $4)
     OR
-    (apply_id = $3 AND receiver_id = $2 AND status = 0)
+    (apply_id = $3 AND receiver_id = $2 AND status = 0 AND flag = $4)
 `
 
 type UpdateFriendClusterApplyParams struct {
 	Status     int16 `json:"status"`
 	ApplyID    int32 `json:"apply_id"`
 	ReceiverID int32 `json:"receiver_id"`
+	Flag       int16 `json:"flag"`
 }
 
 // DELETE FROM friend_cluster_apply
 // WHERE apply_id = $1 AND reply_id = $2;
 func (q *Queries) UpdateFriendClusterApply(ctx context.Context, arg *UpdateFriendClusterApplyParams) error {
-	_, err := q.db.Exec(ctx, updateFriendClusterApply, arg.Status, arg.ApplyID, arg.ReceiverID)
+	_, err := q.db.Exec(ctx, updateFriendClusterApply,
+		arg.Status,
+		arg.ApplyID,
+		arg.ReceiverID,
+		arg.Flag,
+	)
 	return err
 }
