@@ -11,15 +11,10 @@ func TestMail(t *testing.T) {
 		t.Skip()
 	}
 
-	to := "2274000859@qq.com"
+	to := "example@example.com"
 	subject := "使用Golang发送邮件"
 	body := "测试邮件"
 
 	err := SendMail(to, subject, body)
 	require.NoError(t, err)
-}
-
-func TestDesensitizationEmail(t *testing.T) {
-	res := DesensitizationEmail("example@example.com")
-	t.Logf("res: %s", res)
 }
