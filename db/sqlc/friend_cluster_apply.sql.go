@@ -109,7 +109,8 @@ func (q *Queries) ListFriendClusterApply(ctx context.Context, receiverID int32) 
 const updateFriendClusterApply = `-- name: UpdateFriendClusterApply :exec
 UPDATE friend_cluster_apply
 SET
-    status = $1
+    status = $1,
+    reply_time = now()
 WHERE 
     (apply_id = $2 AND receiver_id = $3 AND status = 0 AND flag = $4)
     OR
