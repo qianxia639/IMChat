@@ -21,7 +21,8 @@ WHERE fca.receiver_id = $1 AND fca.status = 0;
 -- WHERE apply_id = $1 AND reply_id = $2;
 UPDATE friend_cluster_apply
 SET
-    status = @status
+    status = @status,
+    reply_time = now()
 WHERE 
     (apply_id = @apply_id AND receiver_id = @receiver_id AND status = 0 AND flag = @flag)
     OR
