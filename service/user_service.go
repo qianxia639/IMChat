@@ -6,7 +6,6 @@ import (
 	"IMChat/utils"
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -34,7 +33,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	// 参数校验
 
 	// 校验账户是否锁定
-	lockedUsernameKey := fmt.Sprintf("locked:%s:%s", time.Now().Format("2006-01-02 15:00:00"), req.GetUsername())
+	lockedUsernameKey := getLocked(time.Now().Format("2006-01-02 15:00:00"), req.GetUsername())
 	isLocked, err := userService.cache.Get(ctx, lockedUsernameKey).Bool()
 	if err != nil && err != redis.Nil {
 		return nil, status.Errorf(codes.Internal, "failed to check user lock status: %v\n", err)
@@ -53,22 +52,22 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 		return nil, status.Errorf(codes.Internal, "failed to find user")
 	}
 
-	attemptsKey := fmt.Sprintf("loginAttempts:%s", req.GetUsername())
+	loginAttemptsKey := getLoginAttempts(req.GetUsername())
 	// 校验密码
 	err = utils.Decrypt(req.GetPassword(), user.Password)
 	if err != nil {
 		// 累加失败次数
-		if err := userService.cache.Incr(ctx, attemptsKey).Err(); err != nil {
+		if err := userService.cache.Incr(ctx, loginAttemptsKey).Err(); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to increment login attempts: %v", err)
 		}
 		// 获取失败登录次数
-		attempts, err := userService.cache.Get(ctx, attemptsKey).Int()
+		loginAttempts, err := userService.cache.Get(ctx, loginAttemptsKey).Int()
 		if err != nil && err != redis.Nil {
 			return nil, status.Errorf(codes.Internal, "failed to get login attempts: %v", err)
 		}
 
 		// 判断是否大于最大失败次数
-		if attempts >= 5 {
+		if loginAttempts >= 5 {
 			// 锁定账户
 			err := userService.cache.Set(ctx, lockedUsernameKey, true, time.Hour).Err()
 			if err != nil {
@@ -81,7 +80,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	}
 
 	// 重置失败次数
-	err = userService.cache.Del(ctx, attemptsKey).Err()
+	err = userService.cache.Del(ctx, loginAttemptsKey).Err()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to reset login attempts: %v", err)
 	}
@@ -120,9 +119,8 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 		log.Warn().Msgf("failed to add user login log: %v", err)
 	}
 
-	userInfoKey := fmt.Sprintf("userInfo:%s", user.Username)
 	expireAt := time.Duration(utils.RandomInt(27, 30))
-	if err := userService.cache.Set(ctx, userInfoKey, &user, expireAt*time.Minute).Err(); err != nil {
+	if err := userService.cache.Set(ctx, getUserInfoKey(user.Username), &user, expireAt*time.Minute).Err(); err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to set user info: %v", err)
 	}
 
@@ -179,10 +177,8 @@ func (userService *UserService) GetUser(ctx context.Context, req *pb.GetUserRequ
 		return nil, unauthenticatedError(err)
 	}
 
-	userInfoKey := fmt.Sprintf("userInfo:%s", req.Username)
-
 	var user db.User
-	_ = userService.cache.Get(ctx, userInfoKey).Scan(&user)
+	_ = userService.cache.Get(ctx, getUserInfoKey(req.GetUsername())).Scan(&user)
 
 	if user.ID <= 0 {
 		user, _ = userService.store.GetUser(ctx, req.Username)
@@ -258,7 +254,7 @@ func (userService *UserService) UpdateUser(ctx context.Context, req *pb.UpdateUs
 		return nil, status.Errorf(codes.Internal, "failed to update user: %s", err)
 	}
 
-	userInfoKey := fmt.Sprintf("userInfo:%s", user.Username)
+	userInfoKey := getUserInfoKey(payload.Username)
 	expireAt := time.Duration(utils.RandomInt(27, 30))
 	if err := userService.cache.Set(ctx, userInfoKey, &user, expireAt*time.Minute).Err(); err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to set user info: %v", err)
@@ -277,7 +273,7 @@ func (userService *UserService) DeleteUser(ctx context.Context, req *pb.EmptyReq
 		return nil, unauthenticatedError(err)
 	}
 
-	userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
+	userInfoKey := getUserInfoKey(payload.Username)
 	var user db.User
 	if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get user info: %v", err)
@@ -307,7 +303,7 @@ func (userService *UserService) UpdateUserPassword(ctx context.Context, req *pb.
 		return nil, status.Error(codes.InvalidArgument, "invalid argument")
 	}
 
-	userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
+	userInfoKey := getUserInfoKey(payload.Username)
 	var user db.User
 	if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get user info: %v", err)
@@ -367,7 +363,7 @@ func (userService *UserService) Logout(ctx context.Context, req *pb.EmptyRequest
 		return nil, unauthenticatedError(err)
 	}
 
-	userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
+	userInfoKey := getUserInfoKey(payload.Username)
 	var user db.User
 	if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get user info: %v", err)
