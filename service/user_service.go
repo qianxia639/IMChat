@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 
 	"google.golang.org/grpc/codes"
@@ -32,6 +33,17 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 
 	// 参数校验
 
+	// 校验账户是否锁定
+	lockedUsernameKey := fmt.Sprintf("locked:%s:%s", time.Now().Format("2006-01-02 15:00:00"), req.GetUsername())
+	isLocked, err := userService.cache.Get(ctx, lockedUsernameKey).Bool()
+	if err != nil && err != redis.Nil {
+		return nil, status.Errorf(codes.Internal, "failed to check user lock status: %v\n", err)
+	}
+
+	if isLocked {
+		return nil, status.Errorf(codes.PermissionDenied, "account locked, please try again later")
+	}
+
 	// 获取用户信息
 	user, err := userService.store.GetUser(ctx, req.GetUsername())
 	if err != nil {
@@ -41,10 +53,37 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 		return nil, status.Errorf(codes.Internal, "failed to find user")
 	}
 
+	attemptsKey := fmt.Sprintf("loginAttempts:%s", req.GetUsername())
 	// 校验密码
 	err = utils.Decrypt(req.GetPassword(), user.Password)
 	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, "incorrect password:")
+		// 累加失败次数
+		if err := userService.cache.Incr(ctx, attemptsKey).Err(); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to increment login attempts: %v", err)
+		}
+		// 获取失败登录次数
+		attempts, err := userService.cache.Get(ctx, attemptsKey).Int()
+		if err != nil && err != redis.Nil {
+			return nil, status.Errorf(codes.Internal, "failed to get login attempts: %v", err)
+		}
+
+		// 判断是否大于最大失败次数
+		if attempts >= 5 {
+			// 锁定账户
+			err := userService.cache.Set(ctx, lockedUsernameKey, true, time.Hour).Err()
+			if err != nil {
+				return nil, status.Errorf(codes.Internal, "failed to lock account: %v\n", err)
+			}
+			return nil, status.Errorf(codes.PermissionDenied, "account locked, please try again later")
+		}
+
+		return nil, status.Error(codes.Unauthenticated, "incorrect password")
+	}
+
+	// 重置失败次数
+	err = userService.cache.Del(ctx, attemptsKey).Err()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to reset login attempts: %v", err)
 	}
 
 	// 查询最新登录日志
@@ -78,7 +117,6 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 		UserAgent:          mtdt.UserAgent,
 	})
 	if err != nil {
-		// log.Printf("failed to add user login log: %v", err)
 		log.Warn().Msgf("failed to add user login log: %v", err)
 	}
 
