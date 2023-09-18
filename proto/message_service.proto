@@ -8,15 +8,25 @@ import "message.proto";
 
 service MessageService {
 
-    rpc SendMessage(stream SendMessageRequest) returns (stream SendMessageResponse) {}
+    rpc SenderMessage(stream SenderMessageRequest) returns (stream SenderMessageResponse) {}
+
+    rpc ReceiverMessage(stream SenderMessageResponse) returns (stream ReceiverMessageRequest) {}
 
 }
 
-message SendMessageRequest {
-    int32 receive_id = 1;
-    string content = 2;
+message SenderMessageRequest {
+    int32 sender_id = 1;
+    int32 receive_id = 2;
+    string content = 3;
 }
 
-message SendMessageResponse {
+message SenderMessageResponse {
     Message message = 1;
+}
+
+message ReceiverMessageRequest {
+    int32 sender_id = 1;
+    int32 receive_id = 2;
+    string content = 3;
+    // google.protobuf.Timestamp sender_time = 4;
 }

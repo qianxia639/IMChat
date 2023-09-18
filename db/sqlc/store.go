@@ -11,6 +11,7 @@ type Store interface {
 	Querier
 	ReplyFriendClusterApplyTx(ctx context.Context, arg *ReplyFriendClusterApplyTxTxParams) (Friend, error)
 	DeleteFriendTx(ctx context.Context, arg *DeleteFriendTxParams) error
+	AddMessageTx(ctx context.Context, arg *AddMessageTxParams) (AddMessageTxResult, error)
 }
 
 type SQLStore struct {

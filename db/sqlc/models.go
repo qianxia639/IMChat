@@ -47,12 +47,10 @@ type Message struct {
 	ReceiverID int32 `json:"receiver_id"`
 	// 消息内容
 	Content string `json:"content"`
-	// 消息类型
-	Type int16 `json:"type"`
 	// 消息发送时间
-	SendTime time.Time `json:"send_time"`
+	SenderTime time.Time `json:"sender_time"`
 	// 消息读取时间
-	ReceiveTime time.Time `json:"receive_time"`
+	ReceiverTime time.Time `json:"receiver_time"`
 }
 
 type User struct {

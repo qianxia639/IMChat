@@ -42,9 +42,8 @@ func (server *Server) getUserInfo(ctx context.Context) (*db.User, error) {
 		return nil, unauthenticatedError(err)
 	}
 
-	userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
 	var user db.User
-	err = server.cache.Get(ctx, userInfoKey).Scan(&user)
+	err = server.cache.Get(ctx, getUserInfoKey(payload.Username)).Scan(&user)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get cache: %v", err)
 	}

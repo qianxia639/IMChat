@@ -7,34 +7,40 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const addMessage = `-- name: AddMessage :one
 INSERT INTO messages (
-    sender_id, receiver_id, content
+    sender_id, receiver_id, content, sender_time
 ) VALUES (
-    $1, $2, $3
+    $1, $2, $3, $4
 )
-RETURNING id, sender_id, receiver_id, content, type, send_time, receive_time
+RETURNING id, sender_id, receiver_id, content, sender_time, receiver_time
 `
 
 type AddMessageParams struct {
-	SenderID   int32  `json:"sender_id"`
-	ReceiverID int32  `json:"receiver_id"`
-	Content    string `json:"content"`
+	SenderID   int32     `json:"sender_id"`
+	ReceiverID int32     `json:"receiver_id"`
+	Content    string    `json:"content"`
+	SenderTime time.Time `json:"sender_time"`
 }
 
 func (q *Queries) AddMessage(ctx context.Context, arg *AddMessageParams) (Message, error) {
-	row := q.db.QueryRow(ctx, addMessage, arg.SenderID, arg.ReceiverID, arg.Content)
+	row := q.db.QueryRow(ctx, addMessage,
+		arg.SenderID,
+		arg.ReceiverID,
+		arg.Content,
+		arg.SenderTime,
+	)
 	var i Message
 	err := row.Scan(
 		&i.ID,
 		&i.SenderID,
 		&i.ReceiverID,
 		&i.Content,
-		&i.Type,
-		&i.SendTime,
-		&i.ReceiveTime,
+		&i.SenderTime,
+		&i.ReceiverTime,
 	)
 	return i, err
 }

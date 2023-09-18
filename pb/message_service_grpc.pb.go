@@ -22,7 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessageServiceClient interface {
-	SendMessage(ctx context.Context, opts ...grpc.CallOption) (MessageService_SendMessageClient, error)
+	SenderMessage(ctx context.Context, opts ...grpc.CallOption) (MessageService_SenderMessageClient, error)
+	ReceiverMessage(ctx context.Context, opts ...grpc.CallOption) (MessageService_ReceiverMessageClient, error)
 }
 
 type messageServiceClient struct {
@@ -33,31 +34,62 @@ func NewMessageServiceClient(cc grpc.ClientConnInterface) MessageServiceClient {
 	return &messageServiceClient{cc}
 }
 
-func (c *messageServiceClient) SendMessage(ctx context.Context, opts ...grpc.CallOption) (MessageService_SendMessageClient, error) {
-	stream, err := c.cc.NewStream(ctx, &MessageService_ServiceDesc.Streams[0], "/qianxia.IMChat.MessageService/SendMessage", opts...)
+func (c *messageServiceClient) SenderMessage(ctx context.Context, opts ...grpc.CallOption) (MessageService_SenderMessageClient, error) {
+	stream, err := c.cc.NewStream(ctx, &MessageService_ServiceDesc.Streams[0], "/qianxia.IMChat.MessageService/SenderMessage", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &messageServiceSendMessageClient{stream}
+	x := &messageServiceSenderMessageClient{stream}
 	return x, nil
 }
 
-type MessageService_SendMessageClient interface {
-	Send(*SendMessageRequest) error
-	Recv() (*SendMessageResponse, error)
+type MessageService_SenderMessageClient interface {
+	Send(*SenderMessageRequest) error
+	Recv() (*SenderMessageResponse, error)
 	grpc.ClientStream
 }
 
-type messageServiceSendMessageClient struct {
+type messageServiceSenderMessageClient struct {
 	grpc.ClientStream
 }
 
-func (x *messageServiceSendMessageClient) Send(m *SendMessageRequest) error {
+func (x *messageServiceSenderMessageClient) Send(m *SenderMessageRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *messageServiceSendMessageClient) Recv() (*SendMessageResponse, error) {
-	m := new(SendMessageResponse)
+func (x *messageServiceSenderMessageClient) Recv() (*SenderMessageResponse, error) {
+	m := new(SenderMessageResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *messageServiceClient) ReceiverMessage(ctx context.Context, opts ...grpc.CallOption) (MessageService_ReceiverMessageClient, error) {
+	stream, err := c.cc.NewStream(ctx, &MessageService_ServiceDesc.Streams[1], "/qianxia.IMChat.MessageService/ReceiverMessage", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &messageServiceReceiverMessageClient{stream}
+	return x, nil
+}
+
+type MessageService_ReceiverMessageClient interface {
+	Send(*SenderMessageResponse) error
+	Recv() (*ReceiverMessageRequest, error)
+	grpc.ClientStream
+}
+
+type messageServiceReceiverMessageClient struct {
+	grpc.ClientStream
+}
+
+func (x *messageServiceReceiverMessageClient) Send(m *SenderMessageResponse) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *messageServiceReceiverMessageClient) Recv() (*ReceiverMessageRequest, error) {
+	m := new(ReceiverMessageRequest)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -68,7 +100,8 @@ func (x *messageServiceSendMessageClient) Recv() (*SendMessageResponse, error) {
 // All implementations must embed UnimplementedMessageServiceServer
 // for forward compatibility
 type MessageServiceServer interface {
-	SendMessage(MessageService_SendMessageServer) error
+	SenderMessage(MessageService_SenderMessageServer) error
+	ReceiverMessage(MessageService_ReceiverMessageServer) error
 	mustEmbedUnimplementedMessageServiceServer()
 }
 
@@ -76,8 +109,11 @@ type MessageServiceServer interface {
 type UnimplementedMessageServiceServer struct {
 }
 
-func (UnimplementedMessageServiceServer) SendMessage(MessageService_SendMessageServer) error {
-	return status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
+func (UnimplementedMessageServiceServer) SenderMessage(MessageService_SenderMessageServer) error {
+	return status.Errorf(codes.Unimplemented, "method SenderMessage not implemented")
+}
+func (UnimplementedMessageServiceServer) ReceiverMessage(MessageService_ReceiverMessageServer) error {
+	return status.Errorf(codes.Unimplemented, "method ReceiverMessage not implemented")
 }
 func (UnimplementedMessageServiceServer) mustEmbedUnimplementedMessageServiceServer() {}
 
@@ -92,26 +128,52 @@ func RegisterMessageServiceServer(s grpc.ServiceRegistrar, srv MessageServiceSer
 	s.RegisterService(&MessageService_ServiceDesc, srv)
 }
 
-func _MessageService_SendMessage_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(MessageServiceServer).SendMessage(&messageServiceSendMessageServer{stream})
+func _MessageService_SenderMessage_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MessageServiceServer).SenderMessage(&messageServiceSenderMessageServer{stream})
 }
 
-type MessageService_SendMessageServer interface {
-	Send(*SendMessageResponse) error
-	Recv() (*SendMessageRequest, error)
+type MessageService_SenderMessageServer interface {
+	Send(*SenderMessageResponse) error
+	Recv() (*SenderMessageRequest, error)
 	grpc.ServerStream
 }
 
-type messageServiceSendMessageServer struct {
+type messageServiceSenderMessageServer struct {
 	grpc.ServerStream
 }
 
-func (x *messageServiceSendMessageServer) Send(m *SendMessageResponse) error {
+func (x *messageServiceSenderMessageServer) Send(m *SenderMessageResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *messageServiceSendMessageServer) Recv() (*SendMessageRequest, error) {
-	m := new(SendMessageRequest)
+func (x *messageServiceSenderMessageServer) Recv() (*SenderMessageRequest, error) {
+	m := new(SenderMessageRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _MessageService_ReceiverMessage_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MessageServiceServer).ReceiverMessage(&messageServiceReceiverMessageServer{stream})
+}
+
+type MessageService_ReceiverMessageServer interface {
+	Send(*ReceiverMessageRequest) error
+	Recv() (*SenderMessageResponse, error)
+	grpc.ServerStream
+}
+
+type messageServiceReceiverMessageServer struct {
+	grpc.ServerStream
+}
+
+func (x *messageServiceReceiverMessageServer) Send(m *ReceiverMessageRequest) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *messageServiceReceiverMessageServer) Recv() (*SenderMessageResponse, error) {
+	m := new(SenderMessageResponse)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -127,8 +189,14 @@ var MessageService_ServiceDesc = grpc.ServiceDesc{
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "SendMessage",
-			Handler:       _MessageService_SendMessage_Handler,
+			StreamName:    "SenderMessage",
+			Handler:       _MessageService_SenderMessage_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "ReceiverMessage",
+			Handler:       _MessageService_ReceiverMessage_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
