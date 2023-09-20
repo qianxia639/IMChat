@@ -258,7 +258,7 @@ func (mr *MockStoreMockRecorder) ListFriends(arg0, arg1 interface{}) *gomock.Cal
 }
 
 // ReplyFriendClusterApplyTx mocks base method.
-func (m *MockStore) ReplyFriendClusterApplyTx(arg0 context.Context, arg1 *db.ReplyFriendClusterApplyTxTxParams) (db.Friend, error) {
+func (m *MockStore) ReplyFriendClusterApplyTx(arg0 context.Context, arg1 *db.ReplyFriendClusterApplyTxParams) (db.Friend, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReplyFriendClusterApplyTx", arg0, arg1)
 	ret0, _ := ret[0].(db.Friend)

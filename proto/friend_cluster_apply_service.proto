@@ -35,6 +35,12 @@ enum Flag {
     CLUSTER = 1;
 }
 
+enum Status {
+    WAIT = 0;
+    AGREE = 1;
+    REFUSE = 2;
+}
+
 message CreateFriendClusterApplyRequest {
     int32 receiver_id = 1;
     string apply_desc = 2;
@@ -47,7 +53,7 @@ message CreateFriendClusterApplyResponse {
 
 message ReplyFriendClusterApplyRequest {
     int32 friend_id = 1;
-    int32 status = 2;
+    Status status = 2;
     Flag flag = 3;
     string note = 4;
 }

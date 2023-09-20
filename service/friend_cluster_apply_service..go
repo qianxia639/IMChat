@@ -81,6 +81,11 @@ func (friendClusterApplyService *FriendClusterApplyService) CreateFriendClusterA
 }
 
 func (friendClusterApplyService *FriendClusterApplyService) ReplyFriendClusterApply(ctx context.Context, req *pb.ReplyFriendClusterApplyRequest) (*pb.ReplyFriendClusterApplyResponse, error) {
+
+	if pb.Status_WAIT == req.Status {
+		return &pb.ReplyFriendClusterApplyResponse{Message: "Waiting..."}, nil
+	}
+
 	user, err := friendClusterApplyService.getUserInfo(ctx)
 	if err != nil {
 		return nil, err
@@ -115,10 +120,10 @@ func (friendClusterApplyService *FriendClusterApplyService) ReplyFriendClusterAp
 		return nil, status.Errorf(codes.InvalidArgument, "非法的数据")
 	}
 
-	arg := &db.ReplyFriendClusterApplyTxTxParams{
+	arg := &db.ReplyFriendClusterApplyTxParams{
 		UserID:   user.ID,
 		FriendID: req.GetFriendId(),
-		Status:   req.GetStatus(),
+		Status:   int32(req.GetStatus()),
 		Flag:     int32(req.GetFlag()),
 		Note:     req.Note,
 	}

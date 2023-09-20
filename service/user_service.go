@@ -2,6 +2,7 @@ package service
 
 import (
 	db "IMChat/db/sqlc"
+	"IMChat/internal/validator"
 	"IMChat/pb"
 	"IMChat/utils"
 	"context"
@@ -31,6 +32,10 @@ func NewUserService(server Server) pb.UserServiceServer {
 func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.LoginUserResponse, error) {
 
 	// 参数校验
+	loginUserValidator := &validator.LoginUserValidator{}
+	if err := loginUserValidator.Validate(req); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
 
 	// 校验账户是否锁定
 	lockedUsernameKey := getLocked(time.Now().Format("2006-01-02 15:00:00"), req.GetUsername())
@@ -56,26 +61,9 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	// 校验密码
 	err = utils.Decrypt(req.GetPassword(), user.Password)
 	if err != nil {
-		// 累加失败次数
-		if err := userService.cache.Incr(ctx, loginAttemptsKey).Err(); err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to increment login attempts: %v", err)
+		if err := userService.recordLoginAttempts(ctx, loginAttemptsKey, lockedUsernameKey); err != nil {
+			return nil, err
 		}
-		// 获取失败登录次数
-		loginAttempts, err := userService.cache.Get(ctx, loginAttemptsKey).Int()
-		if err != nil && err != redis.Nil {
-			return nil, status.Errorf(codes.Internal, "failed to get login attempts: %v", err)
-		}
-
-		// 判断是否大于最大失败次数
-		if loginAttempts >= 5 {
-			// 锁定账户
-			err := userService.cache.Set(ctx, lockedUsernameKey, true, time.Hour).Err()
-			if err != nil {
-				return nil, status.Errorf(codes.Internal, "failed to lock account: %v\n", err)
-			}
-			return nil, status.Errorf(codes.PermissionDenied, "account locked, please try again later")
-		}
-
 		return nil, status.Error(codes.Unauthenticated, "incorrect password")
 	}
 
@@ -127,6 +115,30 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	return &pb.LoginUserResponse{
 		AccessToken: accessToken,
 	}, nil
+}
+
+// 记录登录失败次数
+func (userService *UserService) recordLoginAttempts(ctx context.Context, loginAttemptsKey, lockedUsernameKey string) error {
+	// 累加失败次数
+	if err := userService.cache.Incr(ctx, loginAttemptsKey).Err(); err != nil {
+		return status.Errorf(codes.Internal, "failed to increment login attempts: %v", err)
+	}
+	// 获取失败登录次数
+	loginAttempts, err := userService.cache.Get(ctx, loginAttemptsKey).Int()
+	if err != nil && err != redis.Nil {
+		return status.Errorf(codes.Internal, "failed to get login attempts: %v", err)
+	}
+
+	// 判断是否大于最大失败次数
+	if loginAttempts >= 5 {
+		// 锁定账户
+		err := userService.cache.Set(ctx, lockedUsernameKey, true, time.Hour).Err()
+		if err != nil {
+			return status.Errorf(codes.Internal, "failed to lock account: %v\n", err)
+		}
+		return status.Errorf(codes.PermissionDenied, "account locked, please try again later")
+	}
+	return nil
 }
 
 func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
@@ -293,20 +305,15 @@ func (userService *UserService) DeleteUser(ctx context.Context, req *pb.EmptyReq
 }
 
 func (userService *UserService) UpdateUserPassword(ctx context.Context, req *pb.UpdateUserPasswordRequest) (*pb.UpdateUserPasswordResponse, error) {
-	payload, err := userService.authorization(ctx)
+
+	user, err := userService.getUserInfo(ctx)
 	if err != nil {
-		return nil, unauthenticatedError(err)
+		return nil, err
 	}
 
 	// TODO 校验邮箱验证码是否正确
 	if req.EmailCode != "123" {
 		return nil, status.Error(codes.InvalidArgument, "invalid argument")
-	}
-
-	userInfoKey := getUserInfoKey(payload.Username)
-	var user db.User
-	if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get user info: %v", err)
 	}
 
 	// 校验两次密码是否一致
@@ -318,12 +325,6 @@ func (userService *UserService) UpdateUserPassword(ctx context.Context, req *pb.
 	if err := utils.Decrypt(req.UserConfirmPassword, user.Password); err == nil {
 		return nil, status.Error(codes.InvalidArgument, "新旧密码不能一致")
 	}
-
-	// userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
-	// var user db.User
-	// if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
-	// 	return nil, status.Errorf(codes.Internal, "failed to get user info: %v", err)
-	// }
 
 	// 校验上次密码更新时间与当前时间差
 	if !time.Now().After(user.PasswordChangedAt.Add(7 * 24 * time.Hour)) {
@@ -348,7 +349,7 @@ func (userService *UserService) UpdateUserPassword(ctx context.Context, req *pb.
 		return nil, status.Errorf(codes.Internal, "failed to update user: %v", err)
 	}
 
-	_ = userService.cache.Del(ctx, userInfoKey).Err()
+	_ = userService.cache.Del(ctx, getUserInfoKey(user.Username)).Err()
 
 	resp := &pb.UpdateUserPasswordResponse{
 		Message: "Update Successfully...",
