@@ -33,7 +33,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 
 	// 参数校验
 	loginUserValidator := &validator.LoginUserValidator{}
-	if err := loginUserValidator.Validate(req); err != nil {
+	if err := validator.NewValidateContext(loginUserValidator).Validate(req); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
@@ -143,21 +143,14 @@ func (userService *UserService) recordLoginAttempts(ctx context.Context, loginAt
 
 func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 
-	err := utils.ValidatorEmail(req.GetEmail())
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+	createUserValidator := &validator.CreateUserValidator{}
+	if err := validator.NewValidateContext(createUserValidator).Validate(req); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
 	hashPassword, err := utils.Encrypt(req.GetPassword())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to hash password")
-	}
-
-	if req.Gender != nil {
-		_, exists := pb.Gender_name[int32(req.GetGender())]
-		if !exists {
-			return nil, status.Errorf(codes.InvalidArgument, "invlaid argument, gender is %d", req.GetGender())
-		}
 	}
 
 	arg := &db.CreateUserParams{
