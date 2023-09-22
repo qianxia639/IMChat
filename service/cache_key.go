@@ -4,8 +4,8 @@ func getUserInfoKey(username string) string {
 	return "userInfo:" + username
 }
 
-func getLocked(ti, username string) string {
-	return "locked:" + ti + ":" + username
+func getAccountLocked(ti, username string) string {
+	return "accountLocked:" + ti + ":" + username
 }
 
 func getLoginAttempts(username string) string {

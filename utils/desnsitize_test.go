@@ -1,6 +1,8 @@
 package utils
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestDesnsitize(t *testing.T) {
 	testCases := []string{

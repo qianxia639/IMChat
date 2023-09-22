@@ -39,7 +39,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	}
 
 	// 校验账户是否锁定
-	lockedUsernameKey := getLocked(time.Now().Format("2006-01-02 15:00:00"), req.GetUsername())
+	lockedUsernameKey := getAccountLocked(time.Now().Format("2006-01-02T15:00:00"), req.Username)
 	isLocked, err := userService.cache.Get(ctx, lockedUsernameKey).Bool()
 	if err != nil && err != redis.Nil {
 		return nil, errDefine.ServerErr
@@ -50,7 +50,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	}
 
 	// 获取用户信息
-	user, err := userService.store.GetUser(ctx, req.GetUsername())
+	user, err := userService.store.GetUser(ctx, req.Username)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, errDefine.UserNotFoundErr
@@ -58,9 +58,9 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 		return nil, errDefine.ServerErr
 	}
 
-	loginAttemptsKey := getLoginAttempts(req.GetUsername())
+	loginAttemptsKey := getLoginAttempts(req.Username)
 	// 校验密码
-	err = utils.Decrypt(req.GetPassword(), user.Password)
+	err = utils.Decrypt(req.Password, user.Password)
 	if err != nil {
 		if err := userService.recordLoginAttempts(ctx, loginAttemptsKey, lockedUsernameKey); err != nil {
 			return nil, err
