@@ -8,6 +8,7 @@ import (
 var (
 	PermissionDenied = codes.PermissionDenied
 	NotFound         = codes.NotFound
+	AlreadyExists    = codes.AlreadyExists
 )
 
 func NewError(c codes.Code, msg string) error {

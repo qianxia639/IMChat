@@ -139,6 +139,20 @@ func (mr *MockStoreMockRecorder) DeleteFriend(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFriend", reflect.TypeOf((*MockStore)(nil).DeleteFriend), arg0, arg1)
 }
 
+// DeleteFriendClusterApply mocks base method.
+func (m *MockStore) DeleteFriendClusterApply(arg0 context.Context, arg1 int32) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteFriendClusterApply", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteFriendClusterApply indicates an expected call of DeleteFriendClusterApply.
+func (mr *MockStoreMockRecorder) DeleteFriendClusterApply(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFriendClusterApply", reflect.TypeOf((*MockStore)(nil).DeleteFriendClusterApply), arg0, arg1)
+}
+
 // DeleteFriendTx mocks base method.
 func (m *MockStore) DeleteFriendTx(arg0 context.Context, arg1 *db.DeleteFriendTxParams) error {
 	m.ctrl.T.Helper()
@@ -165,6 +179,50 @@ func (m *MockStore) DeleteUser(arg0 context.Context, arg1 int32) error {
 func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1)
+}
+
+// DeleteUserTx mocks base method.
+func (m *MockStore) DeleteUserTx(arg0 context.Context, arg1 int32) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUserTx", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUserTx indicates an expected call of DeleteUserTx.
+func (mr *MockStoreMockRecorder) DeleteUserTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserTx", reflect.TypeOf((*MockStore)(nil).DeleteUserTx), arg0, arg1)
+}
+
+// ExistEmail mocks base method.
+func (m *MockStore) ExistEmail(arg0 context.Context, arg1 string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExistEmail", arg0, arg1)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExistEmail indicates an expected call of ExistEmail.
+func (mr *MockStoreMockRecorder) ExistEmail(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistEmail", reflect.TypeOf((*MockStore)(nil).ExistEmail), arg0, arg1)
+}
+
+// ExistNickname mocks base method.
+func (m *MockStore) ExistNickname(arg0 context.Context, arg1 string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExistNickname", arg0, arg1)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExistNickname indicates an expected call of ExistNickname.
+func (mr *MockStoreMockRecorder) ExistNickname(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistNickname", reflect.TypeOf((*MockStore)(nil).ExistNickname), arg0, arg1)
 }
 
 // ExistsFriendClusterApply mocks base method.

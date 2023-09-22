@@ -46,6 +46,16 @@ func (q *Queries) CreateFriendClsuterApply(ctx context.Context, arg *CreateFrien
 	return i, err
 }
 
+const deleteFriendClusterApply = `-- name: DeleteFriendClusterApply :exec
+DELETE FROM friend_cluster_apply
+WHERE apply_id = $1 OR receiver_id = $1
+`
+
+func (q *Queries) DeleteFriendClusterApply(ctx context.Context, applyID int32) error {
+	_, err := q.db.Exec(ctx, deleteFriendClusterApply, applyID)
+	return err
+}
+
 const existsFriendClusterApply = `-- name: ExistsFriendClusterApply :one
 SELECT COUNT(*) FROM friend_cluster_apply
 WHERE
@@ -124,8 +134,6 @@ type UpdateFriendClusterApplyParams struct {
 	Flag       int16 `json:"flag"`
 }
 
-// DELETE FROM friend_cluster_apply
-// WHERE apply_id = $1 AND reply_id = $2;
 func (q *Queries) UpdateFriendClusterApply(ctx context.Context, arg *UpdateFriendClusterApplyParams) error {
 	_, err := q.db.Exec(ctx, updateFriendClusterApply,
 		arg.Status,

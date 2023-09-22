@@ -32,3 +32,11 @@ SET
     updated_at = sqlc.arg(updated_at)
 WHERE
     username = sqlc.arg(username);
+
+-- name: ExistEmail :one
+SELECT COUNT(*) FROM users
+WHERE email = $1;
+
+-- name: ExistNickname :one
+SELECT COUNT(*) FROM users
+WHERE nickname = $1;

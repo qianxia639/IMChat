@@ -15,15 +15,16 @@ type Querier interface {
 	CreateFriendClsuterApply(ctx context.Context, arg *CreateFriendClsuterApplyParams) (FriendClusterApply, error)
 	CreateUser(ctx context.Context, arg *CreateUserParams) (User, error)
 	DeleteFriend(ctx context.Context, arg *DeleteFriendParams) error
+	DeleteFriendClusterApply(ctx context.Context, applyID int32) error
 	DeleteUser(ctx context.Context, id int32) error
+	ExistEmail(ctx context.Context, email string) (int64, error)
+	ExistNickname(ctx context.Context, nickname string) (int64, error)
 	ExistsFriendClusterApply(ctx context.Context, arg *ExistsFriendClusterApplyParams) (int64, error)
 	GetFriend(ctx context.Context, arg *GetFriendParams) (Friend, error)
 	GetLastUserLoginLog(ctx context.Context, userID int32) (UserLoginLog, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	ListFriendClusterApply(ctx context.Context, receiverID int32) ([]ListFriendClusterApplyRow, error)
 	ListFriends(ctx context.Context, id int32) ([]ListFriendsRow, error)
-	// DELETE FROM friend_cluster_apply
-	// WHERE apply_id = $1 AND reply_id = $2;
 	UpdateFriendClusterApply(ctx context.Context, arg *UpdateFriendClusterApplyParams) error
 	UpdateFriendNote(ctx context.Context, arg *UpdateFriendNoteParams) (Friend, error)
 	UpdateLastUserLoginLog(ctx context.Context, userID int32) error

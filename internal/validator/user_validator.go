@@ -23,11 +23,11 @@ func (*LoginUserValidator) Validate(param interface{}) error {
 	}
 
 	// 校验用户名
-	if !isValidUsername(req.GetUsername()) {
+	if !isValidUsername(req.Username) {
 		return fmt.Errorf("invalid username")
 	}
 	// 校验密码
-	if !isValidPassword(req.GetPassword()) {
+	if !isValidPassword(req.Password) {
 		return fmt.Errorf("invalid password")
 	}
 	return nil
@@ -44,23 +44,23 @@ func (*CreateUserValidator) Validate(param interface{}) error {
 	}
 
 	// 校验用户名
-	if !isValidUsername(req.GetUsername()) {
+	if !isValidUsername(req.Username) {
 		return fmt.Errorf("invalid username")
 	}
 	// 校验密码
-	if !isValidPassword(req.GetPassword()) {
+	if !isValidPassword(req.Password) {
 		return fmt.Errorf("invalid password")
 	}
 
-	err := utils.ValidatorEmail(req.GetEmail())
+	err := utils.ValidatorEmail(req.Email)
 	if err != nil {
 		return err
 	}
 
 	if req.Gender != nil {
-		_, exists := pb.Gender_name[int32(req.GetGender())]
+		_, exists := pb.Gender_name[int32(*req.Gender)]
 		if !exists {
-			return fmt.Errorf("invlaid argument, gender is %d", req.GetGender())
+			return fmt.Errorf("invlaid argument, gender is %d", int32(*req.Gender))
 		}
 	}
 

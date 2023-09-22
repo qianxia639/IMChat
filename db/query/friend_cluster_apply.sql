@@ -17,8 +17,6 @@ JOIN users u ON fca.apply_id = u.id
 WHERE fca.receiver_id = $1 AND fca.status = 0;
 
 -- name: UpdateFriendClusterApply :exec
--- DELETE FROM friend_cluster_apply 
--- WHERE apply_id = $1 AND reply_id = $2;
 UPDATE friend_cluster_apply
 SET
     status = @status,
@@ -28,6 +26,6 @@ WHERE
     OR
     (apply_id = @receiver_id AND receiver_id = @apply_id AND status = 0 AND flag = @flag);
 
--- name: GetFriendApply :one
--- SELECT * FROM friend_apply
--- WHERE apply_id = $1 AND reply_id = $2;
+-- name: DeleteFriendClusterApply :exec
+DELETE FROM friend_cluster_apply
+WHERE apply_id = $1 OR receiver_id = $1;

@@ -62,6 +62,30 @@ func (q *Queries) DeleteUser(ctx context.Context, id int32) error {
 	return err
 }
 
+const existEmail = `-- name: ExistEmail :one
+SELECT COUNT(*) FROM users
+WHERE email = $1
+`
+
+func (q *Queries) ExistEmail(ctx context.Context, email string) (int64, error) {
+	row := q.db.QueryRow(ctx, existEmail, email)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const existNickname = `-- name: ExistNickname :one
+SELECT COUNT(*) FROM users
+WHERE nickname = $1
+`
+
+func (q *Queries) ExistNickname(ctx context.Context, nickname string) (int64, error) {
+	row := q.db.QueryRow(ctx, existNickname, nickname)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, username, nickname, password, email, gender, avatar, password_changed_at, created_at, updated_at FROM users
 WHERE username = $1

@@ -146,27 +146,35 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 
 	createUserValidator := &validator.CreateUserValidator{}
 	if err := validator.NewValidateContext(createUserValidator).Validate(req); err != nil {
+		log.Err(err).Msg("Create User parmas validator")
 		return nil, errDefine.ParamsErr
 	}
 
-	hashPassword, err := utils.Encrypt(req.GetPassword())
+	hashPassword, err := utils.Encrypt(req.Password)
 	if err != nil {
 		return nil, errDefine.ParamsErr
 	}
 
+	// 判断用户是否存在
+	if user, _ := userService.store.GetUser(ctx, req.Username); user.ID > 0 {
+		return nil, errDefine.AccountExistErr
+	}
+
+	// 判断邮箱是否存在
+	if i, _ := userService.store.ExistEmail(ctx, req.Email); i > 0 {
+		return nil, errDefine.EmailExistErr
+	}
+
 	arg := &db.CreateUserParams{
-		Username: req.GetUsername(),
+		Username: req.Username,
 		Password: hashPassword,
-		Email:    req.GetEmail(),
-		Nickname: req.GetUsername(),
-		Gender:   int16(req.GetGender()),
+		Email:    req.Email,
+		Nickname: req.Username,
+		Gender:   int16(*req.Gender),
 	}
 
 	_, err = userService.store.CreateUser(ctx, arg)
 	if err != nil {
-		if db.ErrorCode(err) == db.UniqueViolation {
-			return nil, status.Errorf(codes.AlreadyExists, err.Error())
-		}
 		return nil, errDefine.ServerErr
 	}
 
@@ -175,7 +183,6 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 	}, nil
 }
 
-// TODO 该接口后期需要优化
 func (userService *UserService) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 
 	_, err := userService.authorization(ctx)
@@ -184,7 +191,7 @@ func (userService *UserService) GetUser(ctx context.Context, req *pb.GetUserRequ
 	}
 
 	var user db.User
-	_ = userService.cache.Get(ctx, getUserInfoKey(req.GetUsername())).Scan(&user)
+	_ = userService.cache.Get(ctx, getUserInfoKey(req.Username)).Scan(&user)
 
 	if user.ID <= 0 {
 		user, _ = userService.store.GetUser(ctx, req.Username)
@@ -224,14 +231,23 @@ func (userService *UserService) UpdateUser(ctx context.Context, req *pb.UpdateUs
 		return nil, unauthenticatedError(err)
 	}
 
-	if payload.Username != req.GetUsername() {
-		return nil, status.Error(codes.PermissionDenied, "cannot update other usre's info")
+	if payload.Username != req.Username {
+		log.Error().Msg("cannot update other usre's info")
+		return nil, errDefine.PermissionDeniedErr
+	}
+
+	if req.Nickname != nil {
+		if i, _ := userService.store.ExistNickname(ctx, *req.Nickname); i > 0 {
+			return nil, errDefine.NicknameExistErr
+		}
 	}
 
 	if req.Gender != nil {
-		_, exists := pb.Gender_name[int32(req.GetGender())]
+		_, exists := pb.Gender_name[int32(*req.Gender)]
 		if !exists {
-			return nil, status.Errorf(codes.InvalidArgument, "invlaid argument, gender is %d", req.GetGender())
+			// return nil, status.Errorf(codes.InvalidArgument, "invlaid argument, gender is %d", req.GetGender())
+			log.Error().Msgf("invalid argument, gender is %d", int32(*req.Gender))
+			return nil, errDefine.ParamsErr
 		}
 	}
 
@@ -250,9 +266,7 @@ func (userService *UserService) UpdateUser(ctx context.Context, req *pb.UpdateUs
 
 	user, err := userService.store.UpdateUser(ctx, arg)
 	if err != nil {
-		if errors.Is(err, db.ErrRecordNotFound) {
-			return nil, errDefine.UserNotFoundErr
-		}
+		log.Error().Err(err).Msg("Can't update user")
 		return nil, errDefine.ServerErr
 	}
 
@@ -281,7 +295,7 @@ func (userService *UserService) DeleteUser(ctx context.Context, req *pb.EmptyReq
 		return nil, errDefine.ServerErr
 	}
 
-	if err := userService.store.DeleteUser(ctx, user.ID); err != nil {
+	if err := userService.store.DeleteUserTx(ctx, user.ID); err != nil {
 		return nil, errDefine.ServerErr
 	}
 
