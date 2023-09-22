@@ -90,17 +90,15 @@ const updateUser = `-- name: UpdateUser :one
 UPDATE users
 SET
     nickname = COALESCE($1, nickname),
-    avatar = COALESCE($2, avatar),
-    gender = COALESCE($3, gender),
-    updated_at = $4
+    gender = COALESCE($2, gender),
+    updated_at = $3
 WHERE
-    username = $5
+    username = $4
 RETURNING id, username, nickname, password, email, gender, avatar, password_changed_at, created_at, updated_at
 `
 
 type UpdateUserParams struct {
 	Nickname  pgtype.Text `json:"nickname"`
-	Avatar    pgtype.Text `json:"avatar"`
 	Gender    pgtype.Int2 `json:"gender"`
 	UpdatedAt time.Time   `json:"updated_at"`
 	Username  string      `json:"username"`
@@ -109,7 +107,6 @@ type UpdateUserParams struct {
 func (q *Queries) UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, updateUser,
 		arg.Nickname,
-		arg.Avatar,
 		arg.Gender,
 		arg.UpdatedAt,
 		arg.Username,

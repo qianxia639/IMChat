@@ -2,6 +2,7 @@ package service
 
 import (
 	db "IMChat/db/sqlc"
+	errDefine "IMChat/internal/errors"
 	"IMChat/internal/validator"
 	"IMChat/pb"
 	"IMChat/utils"
@@ -34,27 +35,27 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	// 参数校验
 	loginUserValidator := &validator.LoginUserValidator{}
 	if err := validator.NewValidateContext(loginUserValidator).Validate(req); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, errDefine.ParamsErr
 	}
 
 	// 校验账户是否锁定
 	lockedUsernameKey := getLocked(time.Now().Format("2006-01-02 15:00:00"), req.GetUsername())
 	isLocked, err := userService.cache.Get(ctx, lockedUsernameKey).Bool()
 	if err != nil && err != redis.Nil {
-		return nil, status.Errorf(codes.Internal, "failed to check user lock status: %v\n", err)
+		return nil, errDefine.ServerErr
 	}
 
 	if isLocked {
-		return nil, status.Errorf(codes.PermissionDenied, "account locked, please try again later")
+		return nil, errDefine.AccountLockedErr
 	}
 
 	// 获取用户信息
 	user, err := userService.store.GetUser(ctx, req.GetUsername())
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
-			return nil, status.Errorf(codes.NotFound, "user not found")
+			return nil, errDefine.UserNotFoundErr
 		}
-		return nil, status.Errorf(codes.Internal, "failed to find user")
+		return nil, errDefine.ServerErr
 	}
 
 	loginAttemptsKey := getLoginAttempts(req.GetUsername())
@@ -64,13 +65,13 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 		if err := userService.recordLoginAttempts(ctx, loginAttemptsKey, lockedUsernameKey); err != nil {
 			return nil, err
 		}
-		return nil, status.Error(codes.Unauthenticated, "incorrect password")
+		return nil, errDefine.IncorrectPasswordErr
 	}
 
 	// 重置失败次数
 	err = userService.cache.Del(ctx, loginAttemptsKey).Err()
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to reset login attempts: %v", err)
+		return nil, errDefine.ServerErr
 	}
 
 	// 查询最新登录日志
@@ -109,7 +110,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 
 	expireAt := time.Duration(utils.RandomInt(27, 30))
 	if err := userService.cache.Set(ctx, getUserInfoKey(user.Username), &user, expireAt*time.Minute).Err(); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to set user info: %v", err)
+		return nil, errDefine.ServerErr
 	}
 
 	return &pb.LoginUserResponse{
@@ -121,12 +122,12 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 func (userService *UserService) recordLoginAttempts(ctx context.Context, loginAttemptsKey, lockedUsernameKey string) error {
 	// 累加失败次数
 	if err := userService.cache.Incr(ctx, loginAttemptsKey).Err(); err != nil {
-		return status.Errorf(codes.Internal, "failed to increment login attempts: %v", err)
+		return errDefine.ServerErr
 	}
 	// 获取失败登录次数
 	loginAttempts, err := userService.cache.Get(ctx, loginAttemptsKey).Int()
 	if err != nil && err != redis.Nil {
-		return status.Errorf(codes.Internal, "failed to get login attempts: %v", err)
+		return errDefine.ServerErr
 	}
 
 	// 判断是否大于最大失败次数
@@ -134,9 +135,9 @@ func (userService *UserService) recordLoginAttempts(ctx context.Context, loginAt
 		// 锁定账户
 		err := userService.cache.Set(ctx, lockedUsernameKey, true, time.Hour).Err()
 		if err != nil {
-			return status.Errorf(codes.Internal, "failed to lock account: %v\n", err)
+			return errDefine.ServerErr
 		}
-		return status.Errorf(codes.PermissionDenied, "account locked, please try again later")
+		return errDefine.AccountLockedErr
 	}
 	return nil
 }
@@ -145,12 +146,12 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 
 	createUserValidator := &validator.CreateUserValidator{}
 	if err := validator.NewValidateContext(createUserValidator).Validate(req); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, errDefine.ParamsErr
 	}
 
 	hashPassword, err := utils.Encrypt(req.GetPassword())
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to hash password")
+		return nil, errDefine.ParamsErr
 	}
 
 	arg := &db.CreateUserParams{
@@ -166,7 +167,7 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 		if db.ErrorCode(err) == db.UniqueViolation {
 			return nil, status.Errorf(codes.AlreadyExists, err.Error())
 		}
-		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
+		return nil, errDefine.ServerErr
 	}
 
 	return &pb.CreateUserResponse{
@@ -241,10 +242,6 @@ func (userService *UserService) UpdateUser(ctx context.Context, req *pb.UpdateUs
 			String: req.GetNickname(),
 			Valid:  req.Nickname != nil,
 		},
-		Avatar: pgtype.Text{
-			String: req.GetAvatar(),
-			Valid:  req.Avatar != nil,
-		},
 		Gender: pgtype.Int2{
 			Int16: int16(req.GetGender()),
 			Valid: req.Gender != nil,
@@ -254,15 +251,15 @@ func (userService *UserService) UpdateUser(ctx context.Context, req *pb.UpdateUs
 	user, err := userService.store.UpdateUser(ctx, arg)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
-			return nil, status.Errorf(codes.NotFound, "user not found")
+			return nil, errDefine.UserNotFoundErr
 		}
-		return nil, status.Errorf(codes.Internal, "failed to update user: %s", err)
+		return nil, errDefine.ServerErr
 	}
 
 	userInfoKey := getUserInfoKey(payload.Username)
 	expireAt := time.Duration(utils.RandomInt(27, 30))
 	if err := userService.cache.Set(ctx, userInfoKey, &user, expireAt*time.Minute).Err(); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to set user info: %v", err)
+		return nil, errDefine.ServerErr
 	}
 
 	resp := &pb.UpdateUserResponse{
@@ -281,11 +278,11 @@ func (userService *UserService) DeleteUser(ctx context.Context, req *pb.EmptyReq
 	userInfoKey := getUserInfoKey(payload.Username)
 	var user db.User
 	if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get user info: %v", err)
+		return nil, errDefine.ServerErr
 	}
 
 	if err := userService.store.DeleteUser(ctx, user.ID); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to delete user: %v", err)
+		return nil, errDefine.ServerErr
 	}
 
 	_ = userService.cache.Del(ctx, userInfoKey).Err()
@@ -306,27 +303,27 @@ func (userService *UserService) UpdateUserPassword(ctx context.Context, req *pb.
 
 	// TODO 校验邮箱验证码是否正确
 	if req.EmailCode != "123" {
-		return nil, status.Error(codes.InvalidArgument, "invalid argument")
+		return nil, errDefine.EmailCodeErr
 	}
 
 	// 校验两次密码是否一致
 	if req.UserPassword != req.UserConfirmPassword {
-		return nil, status.Error(codes.InvalidArgument, "两次密码不一致")
+		return nil, errDefine.RestPwdNotSame
 	}
 
 	// 判断新旧密码是否一致
 	if err := utils.Decrypt(req.UserConfirmPassword, user.Password); err == nil {
-		return nil, status.Error(codes.InvalidArgument, "新旧密码不能一致")
+		return nil, errDefine.NewPwdIsSame
 	}
 
 	// 校验上次密码更新时间与当前时间差
 	if !time.Now().After(user.PasswordChangedAt.Add(7 * 24 * time.Hour)) {
-		return nil, status.Error(codes.InvalidArgument, "两次修改密码的间隔不得低于7天")
+		return nil, errDefine.NewPwdBelowInterval
 	}
 
 	hashPassword, err := utils.Encrypt(req.GetUserConfirmPassword())
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to hash password")
+		return nil, errDefine.ParamsErr
 	}
 
 	now := time.Now()
@@ -339,7 +336,7 @@ func (userService *UserService) UpdateUserPassword(ctx context.Context, req *pb.
 
 	err = userService.store.UpdateUserPassword(ctx, arg)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to update user: %v", err)
+		return nil, errDefine.ServerErr
 	}
 
 	_ = userService.cache.Del(ctx, getUserInfoKey(user.Username)).Err()
@@ -360,7 +357,7 @@ func (userService *UserService) Logout(ctx context.Context, req *pb.EmptyRequest
 	userInfoKey := getUserInfoKey(payload.Username)
 	var user db.User
 	if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get user info: %v", err)
+		return nil, errDefine.ServerErr
 	}
 
 	_ = userService.cache.Del(ctx, userInfoKey).Err()

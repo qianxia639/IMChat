@@ -14,7 +14,6 @@ LIMIT 1;
 UPDATE users
 SET
     nickname = COALESCE(sqlc.narg(nickname), nickname),
-    avatar = COALESCE(sqlc.narg(avatar), avatar),
     gender = COALESCE(sqlc.narg(gender), gender),
     updated_at = sqlc.arg(updated_at)
 WHERE
