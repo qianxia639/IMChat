@@ -15,9 +15,11 @@ service MessageService {
 }
 
 message SenderMessageRequest {
-    int32 sender_id = 1;
-    int32 receive_id = 2;
-    string content = 3;
+    int32 sender_id = 1;   //  发送者Id
+    int32 receive_id = 2;   // 接收者Id
+    int32 message_type = 3; // 消息类型
+    string content = 4;   // 发送的内容
+    SendType send_type = 5;    // 发送类型
 }
 
 message SenderMessageResponse {

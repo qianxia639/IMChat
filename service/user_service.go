@@ -53,6 +53,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	user, err := userService.store.GetUser(ctx, req.Username)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
+			log.Error().Err(err).Msgf("GetUser(_)")
 			return nil, errDefine.UserNotFoundErr
 		}
 		return nil, errDefine.ServerErr

@@ -2,13 +2,12 @@ package service
 
 import (
 	db "IMChat/db/sqlc"
+	errDefine "IMChat/internal/errors"
 	"IMChat/pb"
-	"errors"
 	"io"
 	"time"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/rs/zerolog/log"
 )
 
 type MessageService struct {
@@ -30,36 +29,39 @@ func (messageService *MessageService) SenderMessage(stream pb.MessageService_Sen
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
-			break
+			return nil
 		}
 		if err != nil {
-			return status.Errorf(codes.Unknown, "cannot receive stream request: %v\n", err)
+			return errDefine.ServerErr
 		}
 
 		// 判断发送者是否与当前登录者一致
 		if user.ID != in.SenderId {
-			return status.Errorf(codes.InvalidArgument, "sneder id error")
+			log.Error().Int32("userId", user.ID).Int32("senderId", in.SenderId).Msg("非当前登录用户")
+			return errDefine.PermissionDeniedErr
 		}
 
 		// 判断双方是否为好友关系，只允许好友之间互发消息
-		_, err = messageService.store.GetFriend(ctx, &db.GetFriendParams{
-			UserID:   in.SenderId,
-			FriendID: in.ReceiveId,
-		})
-		if err != nil {
-			if errors.Is(err, db.ErrRecordNotFound) {
-				return status.Errorf(codes.NotFound, "not friend relation")
-			}
-			return status.Errorf(codes.Internal, "failed to find friend")
-		}
+		// _, err = messageService.store.GetFriend(ctx, &db.GetFriendParams{
+		// 	UserID:   in.SenderId,
+		// 	FriendID: in.ReceiveId,
+		// })
+		// if err != nil {
+		// 	if errors.Is(err, db.ErrRecordNotFound) {
+		// 		return status.Errorf(codes.NotFound, "not friend relation")
+		// 	}
+		// 	return errDefine.ServerErr
+		// }
 
 		// 持久化消息
 		arg := &db.AddMessageTxParams{
 			AddMessageParams: db.AddMessageParams{
-				SenderID:   user.ID,
-				ReceiverID: in.ReceiveId,
-				Content:    in.Content,
-				SenderTime: time.Now(),
+				SenderID:    user.ID,
+				ReceiverID:  in.ReceiveId,
+				MessageType: int16(in.MessageType),
+				Content:     in.Content,
+				SendType:    int16(in.SendType),
+				SendingTime: time.Now(),
 			},
 			AfterFunc: func(message db.Message) error {
 				msgPb := converMesagge(message)
@@ -69,7 +71,9 @@ func (messageService *MessageService) SenderMessage(stream pb.MessageService_Sen
 		}
 		_, err = messageService.store.AddMessageTx(ctx, arg)
 		if err != nil {
-			return status.Errorf(codes.Internal, "failed to add message: %v\n", err)
+			// return status.Errorf(codes.Internal, "failed to add message: %v\n", err)
+			log.Error().Err(err).Msgf("%v.AddMessageTx", messageService.store)
+			return errDefine.ServerErr
 		}
 		// msgPb := converMesagge(msg)
 		// resp := &pb.SenderMessageResponse{Message: msgPb}
@@ -77,5 +81,5 @@ func (messageService *MessageService) SenderMessage(stream pb.MessageService_Sen
 		// 	return status.Errorf(codes.Unknown, "failed send message: %v\n", err)
 		// }
 	}
-	return nil
+	// return nil
 }
