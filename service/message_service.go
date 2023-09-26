@@ -4,10 +4,13 @@ import (
 	db "IMChat/db/sqlc"
 	errDefine "IMChat/internal/errors"
 	"IMChat/pb"
+	"errors"
 	"io"
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type MessageService struct {
@@ -42,16 +45,16 @@ func (messageService *MessageService) SenderMessage(stream pb.MessageService_Sen
 		}
 
 		// 判断双方是否为好友关系，只允许好友之间互发消息
-		// _, err = messageService.store.GetFriend(ctx, &db.GetFriendParams{
-		// 	UserID:   in.SenderId,
-		// 	FriendID: in.ReceiveId,
-		// })
-		// if err != nil {
-		// 	if errors.Is(err, db.ErrRecordNotFound) {
-		// 		return status.Errorf(codes.NotFound, "not friend relation")
-		// 	}
-		// 	return errDefine.ServerErr
-		// }
+		_, err = messageService.store.GetFriend(ctx, &db.GetFriendParams{
+			UserID:   in.SenderId,
+			FriendID: in.ReceiveId,
+		})
+		if err != nil {
+			if errors.Is(err, db.ErrRecordNotFound) {
+				return status.Errorf(codes.NotFound, "not friend relation")
+			}
+			return errDefine.ServerErr
+		}
 
 		// 持久化消息
 		arg := &db.AddMessageTxParams{
