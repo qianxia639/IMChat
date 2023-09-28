@@ -73,15 +73,15 @@ func (q *Queries) GetFriend(ctx context.Context, arg *GetFriendParams) (Friend, 
 }
 
 const listFriends = `-- name: ListFriends :many
-SELECT f.friend_id, f.note, u.avatar FROM friends AS f
+SELECT f.friend_id, f.note, u.profile_picture_url FROM friends AS f
 JOIN users AS u ON f.user_id = u.id
 WHERE u.id = $1
 `
 
 type ListFriendsRow struct {
-	FriendID int32  `json:"friend_id"`
-	Note     string `json:"note"`
-	Avatar   string `json:"avatar"`
+	FriendID          int32  `json:"friend_id"`
+	Note              string `json:"note"`
+	ProfilePictureUrl string `json:"profile_picture_url"`
 }
 
 func (q *Queries) ListFriends(ctx context.Context, id int32) ([]ListFriendsRow, error) {
@@ -93,7 +93,7 @@ func (q *Queries) ListFriends(ctx context.Context, id int32) ([]ListFriendsRow, 
 	var items []ListFriendsRow
 	for rows.Next() {
 		var i ListFriendsRow
-		if err := rows.Scan(&i.FriendID, &i.Note, &i.Avatar); err != nil {
+		if err := rows.Scan(&i.FriendID, &i.Note, &i.ProfilePictureUrl); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -13,7 +13,7 @@ func converUser(user db.User) *pb.User {
 		Username:  user.Username,
 		Nickname:  user.Nickname,
 		Email:     utils.DesnsitizeEmail(user.Email),
-		Avatar:    user.Avatar,
+		Avatar:    user.ProfilePictureUrl,
 		Gender:    pb.Gender(pb.Gender(user.Gender).Number()),
 		CreatedAt: timestamppb.New(user.CreatedAt),
 		UpdatedAt: timestamppb.New(user.UpdatedAt),

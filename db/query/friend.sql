@@ -22,6 +22,6 @@ WHERE
     user_id = $1 AND friend_id = $2;
 
 -- name: ListFriends :many
-SELECT f.friend_id, f.note, u.avatar FROM friends AS f
+SELECT f.friend_id, f.note, u.profile_picture_url FROM friends AS f
 JOIN users AS u ON f.user_id = u.id
 WHERE u.id = $1;

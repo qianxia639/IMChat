@@ -6,6 +6,8 @@ package db
 
 import (
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Friend struct {
@@ -70,10 +72,16 @@ type User struct {
 	Email string `json:"email"`
 	// 性别, 0 未知, 1 男, 2 女
 	Gender int16 `json:"gender"`
-	// 用户头像
-	Avatar string `json:"avatar"`
+	// 个人头像图片
+	ProfilePictureUrl string `json:"profile_picture_url"`
+	// 在线状态(在线/离线)
+	Status int16 `json:"status"`
 	// 密码更新时间
 	PasswordChangedAt time.Time `json:"password_changed_at"`
+	// 最后在线时间
+	LastLoginAt time.Time `json:"last_login_at"`
+	// 活动状态(激活/未激活)
+	IsActive pgtype.Bool `json:"is_active"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
 	// 更新时间

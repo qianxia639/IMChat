@@ -143,7 +143,7 @@ func (friendService *FriendService) ListFriends(req *pb.EmptyRequest, stream pb.
 		res := &pb.ListFriendsResponse{
 			FriendId: friend.FriendID,
 			Note:     friend.Note,
-			Avatar:   friend.Avatar,
+			Avatar:   friend.ProfilePictureUrl,
 		}
 		if err := stream.Send(res); err != nil {
 			return err

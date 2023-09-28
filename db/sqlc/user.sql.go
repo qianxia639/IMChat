@@ -17,7 +17,7 @@ INSERT INTO users (
     username, password, nickname, email, gender
 ) VALUES (
     $1, $2, $3, $4, $5
-) RETURNING id, username, nickname, password, email, gender, avatar, password_changed_at, created_at, updated_at
+) RETURNING id, username, nickname, password, email, gender, profile_picture_url, status, password_changed_at, last_login_at, is_active, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -44,8 +44,11 @@ func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (User, 
 		&i.Password,
 		&i.Email,
 		&i.Gender,
-		&i.Avatar,
+		&i.ProfilePictureUrl,
+		&i.Status,
 		&i.PasswordChangedAt,
+		&i.LastLoginAt,
+		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -87,7 +90,7 @@ func (q *Queries) ExistNickname(ctx context.Context, nickname string) (int64, er
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, nickname, password, email, gender, avatar, password_changed_at, created_at, updated_at FROM users
+SELECT id, username, nickname, password, email, gender, profile_picture_url, status, password_changed_at, last_login_at, is_active, created_at, updated_at FROM users
 WHERE username = $1
 LIMIT 1
 `
@@ -102,8 +105,11 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 		&i.Password,
 		&i.Email,
 		&i.Gender,
-		&i.Avatar,
+		&i.ProfilePictureUrl,
+		&i.Status,
 		&i.PasswordChangedAt,
+		&i.LastLoginAt,
+		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -118,7 +124,7 @@ SET
     updated_at = $3
 WHERE
     username = $4
-RETURNING id, username, nickname, password, email, gender, avatar, password_changed_at, created_at, updated_at
+RETURNING id, username, nickname, password, email, gender, profile_picture_url, status, password_changed_at, last_login_at, is_active, created_at, updated_at
 `
 
 type UpdateUserParams struct {
@@ -143,8 +149,11 @@ func (q *Queries) UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, 
 		&i.Password,
 		&i.Email,
 		&i.Gender,
-		&i.Avatar,
+		&i.ProfilePictureUrl,
+		&i.Status,
 		&i.PasswordChangedAt,
+		&i.LastLoginAt,
+		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
