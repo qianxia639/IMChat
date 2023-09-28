@@ -11,17 +11,6 @@ CREATE TABLE "users" (
   "updated_at" TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z'
 );
 
-CREATE TABLE "user_login_logs" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "user_id" INTEGER NOT NULL,
-  "login_time" TIMESTAMPTZ NOT NULL DEFAULT (now()),
-  "login_ip" VARCHAR(20) NOT NULL,
-  "login_ip_region" VARCHAR(20) NOT NULL,
-  "is_login_exceptional" BOOLEAN NOT NULL DEFAULT false,
-  "platform" VARCHAR(16) NOT NULL,
-  "user_agent" VARCHAR(150) NOT NULL
-);
-
 COMMENT ON COLUMN "users"."id" IS '用户Id';
 
 COMMENT ON COLUMN "users"."username" IS '用户名';
@@ -41,6 +30,18 @@ COMMENT ON COLUMN "users"."password_changed_at" IS '密码更新时间';
 COMMENT ON COLUMN "users"."created_at" IS '创建时间';
 
 COMMENT ON COLUMN "users"."updated_at" IS '更新时间';
+
+
+CREATE TABLE "user_login_logs" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "user_id" INTEGER NOT NULL,
+  "login_time" TIMESTAMPTZ NOT NULL DEFAULT (now()),
+  "login_ip" VARCHAR(20) NOT NULL,
+  "login_ip_region" VARCHAR(20) NOT NULL,
+  "is_login_exceptional" BOOLEAN NOT NULL DEFAULT false,
+  "platform" VARCHAR(16) NOT NULL,
+  "user_agent" VARCHAR(150) NOT NULL
+);
 
 COMMENT ON COLUMN "user_login_logs"."id" IS '日志Id';
 

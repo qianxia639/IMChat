@@ -4,6 +4,6 @@ http/
 
 .vscode/
 
-.md
+-*.md
 
 client/
