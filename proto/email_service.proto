@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package qianxia.IMChat;
+
+option go_package = "IMChat/pb";
+
+service EmailService {
+
+    rpc SendEmailCode (SendEmailCodeRequest) returns (SendEmailCodeResponse);
+}
+
+message SendEmailCodeRequest {
+    string email = 1;
+}
+
+message SendEmailCodeResponse {
+    string message = 1;
+}

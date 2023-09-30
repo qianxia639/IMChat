@@ -8,6 +8,7 @@ type Config struct {
 	Server      Server   `mapstructure:"server"`
 	Token       Token    `mapstructure:"token"`
 	Redis       Redis    `mapstructure:"redis"`
+	Email       Email    `mapstructure:"email"`
 }
 
 type Postgres struct {
@@ -29,4 +30,10 @@ type Redis struct {
 	Address  string `mapstructure:"address"`
 	Password string `mapstructure:"password"`
 	DB       int    `mapstructure:"db"`
+}
+
+type Email struct {
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	Host     string `mapstructure:"host"`
 }

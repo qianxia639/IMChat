@@ -151,6 +151,12 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 		return nil, errDefine.ParamsErr
 	}
 
+	// 校验邮箱验证码
+	ok, _ := utils.VerifyEmailCode(userService.cache, req.Email, req.EmailCode)
+	if !ok {
+		return nil, errDefine.EmailCodeErr
+	}
+
 	hashPassword, err := utils.Encrypt(req.Password)
 	if err != nil {
 		return nil, errDefine.ParamsErr

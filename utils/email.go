@@ -1,32 +1,38 @@
 package utils
 
 import (
+	"context"
 	"crypto/tls"
+	"fmt"
 	"net/smtp"
+	"time"
+
+	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
 )
 
-var (
-	username = "2274000859@qq.com"
-	password = "sersteijzokudjfj"
-	host     = "smtp.qq.com"
-)
+type Email struct {
+	Username string
+	Password string
+	Host     string
+}
 
-func SendMail(to, subject, body string) error {
-	auth := smtp.PlainAuth("", username, password, host)
+func (e *Email) SendMail(to, subject, body string) error {
+	auth := smtp.PlainAuth("", e.Username, e.Password, e.Host)
 
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: true,
-		ServerName:         host + ":465",
+		ServerName:         e.Host + ":465",
 	}
 
-	msg := []byte("To: " + to + "\r\nFrom: " + username + "\r\nSubject: " + subject + "\r\n\r\n" + body)
+	msg := []byte("To: " + to + "\r\nFrom: " + e.Username + "\r\nSubject: " + subject + "\r\n\r\n" + body)
 
-	conn, err := tls.Dial("tcp", host+":465", tlsConfig)
+	conn, err := tls.Dial("tcp", e.Host+":465", tlsConfig)
 	if err != nil {
 		return err
 	}
 
-	client, err := smtp.NewClient(conn, host)
+	client, err := smtp.NewClient(conn, e.Host)
 	if err != nil {
 		return err
 	}
@@ -36,7 +42,7 @@ func SendMail(to, subject, body string) error {
 		return err
 	}
 
-	if err := client.Mail(username); err != nil {
+	if err := client.Mail(e.Username); err != nil {
 		return err
 	}
 
@@ -59,4 +65,33 @@ func SendMail(to, subject, body string) error {
 	}
 
 	return nil
+}
+
+func (e *Email) SendEmailCode(cache *redis.Client, email string) error {
+	code := RandomInt(100000, 999999)
+	body := fmt.Sprintf("您的验证码为: %d, 有效时间为5分钟", code)
+	err := e.SendMail(email, "", body)
+	if err != nil {
+		log.Err(err).Msg("邮件发送失败")
+		return err
+	}
+
+	err = cache.Set(context.Background(), email, code, time.Minute*5).Err()
+	if err != nil {
+		log.Err(err).Msg("SendEmailCode error")
+		return err
+	}
+
+	return nil
+}
+
+func VerifyEmailCode(cache *redis.Client, email, code string) (bool, error) {
+	var emailCode string
+	err := cache.Get(context.Background(), email).Scan(&emailCode)
+	if err != nil {
+		log.Err(err).Msg("VerifyEmailCode error")
+		return false, err
+	}
+
+	return emailCode == code, nil
 }
