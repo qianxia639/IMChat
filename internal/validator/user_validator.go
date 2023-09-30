@@ -5,11 +5,13 @@ import (
 	"IMChat/utils"
 	"fmt"
 	"regexp"
+
+	"github.com/dlclark/regexp2"
 )
 
 var (
 	isValidUsername = regexp.MustCompile(`^[\da-zA-Z_]{6,20}$`).MatchString
-	isValidPassword = regexp.MustCompile(`^[\da-zA-Z_?!]{6,20}$`).MatchString
+	isValidPassword = regexp.MustCompile(`^[a-zA-Z\d]{8,16}$`).MatchString
 )
 
 type LoginUserValidator struct{}
@@ -27,9 +29,12 @@ func (*LoginUserValidator) Validate(param interface{}) error {
 		return fmt.Errorf("invalid username")
 	}
 	// 校验密码
-	if !isValidPassword(req.Password) {
+	reg, _ := regexp2.Compile("^(?=.*[A-Za-z])(?=.*\\d|.*[\\W_])[A-Za-z\\d\\W_]{8,16}$", 0)
+	_, err := reg.MatchString(req.Password)
+	if err != nil {
 		return fmt.Errorf("invalid password")
 	}
+
 	return nil
 }
 
@@ -55,13 +60,6 @@ func (*CreateUserValidator) Validate(param interface{}) error {
 	err := utils.ValidatorEmail(req.Email)
 	if err != nil {
 		return err
-	}
-
-	if req.Gender != nil {
-		_, exists := pb.Gender_name[int32(*req.Gender)]
-		if !exists {
-			return fmt.Errorf("invlaid argument, gender is %d", int32(*req.Gender))
-		}
 	}
 
 	return nil

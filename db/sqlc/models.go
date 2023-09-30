@@ -6,8 +6,6 @@ package db
 
 import (
 	"time"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Friend struct {
@@ -80,8 +78,6 @@ type User struct {
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	// 最后在线时间
 	LastLoginAt time.Time `json:"last_login_at"`
-	// 活动状态(激活/未激活)
-	IsActive pgtype.Bool `json:"is_active"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
 	// 更新时间

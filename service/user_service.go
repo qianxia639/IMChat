@@ -171,7 +171,6 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 		Password: hashPassword,
 		Email:    req.Email,
 		Nickname: req.Username,
-		Gender:   int16(*req.Gender),
 	}
 
 	_, err = userService.store.CreateUser(ctx, arg)

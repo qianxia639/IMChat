@@ -9,7 +9,6 @@ CREATE TABLE "users" (
   "status" SMALLINT NOT NULL DEFAULT 0,
   "password_changed_at" TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z',
   "last_login_at" TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z',
-  "is_active" BOOLEAN DEFAULT false,
   "created_at" TIMESTAMPTZ NOT NULL DEFAULT (now()),
   "updated_at" TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z'
 );
@@ -33,8 +32,6 @@ COMMENT ON COLUMN "users"."status" IS '在线状态(在线/离线)';
 COMMENT ON COLUMN "users"."password_changed_at" IS '密码更新时间';
 
 COMMENT ON COLUMN "users"."last_login_at" IS '最后在线时间';
-
-COMMENT ON COLUMN "users"."is_active" IS '活动状态(激活/未激活)';
 
 COMMENT ON COLUMN "users"."created_at" IS '创建时间';
 

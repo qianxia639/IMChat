@@ -1,12 +1,14 @@
 package validator
 
 import (
-	"regexp"
 	"testing"
+
+	"github.com/dlclark/regexp2"
 )
 
 func TestRegexp(t *testing.T) {
-	var isBool = regexp.MustCompile("^[a-zA-Z0-9_?!]{6,20}$").MatchString
+	reg, _ := regexp2.Compile("^(?=.*[A-Za-z])(?=.*\\d|.*[\\W_])[A-Za-z\\d\\W_]{8,16}$", 0)
+	// _, err := reg.MatchString(req.Password)
 
 	testCases := []string{
 		"qqqqq",
@@ -18,6 +20,11 @@ func TestRegexp(t *testing.T) {
 	}
 
 	for _, s := range testCases {
-		t.Logf("%s ----------> %t\n", s, isBool(s))
+		t.Logf("%s ----------> %t\n", s, matchRegexp2(reg, s))
 	}
+}
+
+func matchRegexp2(reg *regexp2.Regexp, str string) bool {
+	matched, _ := reg.MatchString(str)
+	return matched
 }

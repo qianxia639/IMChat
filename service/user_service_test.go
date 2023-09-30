@@ -9,7 +9,6 @@ import (
 	"database/sql"
 	"fmt"
 	"testing"
-	"unsafe"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -63,7 +62,7 @@ func randomUser(t *testing.T) (user db.User, password string) {
 
 func TestCreateUser(t *testing.T) {
 	user, password := randomUser(t)
-	gender := 5
+
 	testCases := []struct {
 		name          string
 		req           *pb.CreateUserRequest
@@ -157,7 +156,6 @@ func TestCreateUser(t *testing.T) {
 				Username: user.Username,
 				Password: password,
 				Email:    user.Email,
-				Gender:   (*pb.Gender)(unsafe.Pointer(&gender)),
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
