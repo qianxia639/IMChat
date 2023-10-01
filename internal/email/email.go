@@ -1,6 +1,7 @@
-package utils
+package email
 
 import (
+	"IMChat/utils"
 	"context"
 	"crypto/tls"
 	"fmt"
@@ -17,7 +18,7 @@ type Email struct {
 	Host     string
 }
 
-func (e *Email) SendMail(to, subject, body string) error {
+func (e *Email) sendMail(to, subject, body string) error {
 	auth := smtp.PlainAuth("", e.Username, e.Password, e.Host)
 
 	tlsConfig := &tls.Config{
@@ -68,9 +69,9 @@ func (e *Email) SendMail(to, subject, body string) error {
 }
 
 func (e *Email) SendEmailCode(cache *redis.Client, email string) error {
-	code := RandomInt(100000, 999999)
+	code := utils.RandomInt(100000, 999999)
 	body := fmt.Sprintf("您的验证码为: %d, 有效时间为5分钟", code)
-	err := e.SendMail(email, "", body)
+	err := e.sendMail(email, "验证信息", body)
 	if err != nil {
 		log.Err(err).Msg("邮件发送失败")
 		return err

@@ -12,10 +12,10 @@ import (
 
 type FriendClusterApplyService struct {
 	pb.UnimplementedFriendClusterApplyServiceServer
-	Server
+	*Server
 }
 
-func NewFriendClusterApplyService(server Server) pb.FriendClusterApplyServiceServer {
+func NewFriendClusterApplyService(server *Server) pb.FriendClusterApplyServiceServer {
 	return &FriendClusterApplyService{
 		Server: server,
 	}

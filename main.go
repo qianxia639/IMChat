@@ -62,11 +62,11 @@ func runDBMigration(migrationURL, dbSource string) {
 func runGrpcServer(conf config.Config, store db.Store) {
 
 	server := service.NewServer(conf, store)
-	userService := service.NewUserService(*server)
-	friendApplyService := service.NewFriendClusterApplyService(*server)
-	friendService := service.NewFriendService(*server)
-	messageService := service.NewMessageService(*server)
-	emailService := service.NewEmailService(*server)
+	userService := service.NewUserService(server)
+	friendApplyService := service.NewFriendClusterApplyService(server)
+	friendService := service.NewFriendService(server)
+	messageService := service.NewMessageService(server)
+	emailService := service.NewEmailService(server)
 
 	grpcLogger := grpc.UnaryInterceptor(interceptor.GrpcUnaryLogger)
 	grpcServer := grpc.NewServer(
@@ -106,13 +106,13 @@ func runGatewayServer(conf config.Config, store db.Store) {
 	// 	grpc.WithTransportCredentials(insecure.NewCredentials()),
 	// }
 	// err := pb.RegisterUserServiceHandlerFromEndpoint(ctx, grpcMux, conf.Server.GrpcServerAddress, dialOpts)
-	err := pb.RegisterUserServiceHandlerServer(ctx, grpcMux, service.NewUserService(*server))
+	err := pb.RegisterUserServiceHandlerServer(ctx, grpcMux, service.NewUserService(server))
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot register handler server")
 	}
 
-	pb.RegisterFriendClusterApplyServiceHandlerServer(ctx, grpcMux, service.NewFriendClusterApplyService(*server))
-	pb.RegisterFriendServiceHandlerServer(ctx, grpcMux, service.NewFriendService(*server))
+	pb.RegisterFriendClusterApplyServiceHandlerServer(ctx, grpcMux, service.NewFriendClusterApplyService(server))
+	pb.RegisterFriendServiceHandlerServer(ctx, grpcMux, service.NewFriendService(server))
 
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux) // 覆盖所有路由

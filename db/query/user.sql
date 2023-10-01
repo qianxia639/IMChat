@@ -15,6 +15,8 @@ UPDATE users
 SET
     nickname = COALESCE(sqlc.narg(nickname), nickname),
     gender = COALESCE(sqlc.narg(gender), gender),
+    status = COALESCE(sqlc.narg(status), status),
+    last_login_at = COALESCE(sqlc.narg(last_login_at), last_login_at),
     updated_at = sqlc.arg(updated_at)
 WHERE
     username = sqlc.arg(username)

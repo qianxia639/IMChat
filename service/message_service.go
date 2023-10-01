@@ -15,10 +15,10 @@ import (
 
 type MessageService struct {
 	pb.UnimplementedMessageServiceServer
-	Server
+	*Server
 }
 
-func NewMessageService(server Server) pb.MessageServiceServer {
+func NewMessageService(server *Server) pb.MessageServiceServer {
 	return &MessageService{Server: server}
 }
 

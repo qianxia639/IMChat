@@ -2,6 +2,7 @@ package service
 
 import (
 	db "IMChat/db/sqlc"
+	"IMChat/internal/email"
 	errDefine "IMChat/internal/errors"
 	"IMChat/internal/validator"
 	"IMChat/pb"
@@ -21,10 +22,10 @@ import (
 
 type UserService struct {
 	pb.UnimplementedUserServiceServer
-	Server
+	*Server
 }
 
-func NewUserService(server Server) pb.UserServiceServer {
+func NewUserService(server *Server) pb.UserServiceServer {
 	return &UserService{
 		Server: server,
 	}
@@ -109,6 +110,21 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 		log.Warn().Msgf("failed to add user login log: %v", err)
 	}
 
+	// 更改在线状态
+	now := time.Now()
+	arg := &db.UpdateUserParams{
+		Username:  user.Username,
+		UpdatedAt: now,
+		Status: pgtype.Int2{
+			Int16: 1,
+			Valid: true,
+		},
+	}
+	_, err = userService.store.UpdateUser(ctx, arg)
+	if err != nil {
+		return nil, errDefine.ServerErr
+	}
+
 	expireAt := time.Duration(utils.RandomInt(27, 30))
 	if err := userService.cache.Set(ctx, getUserInfoKey(user.Username), &user, expireAt*time.Minute).Err(); err != nil {
 		return nil, errDefine.ServerErr
@@ -152,7 +168,7 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 	}
 
 	// 校验邮箱验证码
-	ok, _ := utils.VerifyEmailCode(userService.cache, req.Email, req.EmailCode)
+	ok, _ := email.VerifyEmailCode(userService.cache, req.Email, req.EmailCode)
 	if !ok {
 		return nil, errDefine.EmailCodeErr
 	}
@@ -377,6 +393,25 @@ func (userService *UserService) Logout(ctx context.Context, req *pb.EmptyRequest
 	userInfoKey := getUserInfoKey(payload.Username)
 	var user db.User
 	if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
+		return nil, errDefine.ServerErr
+	}
+
+	// 更改在线状态为离线并更新最后在线时间
+	now := time.Now()
+	arg := &db.UpdateUserParams{
+		Username:  user.Username,
+		UpdatedAt: now,
+		Status: pgtype.Int2{
+			Int16: 0,
+			Valid: true,
+		},
+		LastLoginAt: pgtype.Timestamptz{
+			Time:  now,
+			Valid: true,
+		},
+	}
+	_, err = userService.store.UpdateUser(ctx, arg)
+	if err != nil {
 		return nil, errDefine.ServerErr
 	}
 

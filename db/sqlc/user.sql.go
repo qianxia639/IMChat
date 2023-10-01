@@ -117,23 +117,29 @@ UPDATE users
 SET
     nickname = COALESCE($1, nickname),
     gender = COALESCE($2, gender),
-    updated_at = $3
+    status = COALESCE($3, status),
+    last_login_at = COALESCE($4, last_login_at),
+    updated_at = $5
 WHERE
-    username = $4
+    username = $6
 RETURNING id, username, nickname, password, email, gender, profile_picture_url, status, password_changed_at, last_login_at, created_at, updated_at
 `
 
 type UpdateUserParams struct {
-	Nickname  pgtype.Text `json:"nickname"`
-	Gender    pgtype.Int2 `json:"gender"`
-	UpdatedAt time.Time   `json:"updated_at"`
-	Username  string      `json:"username"`
+	Nickname    pgtype.Text        `json:"nickname"`
+	Gender      pgtype.Int2        `json:"gender"`
+	Status      pgtype.Int2        `json:"status"`
+	LastLoginAt pgtype.Timestamptz `json:"last_login_at"`
+	UpdatedAt   time.Time          `json:"updated_at"`
+	Username    string             `json:"username"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, updateUser,
 		arg.Nickname,
 		arg.Gender,
+		arg.Status,
+		arg.LastLoginAt,
 		arg.UpdatedAt,
 		arg.Username,
 	)

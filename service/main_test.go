@@ -24,5 +24,5 @@ func newTestServer(t *testing.T, store db.Store) *Server {
 
 func newTestUserService(t *testing.T, store db.Store) pb.UserServiceServer {
 	server := newTestServer(t, store)
-	return NewUserService(*server)
+	return NewUserService(server)
 }

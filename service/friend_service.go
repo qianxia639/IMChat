@@ -12,10 +12,10 @@ import (
 
 type FriendService struct {
 	pb.UnimplementedFriendServiceServer
-	Server
+	*Server
 }
 
-func NewFriendService(server Server) pb.FriendServiceServer {
+func NewFriendService(server *Server) pb.FriendServiceServer {
 	return &FriendService{
 		Server: server,
 	}
