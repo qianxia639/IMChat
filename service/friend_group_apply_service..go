@@ -10,36 +10,36 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-type FriendClusterApplyService struct {
-	pb.UnimplementedFriendClusterApplyServiceServer
+type FriendGroupApplyService struct {
+	pb.UnimplementedFriendGroupApplyServiceServer
 	*Server
 }
 
-func NewFriendClusterApplyService(server *Server) pb.FriendClusterApplyServiceServer {
-	return &FriendClusterApplyService{
+func NewFriendGroupRequestService(server *Server) pb.FriendGroupApplyServiceServer {
+	return &FriendGroupApplyService{
 		Server: server,
 	}
 }
 
-func (friendClusterApplyService *FriendClusterApplyService) CreateFriendClusterApply(ctx context.Context, req *pb.CreateFriendClusterApplyRequest) (*pb.CreateFriendClusterApplyResponse, error) {
+func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGrpupApply(ctx context.Context, req *pb.CreateFriendGroupApplyRequest) (*pb.CreateFriendGroupApplyResponse, error) {
 
 	// 身份校验并获取用户信息
-	user, err := friendClusterApplyService.getUserInfo(ctx)
+	user, err := friendGroupApplyService.getUserInfo(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	if user.ID == req.ReceiverId && req.Flag == 0 {
+	if user.ID == req.ReceiverId && req.ApplyType == 0 {
 		return nil, status.Error(codes.InvalidArgument, "无法添加自己")
 	}
 
-	switch req.GetFlag() {
+	switch req.ApplyType {
 	case 0: // 好友
 		// 判断是否已申请
-		count, _ := friendClusterApplyService.store.ExistsFriendClusterApply(ctx, &db.ExistsFriendClusterApplyParams{
-			ApplyID:    user.ID,
+		count, _ := friendGroupApplyService.store.ExistsFriendGroupApply(ctx, &db.ExistsFriendGroupApplyParams{
+			SenderID:   user.ID,
 			ReceiverID: req.GetReceiverId(),
-			Flag:       int16(req.Flag),
+			ApplyType:  int16(req.ApplyType),
 		})
 		if count > 0 {
 			return nil, status.Errorf(codes.InvalidArgument, "请勿重复申请")
@@ -47,7 +47,7 @@ func (friendClusterApplyService *FriendClusterApplyService) CreateFriendClusterA
 
 		// 判断是否已经是好友
 		// TODO: 暂未完成
-		friend, _ := friendClusterApplyService.store.GetFriend(ctx, &db.GetFriendParams{
+		friend, _ := friendGroupApplyService.store.GetFriend(ctx, &db.GetFriendParams{
 			UserID:   user.ID,
 			FriendID: req.GetReceiverId(),
 		})
@@ -63,35 +63,35 @@ func (friendClusterApplyService *FriendClusterApplyService) CreateFriendClusterA
 
 	}
 
-	arg := &db.CreateFriendClsuterApplyParams{
-		ApplyID:    user.ID,
+	arg := &db.CreateFriendGroupApplyParams{
+		SenderID:   user.ID,
 		ReceiverID: req.GetReceiverId(),
 		ApplyDesc:  req.GetApplyDesc(),
-		Flag:       int16(req.GetFlag()),
+		ApplyType:  int16(req.GetApplyType()),
 	}
 
-	_, err = friendClusterApplyService.store.CreateFriendClsuterApply(ctx, arg)
+	_, err = friendGroupApplyService.store.CreateFriendGroupApply(ctx, arg)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create check: %v", err)
 	}
 
-	return &pb.CreateFriendClusterApplyResponse{
+	return &pb.CreateFriendGroupApplyResponse{
 		Message: "Create Successfully",
 	}, nil
 }
 
-func (friendClusterApplyService *FriendClusterApplyService) ReplyFriendClusterApply(ctx context.Context, req *pb.ReplyFriendClusterApplyRequest) (*pb.ReplyFriendClusterApplyResponse, error) {
+func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ctx context.Context, req *pb.ReplyFriendGroupApplyRequest) (*pb.ReplyFriendGroupApplyResponse, error) {
 
-	if pb.Status_WAIT == req.Status {
-		return &pb.ReplyFriendClusterApplyResponse{Message: "Waiting..."}, nil
+	if pb.Status_PENDING == req.Status {
+		return &pb.ReplyFriendGroupApplyResponse{Message: "Waiting..."}, nil
 	}
 
-	user, err := friendClusterApplyService.getUserInfo(ctx)
+	user, err := friendGroupApplyService.getUserInfo(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	if user.ID == req.GetFriendId() && req.Flag == pb.Flag_FRIEND {
+	if user.ID == req.GetFriendId() && req.ApplyType == pb.ApplyType_FRIEND {
 		return nil, status.Error(codes.InvalidArgument, "不能添加自己为好友")
 	}
 
@@ -111,10 +111,10 @@ func (friendClusterApplyService *FriendClusterApplyService) ReplyFriendClusterAp
 	// }
 
 	// 判断是否是申请列表中的数据
-	count, _ := friendClusterApplyService.store.ExistsFriendClusterApply(ctx, &db.ExistsFriendClusterApplyParams{
-		ApplyID:    req.FriendId,
+	count, _ := friendGroupApplyService.store.ExistsFriendGroupApply(ctx, &db.ExistsFriendGroupApplyParams{
+		SenderID:   req.FriendId,
 		ReceiverID: user.ID,
-		Flag:       int16(req.GetFlag()),
+		ApplyType:  int16(req.GetApplyType()),
 	})
 	if count < 1 {
 		return nil, status.Errorf(codes.InvalidArgument, "非法的数据")
@@ -124,11 +124,11 @@ func (friendClusterApplyService *FriendClusterApplyService) ReplyFriendClusterAp
 		UserID:   user.ID,
 		FriendID: req.GetFriendId(),
 		Status:   int32(req.GetStatus()),
-		Flag:     int32(req.GetFlag()),
+		Flag:     int32(req.GetApplyType()),
 		Note:     req.Note,
 	}
 
-	_, err = friendClusterApplyService.store.ReplyFriendClusterApplyTx(ctx, arg)
+	_, err = friendGroupApplyService.store.ReplyFriendClusterApplyTx(ctx, arg)
 	if err != nil {
 		pgErr := db.ErrorCode(err)
 		if pgErr == db.ForeignKeyViolation || pgErr == db.UniqueViolation {
@@ -137,23 +137,23 @@ func (friendClusterApplyService *FriendClusterApplyService) ReplyFriendClusterAp
 		return nil, status.Errorf(codes.Internal, "filaed to add friend: %v", err)
 	}
 
-	return &pb.ReplyFriendClusterApplyResponse{Message: "Successfully..."}, nil
+	return &pb.ReplyFriendGroupApplyResponse{Message: "Successfully..."}, nil
 }
 
-func (friendClusterApplyService *FriendClusterApplyService) ListFriendClusterApply(req *pb.EmptyRequest, stream pb.FriendClusterApplyService_ListFriendClusterApplyServer) error {
+func (friendGroupApplyService *FriendGroupApplyService) ListFriendGroupApply(req *pb.EmptyRequest, stream pb.FriendGroupApplyService_ListFriendGroupApplyServer) error {
 	ctx := stream.Context()
-	user, err := friendClusterApplyService.getUserInfo(ctx)
+	user, err := friendGroupApplyService.getUserInfo(ctx)
 	if err != nil {
 		return err
 	}
 
-	friendClusterApplys, _ := friendClusterApplyService.store.ListFriendClusterApply(ctx, user.ID)
+	friendClusterApplys, _ := friendGroupApplyService.store.ListFriendGroupApply(ctx, user.ID)
 	for _, friendClusterApply := range friendClusterApplys {
-		res := &pb.ListFriendClusterApplyResponse{
-			ApplyId:   friendClusterApply.ApplyID,
+		res := &pb.ListFriendGroupApplyResponse{
+			ApplyId:   friendClusterApply.SenderID,
 			Nickname:  friendClusterApply.Nickname,
 			ApplyDesc: friendClusterApply.ApplyDesc,
-			Flag:      int32(friendClusterApply.Flag),
+			ApplyType: int32(friendClusterApply.ApplyType),
 			ApplyTime: timestamppb.New(friendClusterApply.ApplyTime),
 		}
 		if err := stream.Send(res); err != nil {

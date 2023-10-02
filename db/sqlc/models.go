@@ -9,6 +9,8 @@ import (
 )
 
 type Friend struct {
+	// 主键Id
+	ID int64 `json:"id"`
 	// 用户Id
 	UserID int32 `json:"user_id"`
 	// 好友Id
@@ -19,23 +21,36 @@ type Friend struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-type FriendClusterApply struct {
+type FriendGroupApply struct {
 	// 主键Id
 	ID int64 `json:"id"`
 	// 申请者的用户Id
-	ApplyID int32 `json:"apply_id"`
-	// 接收者的用户或群组Id
+	SenderID int32 `json:"sender_id"`
+	// 接收者的用户Id或群组Id
 	ReceiverID int32 `json:"receiver_id"`
 	// 申请描述
 	ApplyDesc string `json:"apply_desc"`
 	// 申请状态, 0: 等待中, 1: 同意, 2: 拒绝
 	Status int16 `json:"status"`
-	// 申请标识, 0: 好友, 1: 群组
-	Flag int16 `json:"flag"`
+	// 申请类型, 0: 好友, 1: 群组
+	ApplyType int16 `json:"apply_type"`
 	// 申请时间
 	ApplyTime time.Time `json:"apply_time"`
 	// 响应时间
 	ReplyTime time.Time `json:"reply_time"`
+}
+
+type Group struct {
+	// 主键Id
+	ID int64 `json:"id"`
+	// 创建者Id
+	CreatorID int32 `json:"creator_id"`
+	// 群组名
+	GroupName string `json:"group_name"`
+	// 群员人数
+	CurrentQuantity int32 `json:"current_quantity"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Message struct {

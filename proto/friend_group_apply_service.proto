@@ -8,64 +8,64 @@ import "command.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
-service FriendClusterApplyService {
-    rpc CreateFriendClusterApply (CreateFriendClusterApplyRequest) returns (CreateFriendClusterApplyResponse) {
+service FriendGroupApplyService {
+    rpc CreateFriendGroupApply (CreateFriendGroupApplyRequest) returns (CreateFriendGroupApplyResponse) {
         option (google.api.http) = {
             post: "/v1/friend/apply"
             body: "*"
         };
     };
 
-    rpc ReplyFriendClusterApply (ReplyFriendClusterApplyRequest) returns (ReplyFriendClusterApplyResponse) {
+    rpc ReplyFriendGroupApply (ReplyFriendGroupApplyRequest) returns (ReplyFriendGroupApplyResponse) {
         option (google.api.http) = {
             post: "/v1/friend/reply"
             body: "*"
         };
     };
 
-    rpc ListFriendClusterApply (EmptyRequest) returns (stream ListFriendClusterApplyResponse) {
+    rpc ListFriendGroupApply (EmptyRequest) returns (stream ListFriendGroupApplyResponse) {
         option (google.api.http) = {
             get: "/v1/friend/apply"
         };
     };
 }
 
-enum Flag {
+enum ApplyType {
     FRIEND = 0;
     CLUSTER = 1;
 }
 
 enum Status {
-    WAIT = 0;
-    AGREE = 1;
-    REFUSE = 2;
+    PENDING = 0;
+    ACCEPTEd = 1;
+    REJECTED = 2;
 }
 
-message CreateFriendClusterApplyRequest {
+message CreateFriendGroupApplyRequest {
     int32 receiver_id = 1;
     string apply_desc = 2;
-    Flag flag = 3;
+    ApplyType apply_type = 3;
 }
 
-message CreateFriendClusterApplyResponse {
+message CreateFriendGroupApplyResponse {
     string message = 1;
 }
 
-message ReplyFriendClusterApplyRequest {
+message ReplyFriendGroupApplyRequest {
     int32 friend_id = 1;
     Status status = 2;
-    Flag flag = 3;
+    ApplyType apply_type = 3;
     string note = 4;
 }
 
-message ReplyFriendClusterApplyResponse {
+message ReplyFriendGroupApplyResponse {
     string message = 1;
 }
 
-message ListFriendClusterApplyResponse {
+message ListFriendGroupApplyResponse {
     int32 apply_id = 1;
     string nickname = 2;
     string apply_desc = 3;
-    int32 flag = 4;
+    int32 apply_type = 4;
     google.protobuf.Timestamp apply_time = 5;
 }

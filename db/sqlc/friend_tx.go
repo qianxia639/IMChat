@@ -16,9 +16,9 @@ func (store *SQLStore) ReplyFriendClusterApplyTx(ctx context.Context, arg *Reply
 	err = store.execTx(ctx, func(q *Queries) error {
 		if arg.Status == 2 { // 拒绝
 			// 更新申请表中的状态
-			return q.UpdateFriendClusterApply(ctx, &UpdateFriendClusterApplyParams{
+			return q.UpdateFriendGroupApply(ctx, &UpdateFriendGroupApplyParams{
 				Status:     int16(arg.Status),
-				ApplyID:    arg.UserID,
+				SenderID:   arg.UserID,
 				ReceiverID: arg.FriendID,
 			})
 		}
@@ -42,9 +42,9 @@ func (store *SQLStore) ReplyFriendClusterApplyTx(ctx context.Context, arg *Reply
 		}
 
 		// 更新申请表中的状态
-		err = q.UpdateFriendClusterApply(ctx, &UpdateFriendClusterApplyParams{
+		err = q.UpdateFriendGroupApply(ctx, &UpdateFriendGroupApplyParams{
 			Status:     int16(arg.Status),
-			ApplyID:    arg.UserID,
+			SenderID:   arg.UserID,
 			ReceiverID: arg.FriendID,
 		})
 		if err != nil {

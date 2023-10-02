@@ -31,6 +31,52 @@ func NewUserService(server *Server) pb.UserServiceServer {
 	}
 }
 
+func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+
+	createUserValidator := &validator.CreateUserValidator{}
+	if err := validator.NewValidateContext(createUserValidator).Validate(req); err != nil {
+		log.Err(err).Msg("Create User parmas validator")
+		return nil, errDefine.ParamsErr
+	}
+
+	// 校验邮箱验证码
+	ok, _ := email.VerifyEmailCode(userService.cache, req.Email, req.EmailCode)
+	if !ok {
+		return nil, errDefine.EmailCodeErr
+	}
+
+	hashPassword, err := utils.Encrypt(req.Password)
+	if err != nil {
+		return nil, errDefine.ParamsErr
+	}
+
+	// 判断用户是否存在
+	if user, _ := userService.store.GetUser(ctx, req.Username); user.ID > 0 {
+		return nil, errDefine.AccountExistErr
+	}
+
+	// 判断邮箱是否存在
+	if i, _ := userService.store.ExistEmail(ctx, req.Email); i > 0 {
+		return nil, errDefine.EmailExistErr
+	}
+
+	arg := &db.CreateUserParams{
+		Username: req.Username,
+		Password: hashPassword,
+		Email:    req.Email,
+		Nickname: req.Username,
+	}
+
+	_, err = userService.store.CreateUser(ctx, arg)
+	if err != nil {
+		return nil, errDefine.ServerErr
+	}
+
+	return &pb.CreateUserResponse{
+		Message: "Create User Succeddfully",
+	}, nil
+}
+
 func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.LoginUserResponse, error) {
 
 	// 参数校验
@@ -157,52 +203,6 @@ func (userService *UserService) recordLoginAttempts(ctx context.Context, loginAt
 		return errDefine.AccountLockedErr
 	}
 	return nil
-}
-
-func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
-
-	createUserValidator := &validator.CreateUserValidator{}
-	if err := validator.NewValidateContext(createUserValidator).Validate(req); err != nil {
-		log.Err(err).Msg("Create User parmas validator")
-		return nil, errDefine.ParamsErr
-	}
-
-	// 校验邮箱验证码
-	ok, _ := email.VerifyEmailCode(userService.cache, req.Email, req.EmailCode)
-	if !ok {
-		return nil, errDefine.EmailCodeErr
-	}
-
-	hashPassword, err := utils.Encrypt(req.Password)
-	if err != nil {
-		return nil, errDefine.ParamsErr
-	}
-
-	// 判断用户是否存在
-	if user, _ := userService.store.GetUser(ctx, req.Username); user.ID > 0 {
-		return nil, errDefine.AccountExistErr
-	}
-
-	// 判断邮箱是否存在
-	if i, _ := userService.store.ExistEmail(ctx, req.Email); i > 0 {
-		return nil, errDefine.EmailExistErr
-	}
-
-	arg := &db.CreateUserParams{
-		Username: req.Username,
-		Password: hashPassword,
-		Email:    req.Email,
-		Nickname: req.Username,
-	}
-
-	_, err = userService.store.CreateUser(ctx, arg)
-	if err != nil {
-		return nil, errDefine.ServerErr
-	}
-
-	return &pb.CreateUserResponse{
-		Message: "Create User Succeddfully",
-	}, nil
 }
 
 func (userService *UserService) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {

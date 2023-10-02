@@ -63,7 +63,7 @@ func runGrpcServer(conf config.Config, store db.Store) {
 
 	server := service.NewServer(conf, store)
 	userService := service.NewUserService(server)
-	friendApplyService := service.NewFriendClusterApplyService(server)
+	friendApplyService := service.NewFriendGroupRequestService(server)
 	friendService := service.NewFriendService(server)
 	messageService := service.NewMessageService(server)
 	emailService := service.NewEmailService(server)
@@ -75,7 +75,7 @@ func runGrpcServer(conf config.Config, store db.Store) {
 	)
 
 	pb.RegisterUserServiceServer(grpcServer, userService)
-	pb.RegisterFriendClusterApplyServiceServer(grpcServer, friendApplyService)
+	pb.RegisterFriendGroupApplyServiceServer(grpcServer, friendApplyService)
 	pb.RegisterFriendServiceServer(grpcServer, friendService)
 	pb.RegisterMessageServiceServer(grpcServer, messageService)
 	pb.RegisterEmailServiceServer(grpcServer, emailService)
@@ -111,7 +111,7 @@ func runGatewayServer(conf config.Config, store db.Store) {
 		log.Fatal().Err(err).Msg("cannot register handler server")
 	}
 
-	pb.RegisterFriendClusterApplyServiceHandlerServer(ctx, grpcMux, service.NewFriendClusterApplyService(server))
+	pb.RegisterFriendGroupApplyServiceHandlerServer(ctx, grpcMux, service.NewFriendGroupRequestService(server))
 	pb.RegisterFriendServiceHandlerServer(ctx, grpcMux, service.NewFriendService(server))
 
 	mux := http.NewServeMux()
