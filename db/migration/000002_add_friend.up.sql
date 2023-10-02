@@ -20,7 +20,7 @@ COMMENT ON COLUMN friends.created_at IS '创建时间';
 CREATE TABLE groups (
     id BIGSERIAL PRIMARY KEY,
     creator_id INTEGER NOT NULL,
-    group_name VARCHAR(100) NOT NULL,
+    group_name VARCHAR(100) NOT NULL UNIQUE,
     current_quantity INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT (now()),
     FOREIGN KEY (creator_id) REFERENCES users ON DELETE CASCADE
