@@ -39,7 +39,7 @@ func main() {
 		log.Fatal().Err(err).Msg("can't connect to db")
 	}
 
-	// runDBMigration(conf.Postgres.MigrateUrl, conf.Postgres.Source)
+	runDBMigration(conf.Postgres.MigrateUrl, conf.Postgres.Source)
 
 	store := db.NewStore(connPool)
 
