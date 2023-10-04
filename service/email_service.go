@@ -1,7 +1,6 @@
 package service
 
 import (
-	"IMChat/internal/email"
 	"IMChat/internal/errors"
 	"IMChat/pb"
 	"context"
@@ -20,14 +19,10 @@ func NewEmailService(server *Server) pb.EmailServiceServer {
 
 func (emailService *EmailService) SendEmailCode(ctx context.Context, req *pb.SendEmailCodeRequest) (*pb.SendEmailCodeResponse, error) {
 
-	e := emailService.emailPool.Get().(*email.Email)
-
-	err := e.SendEmailCode(emailService.cache, req.Email)
+	err := emailService.mail.SendEmailCode(emailService.cache, req.Email)
 	if err != nil {
 		return nil, errors.SendEmailCodeErr
 	}
-
-	emailService.emailPool.Put(e)
 
 	return &pb.SendEmailCodeResponse{Message: "send email code successfully"}, nil
 }
