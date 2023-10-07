@@ -26,6 +26,6 @@ func converMesagge(message db.Message) *pb.Message {
 		ReceiverId:  message.ReceiverID,
 		Content:     message.Content,
 		SendingTime: timestamppb.New(message.SendingTime),
-		ReceivTime:  timestamppb.New(message.ReceivTime),
+		// ReceivTime:  timestamppb.New(message.ReceivTime),
 	}
 }

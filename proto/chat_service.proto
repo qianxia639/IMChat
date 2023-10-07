@@ -6,7 +6,9 @@ option go_package = "IMChat/pb";
 
 import "message.proto";
 
-service MessageService {
+service ChatService {
+
+    rpc ChatMessage(stream ChatMessagg) returns (stream ChatMessagg) {}
 
     rpc SenderMessage(stream SenderMessageRequest) returns (stream SenderMessageResponse) {}
 
@@ -14,12 +16,16 @@ service MessageService {
 
 }
 
+message ChatMessagg {
+    Message message = 1;
+}
+
 message SenderMessageRequest {
-    int32 sender_id = 1;   //  发送者Id
-    int32 receive_id = 2;   // 接收者Id
+    int32 sender_id = 1;    //  发送者Id
+    int32 receiver_id = 2;  // 接收者Id
     int32 message_type = 3; // 消息类型
-    string content = 4;   // 发送的内容
-    SendType send_type = 5;    // 发送类型
+    string content = 4; // 发送的内容
+    SendType send_type = 5; // 发送类型
 }
 
 message SenderMessageResponse {
@@ -27,8 +33,5 @@ message SenderMessageResponse {
 }
 
 message ReceiverMessageRequest {
-    int32 sender_id = 1;
-    int32 receive_id = 2;
-    string content = 3;
-    // google.protobuf.Timestamp sender_time = 4;
+    Message message = 1;
 }

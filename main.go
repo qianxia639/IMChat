@@ -65,7 +65,7 @@ func runGrpcServer(conf config.Config, store db.Store) {
 	userService := service.NewUserService(server)
 	friendApplyService := service.NewFriendGroupRequestService(server)
 	friendService := service.NewFriendService(server)
-	messageService := service.NewMessageService(server)
+	messageService := service.NewChatService(server)
 	emailService := service.NewEmailService(server)
 
 	grpcLogger := grpc.UnaryInterceptor(interceptor.GrpcUnaryLogger)
@@ -77,7 +77,7 @@ func runGrpcServer(conf config.Config, store db.Store) {
 	pb.RegisterUserServiceServer(grpcServer, userService)
 	pb.RegisterFriendGroupApplyServiceServer(grpcServer, friendApplyService)
 	pb.RegisterFriendServiceServer(grpcServer, friendService)
-	pb.RegisterMessageServiceServer(grpcServer, messageService)
+	pb.RegisterChatServiceServer(grpcServer, messageService)
 	pb.RegisterEmailServiceServer(grpcServer, emailService)
 	reflection.Register(grpcServer)
 
