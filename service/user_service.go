@@ -207,20 +207,20 @@ func (userService *UserService) recordLoginAttempts(ctx context.Context, loginAt
 
 func (userService *UserService) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 
-	_, err := userService.authorization(ctx)
+	user, err := userService.authorization(ctx)
 	if err != nil {
-		return nil, unauthenticatedError(err)
+		return nil, err
 	}
 
-	var user db.User
-	_ = userService.cache.Get(ctx, getUserInfoKey(req.Username)).Scan(&user)
+	// var user db.User
+	// _ = userService.cache.Get(ctx, getUserInfoKey(req.Username)).Scan(&user)
 
 	if user.ID <= 0 {
-		user, _ = userService.store.GetUser(ctx, req.Username)
+		*user, _ = userService.store.GetUser(ctx, req.Username)
 	}
 
 	resp := &pb.GetUserResponse{
-		User: converUser(user),
+		User: converUser(*user),
 	}
 
 	return resp, nil
@@ -248,12 +248,12 @@ func (userService *UserService) SearchUser(ctx context.Context, req *pb.SearchUs
 
 func (userService *UserService) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
 
-	payload, err := userService.authorization(ctx)
+	user, err := userService.authorization(ctx)
 	if err != nil {
-		return nil, unauthenticatedError(err)
+		return nil, err
 	}
 
-	if payload.Username != req.Username {
+	if user.Username != req.Username {
 		log.Error().Msg("cannot update other usre's info")
 		return nil, errDefine.PermissionDeniedErr
 	}
@@ -286,41 +286,42 @@ func (userService *UserService) UpdateUser(ctx context.Context, req *pb.UpdateUs
 		},
 	}
 
-	user, err := userService.store.UpdateUser(ctx, arg)
+	*user, err = userService.store.UpdateUser(ctx, arg)
 	if err != nil {
 		log.Error().Err(err).Msg("Can't update user")
 		return nil, errDefine.ServerErr
 	}
 
-	userInfoKey := getUserInfoKey(payload.Username)
+	userInfoKey := getUserInfoKey(user.Username)
 	expireAt := time.Duration(utils.RandomInt(27, 30))
 	if err := userService.cache.Set(ctx, userInfoKey, &user, expireAt*time.Minute).Err(); err != nil {
 		return nil, errDefine.ServerErr
 	}
 
 	resp := &pb.UpdateUserResponse{
-		User: converUser(user),
+		User: converUser(*user),
 	}
 
 	return resp, nil
 }
 
 func (userService *UserService) DeleteUser(ctx context.Context, req *pb.EmptyRequest) (*pb.DeleteUserResponse, error) {
-	payload, err := userService.authorization(ctx)
+	user, err := userService.authorization(ctx)
 	if err != nil {
-		return nil, unauthenticatedError(err)
+		return nil, err
 	}
 
-	userInfoKey := getUserInfoKey(payload.Username)
-	var user db.User
-	if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
-		return nil, errDefine.ServerErr
-	}
+	// userInfoKey := getUserInfoKey(payload.Username)
+	// var user db.User
+	// if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
+	// 	return nil, errDefine.ServerErr
+	// }
 
 	if err := userService.store.DeleteUserTx(ctx, user.ID); err != nil {
 		return nil, errDefine.ServerErr
 	}
 
+	userInfoKey := getUserInfoKey(user.Username)
 	_ = userService.cache.Del(ctx, userInfoKey).Err()
 
 	resp := &pb.DeleteUserResponse{
@@ -332,7 +333,7 @@ func (userService *UserService) DeleteUser(ctx context.Context, req *pb.EmptyReq
 
 func (userService *UserService) UpdateUserPassword(ctx context.Context, req *pb.UpdateUserPasswordRequest) (*pb.UpdateUserPasswordResponse, error) {
 
-	user, err := userService.getUserInfo(ctx)
+	user, err := userService.authorization(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -385,15 +386,9 @@ func (userService *UserService) UpdateUserPassword(ctx context.Context, req *pb.
 }
 
 func (userService *UserService) Logout(ctx context.Context, req *pb.EmptyRequest) (*pb.LogoutResponse, error) {
-	payload, err := userService.authorization(ctx)
+	user, err := userService.authorization(ctx)
 	if err != nil {
-		return nil, unauthenticatedError(err)
-	}
-
-	userInfoKey := getUserInfoKey(payload.Username)
-	var user db.User
-	if err := userService.cache.Get(ctx, userInfoKey).Scan(&user); err != nil {
-		return nil, errDefine.ServerErr
+		return nil, err
 	}
 
 	// 更改在线状态为离线并更新最后在线时间
@@ -415,6 +410,7 @@ func (userService *UserService) Logout(ctx context.Context, req *pb.EmptyRequest
 		return nil, errDefine.ServerErr
 	}
 
+	userInfoKey := getUserInfoKey(user.Username)
 	_ = userService.cache.Del(ctx, userInfoKey).Err()
 
 	resp := &pb.LogoutResponse{

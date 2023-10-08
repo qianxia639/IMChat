@@ -4,7 +4,6 @@ import (
 	db "IMChat/db/sqlc"
 	"IMChat/pb"
 	"context"
-	"fmt"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -71,20 +70,13 @@ func NewFriendService(server *Server) pb.FriendServiceServer {
 // }
 
 func (friendService *FriendService) UpdateFriend(ctx context.Context, req *pb.UpdateFriendRequest) (*pb.UpdateFriendResponse, error) {
-	payload, err := friendService.authorization(ctx)
+	user, err := friendService.authorization(ctx)
 	if err != nil {
-		return nil, unauthenticatedError(err)
+		return nil, err
 	}
 
 	if req.Note == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
-	}
-
-	userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
-	var user db.User
-	err = friendService.cache.Get(ctx, userInfoKey).Scan(&user)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "faile to get cache: %v", err)
 	}
 
 	_, err = friendService.store.UpdateFriendNote(ctx, &db.UpdateFriendNoteParams{
@@ -100,16 +92,9 @@ func (friendService *FriendService) UpdateFriend(ctx context.Context, req *pb.Up
 }
 
 func (friendService *FriendService) DeleteFriend(ctx context.Context, req *pb.DeleteFriendRequest) (*pb.DeleteFriendResponse, error) {
-	payload, err := friendService.authorization(ctx)
+	user, err := friendService.authorization(ctx)
 	if err != nil {
-		return nil, unauthenticatedError(err)
-	}
-
-	userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
-	var user db.User
-	err = friendService.cache.Get(ctx, userInfoKey).Scan(&user)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "faile to get cache: %v", err)
+		return nil, err
 	}
 
 	arg := &db.DeleteFriendTxParams{
@@ -126,16 +111,9 @@ func (friendService *FriendService) DeleteFriend(ctx context.Context, req *pb.De
 
 func (friendService *FriendService) ListFriends(req *pb.EmptyRequest, stream pb.FriendService_ListFriendsServer) error {
 	ctx := stream.Context()
-	payload, err := friendService.authorization(ctx)
+	user, err := friendService.authorization(ctx)
 	if err != nil {
-		return unauthenticatedError(err)
-	}
-
-	userInfoKey := fmt.Sprintf("userInfo:%s", payload.Username)
-	var user db.User
-	err = friendService.cache.Get(ctx, userInfoKey).Scan(&user)
-	if err != nil {
-		return status.Errorf(codes.Internal, "faile to get cache: %v", err)
+		return err
 	}
 
 	friends, _ := friendService.store.ListFriends(ctx, user.ID)

@@ -64,7 +64,7 @@ func (chatService *ChatService) ChatMessage(stream pb.ChatService_ChatMessageSer
 
 func (chatService *ChatService) SenderMessage(stream pb.ChatService_SenderMessageServer) error {
 	ctx := stream.Context()
-	user, err := chatService.getUserInfo(ctx)
+	user, err := chatService.authorization(ctx)
 	if err != nil {
 		return err
 	}

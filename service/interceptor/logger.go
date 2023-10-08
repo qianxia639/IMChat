@@ -14,7 +14,9 @@ import (
 
 func GrpcUnaryLogger(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 	startTime := time.Now()
+
 	result, err := handler(ctx, req)
+
 	duration := time.Since(startTime)
 
 	statusCode := codes.Unknown
@@ -29,6 +31,7 @@ func GrpcUnaryLogger(ctx context.Context, req interface{}, info *grpc.UnaryServe
 
 	md, _ := metadata.FromIncomingContext(ctx)
 
+	// FullMethod :: /ServiceName/Method  :: /qianxia.IMChat.ChatService/ChatMessage
 	logger.Str("protocol", "grpc").
 		Str("method", info.FullMethod).
 		Int("status_code", int(statusCode)).

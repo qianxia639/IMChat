@@ -24,7 +24,7 @@ func NewFriendGroupRequestService(server *Server) pb.FriendGroupApplyServiceServ
 func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGrpupApply(ctx context.Context, req *pb.CreateFriendGroupApplyRequest) (*pb.CreateFriendGroupApplyResponse, error) {
 
 	// 身份校验并获取用户信息
-	user, err := friendGroupApplyService.getUserInfo(ctx)
+	user, err := friendGroupApplyService.authorization(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ct
 		return &pb.ReplyFriendGroupApplyResponse{Message: "Waiting..."}, nil
 	}
 
-	user, err := friendGroupApplyService.getUserInfo(ctx)
+	user, err := friendGroupApplyService.authorization(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ct
 
 func (friendGroupApplyService *FriendGroupApplyService) ListFriendGroupApply(req *pb.EmptyRequest, stream pb.FriendGroupApplyService_ListFriendGroupApplyServer) error {
 	ctx := stream.Context()
-	user, err := friendGroupApplyService.getUserInfo(ctx)
+	user, err := friendGroupApplyService.authorization(ctx)
 	if err != nil {
 		return err
 	}

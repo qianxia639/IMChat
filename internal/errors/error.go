@@ -23,6 +23,6 @@ func NewInternalError(msg string) error {
 	return status.Error(codes.Internal, msg)
 }
 
-func NewUnauthenticatedError(msg string) error {
+func NewUnauthorizaedError(msg string) error {
 	return status.Error(codes.Unauthenticated, msg)
 }

@@ -1,52 +1,63 @@
 package service
 
 import (
-	"IMChat/core/token"
 	db "IMChat/db/sqlc"
+	"IMChat/internal/errors"
 	"context"
-	"fmt"
 
-	"google.golang.org/grpc/codes"
+	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
 )
 
 const authorizationHeader = "authorization"
 
-func (server *Server) authorization(ctx context.Context) (*token.Payload, error) {
+func (server *Server) authorization(ctx context.Context) (*db.User, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, fmt.Errorf("missing metadata")
+		log.Error().Msgf("missing meetadata")
+		return nil, errors.UnauthorizaedErr
 	}
 
 	values := md.Get(authorizationHeader)
 	if len(values) == 0 {
-		return nil, fmt.Errorf("missing authorization header")
+		log.Error().Msgf("missing authorization header")
+		return nil, errors.UnauthorizaedErr
 	}
 
 	authHeader := values[0]
 	if len(authHeader) < 1 {
-		return nil, fmt.Errorf("invalid authorization header format")
+		log.Error().Msgf("invalid authorization header format")
+		return nil, errors.UnauthorizaedErr
 	}
 
 	payload, err := server.maker.VerifyToken(authHeader)
 	if err != nil {
-		return nil, fmt.Errorf("invalid access token: %v", err)
-	}
-	return payload, nil
-}
-
-func (server *Server) getUserInfo(ctx context.Context) (*db.User, error) {
-	payload, err := server.authorization(ctx)
-	if err != nil {
-		return nil, unauthenticatedError(err)
+		log.Error().Err(err).Msgf("invalid access token")
+		return nil, errors.UnauthorizaedErr
 	}
 
 	var user db.User
 	err = server.cache.Get(ctx, getUserInfoKey(payload.Username)).Scan(&user)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get cache: %v", err)
+		log.Error().Err(err)
+		return nil, errors.ServerErr
 	}
 
 	return &user, nil
 }
+
+// func (server *Server) getUserInfo(ctx context.Context) (*db.User, error) {
+// 	payload, err := server.authorization(ctx)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	var user db.User
+// 	err = server.cache.Get(ctx, getUserInfoKey(payload.Username)).Scan(&user)
+// 	if err != nil {
+// 		log.Error().Err(err)
+// 		return nil, errors.ServerErr
+// 	}
+
+// 	return &user, nil
+// }
