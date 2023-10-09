@@ -25,8 +25,8 @@ const (
 type ApplyType int32
 
 const (
-	ApplyType_FRIEND  ApplyType = 0
-	ApplyType_CLUSTER ApplyType = 1
+	ApplyType_FRIEND  ApplyType = 0 // 好友
+	ApplyType_CLUSTER ApplyType = 1 // 群组
 )
 
 // Enum value maps for ApplyType.
@@ -71,9 +71,9 @@ func (ApplyType) EnumDescriptor() ([]byte, []int) {
 type Status int32
 
 const (
-	Status_PENDING  Status = 0
-	Status_ACCEPTEd Status = 1
-	Status_REJECTED Status = 2
+	Status_PENDING  Status = 0 // 等待中
+	Status_ACCEPTEd Status = 1 // 接受
+	Status_REJECTED Status = 2 // 拒绝
 )
 
 // Enum value maps for Status.

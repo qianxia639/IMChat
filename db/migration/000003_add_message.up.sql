@@ -1,3 +1,4 @@
+-- 消息表
 CREATE TABLE messages (
     id BIGSERIAL PRIMARy KEY,
     sender_id INTEGER NOT NULL,

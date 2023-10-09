@@ -30,7 +30,7 @@ type FriendGroupApply struct {
 	ReceiverID int32 `json:"receiver_id"`
 	// 申请描述
 	ApplyDesc string `json:"apply_desc"`
-	// 申请状态, 0: 等待中, 1: 同意, 2: 拒绝
+	// 申请状态, 0: 待确定, 1: 同意, 2: 拒绝
 	Status int16 `json:"status"`
 	// 申请类型, 0: 好友, 1: 群组
 	ApplyType int16 `json:"apply_type"`
@@ -51,6 +51,19 @@ type Group struct {
 	CurrentQuantity int32 `json:"current_quantity"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type GroupMemberShip struct {
+	// 群组成员的唯一标识符
+	ID int64 `json:"id"`
+	// 用户Id
+	UserID int32 `json:"user_id"`
+	// 群组Id
+	GroupID int32 `json:"group_id"`
+	// 角色, 0: 管理员, 1: 普通成员
+	Role int32 `json:"role"`
+	// 加入时间
+	JoinedAt time.Time `json:"joined_at"`
 }
 
 type Message struct {

@@ -1,3 +1,4 @@
+-- 好友表
 CREATE TABLE friends (
     id BIGSERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
@@ -16,7 +17,7 @@ COMMENT ON COLUMN friends.note IS '好友备注';
 
 COMMENT ON COLUMN friends.created_at IS '创建时间';
 
-
+-- 群组表
 CREATE TABLE groups (
     id BIGSERIAL PRIMARY KEY,
     creator_id INTEGER NOT NULL,
@@ -36,7 +37,7 @@ COMMENT ON COLUMN groups.current_quantity IS '群员人数';
 
 COMMENT ON COLUMN groups.created_at IS '创建时间';
 
-
+-- 好友/群组申请表
 CREATE TABLE friend_group_applys (
     id BIGSERIAL PRIMARY KEY,
     sender_id INTEGER NOT NULL,
@@ -56,7 +57,7 @@ COMMENT ON COLUMN friend_group_applys.receiver_id IS '接收者的用户Id或群
 
 COMMENT ON COLUMN friend_group_applys.apply_desc IS '申请描述';
 
-COMMENT ON COLUMN friend_group_applys.status IS '申请状态, 0: 等待中, 1: 同意, 2: 拒绝';
+COMMENT ON COLUMN friend_group_applys.status IS '申请状态, 0: 待确定, 1: 同意, 2: 拒绝';
 
 COMMENT ON COLUMN friend_group_applys.apply_type IS '申请类型, 0: 好友, 1: 群组';
 

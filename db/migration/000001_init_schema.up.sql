@@ -1,3 +1,4 @@
+-- 用户表
 CREATE TABLE "users" (
   "id" SERIAL PRIMARY KEY,
   "username" VARCHAR(20) UNIQUE NOT NULL,
@@ -37,7 +38,7 @@ COMMENT ON COLUMN "users"."created_at" IS '创建时间';
 
 COMMENT ON COLUMN "users"."updated_at" IS '更新时间';
 
-
+-- 用户登录日志表
 CREATE TABLE "user_login_logs" (
   "id" BIGSERIAL PRIMARY KEY,
   "user_id" INTEGER NOT NULL,

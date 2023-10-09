@@ -31,14 +31,14 @@ service FriendGroupApplyService {
 }
 
 enum ApplyType {
-    FRIEND = 0;
-    CLUSTER = 1;
+    FRIEND = 0;     // 好友
+    CLUSTER = 1;    // 群组
 }
 
 enum Status {
-    PENDING = 0;
-    ACCEPTEd = 1;
-    REJECTED = 2;
+    PENDING = 0;    // 等待中
+    ACCEPTEd = 1;   // 接受
+    REJECTED = 2;   // 拒绝
 }
 
 message CreateFriendGroupApplyRequest {
