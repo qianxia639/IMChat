@@ -5,11 +5,11 @@ import (
 )
 
 type ReplyFriendClusterApplyTxParams struct {
-	UserID   int32  `json:"user_id"`
-	FriendID int32  `json:"friend_id"`
-	Status   int32  `json:"status"`
-	Flag     int32  `json:"flag"`
-	Note     string `json:"note"`
+	UserID    int32  `json:"user_id"`
+	FriendID  int32  `json:"friend_id"`
+	Status    int32  `json:"status"`
+	ApplyType int32  `json:"apply_type"`
+	Note      string `json:"note"`
 }
 
 func (store *SQLStore) ReplyFriendClusterApplyTx(ctx context.Context, arg *ReplyFriendClusterApplyTxParams) (friend Friend, err error) {
@@ -20,6 +20,7 @@ func (store *SQLStore) ReplyFriendClusterApplyTx(ctx context.Context, arg *Reply
 				Status:     int16(arg.Status),
 				SenderID:   arg.UserID,
 				ReceiverID: arg.FriendID,
+				ApplyType:  int16(arg.ApplyType),
 			})
 		}
 		var err error
@@ -46,6 +47,7 @@ func (store *SQLStore) ReplyFriendClusterApplyTx(ctx context.Context, arg *Reply
 			Status:     int16(arg.Status),
 			SenderID:   arg.UserID,
 			ReceiverID: arg.FriendID,
+			ApplyType:  int16(arg.ApplyType),
 		})
 		if err != nil {
 			return err

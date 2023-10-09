@@ -2,9 +2,11 @@ package service
 
 import (
 	db "IMChat/db/sqlc"
+	"IMChat/internal/errors"
 	"IMChat/pb"
 	"context"
 
+	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -91,24 +93,9 @@ func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ct
 		return nil, err
 	}
 
-	if user.ID == req.GetFriendId() && req.ApplyType == pb.ApplyType_FRIEND {
+	if user.ID == req.FriendId && req.ApplyType == pb.ApplyType_FRIEND {
 		return nil, status.Error(codes.InvalidArgument, "不能添加自己为好友")
 	}
-
-	// 判断该申请是否存在与申请表中
-
-	// 判断是否已经是好友或意在群组中
-
-	// 添加记录
-
-	// TODO 需要更改
-	// friend, err := friendService.store.GetFriendApply(ctx, &db.GetFriendApplyParams{
-	// 	ApplyID: req.GetFriendId(),
-	// 	ReplyID: user.ID,
-	// })
-	// if friend.ReplyID != user.ID && err != nil {
-	// 	return nil, status.Errorf(codes.Internal, "failed to get friend apply: %v", err)
-	// }
 
 	// 判断是否是申请列表中的数据
 	count, _ := friendGroupApplyService.store.ExistsFriendGroupApply(ctx, &db.ExistsFriendGroupApplyParams{
@@ -117,24 +104,28 @@ func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ct
 		ApplyType:  int16(req.GetApplyType()),
 	})
 	if count < 1 {
-		return nil, status.Errorf(codes.InvalidArgument, "非法的数据")
+		log.Error().Msgf("ExistsFriendGroupApply(_)")
+		return nil, errors.ParamsErr
 	}
 
 	arg := &db.ReplyFriendClusterApplyTxParams{
-		UserID:   user.ID,
-		FriendID: req.GetFriendId(),
-		Status:   int32(req.GetStatus()),
-		Flag:     int32(req.GetApplyType()),
-		Note:     req.Note,
+		UserID:    user.ID,
+		FriendID:  req.GetFriendId(),
+		Status:    int32(req.GetStatus()),
+		ApplyType: int32(req.GetApplyType()),
+		Note:      req.Note,
 	}
+
+	// 判断是否已经是好友或已在群组中
 
 	_, err = friendGroupApplyService.store.ReplyFriendClusterApplyTx(ctx, arg)
 	if err != nil {
-		pgErr := db.ErrorCode(err)
-		if pgErr == db.ForeignKeyViolation || pgErr == db.UniqueViolation {
-			return nil, status.Errorf(codes.AlreadyExists, "faile add friend error: %v", err)
-		}
-		return nil, status.Errorf(codes.Internal, "filaed to add friend: %v", err)
+		// pgErr := db.ErrorCode(err)
+		// if pgErr == db.ForeignKeyViolation || pgErr == db.UniqueViolation {
+		// 	return nil, status.Errorf(codes.AlreadyExists, "faile add friend error: %v", err)
+		// }
+		log.Error().Err(err).Msgf("ReplyFriendClusterApplyTx(_)")
+		return nil, errors.ServerErr
 	}
 
 	return &pb.ReplyFriendGroupApplyResponse{Message: "Successfully..."}, nil
