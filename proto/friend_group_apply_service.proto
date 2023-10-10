@@ -9,6 +9,21 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
 service FriendGroupApplyService {
+
+    // rpc CreateFriendApply (CreateFriendApplyRequest) returns (Response) {
+    //     option (google.api.http) = {
+    //         post: "/v1/create/friend/apply"
+    //         body: "*"
+    //     };
+    // };
+
+    // rpc CreateGroupApply (CreateGroupApplyRequest) returns (Response) {
+    //     option (google.api.http) = {
+    //         post: "/v1/create/group/apply"
+    //         body: "*"
+    //     };
+    // };
+
     rpc CreateFriendGroupApply (CreateFriendGroupApplyRequest) returns (CreateFriendGroupApplyResponse) {
         option (google.api.http) = {
             post: "/v1/friend/apply"
@@ -40,6 +55,20 @@ enum Status {
     ACCEPTEd = 1;   // 接受
     REJECTED = 2;   // 拒绝
 }
+
+// message CreateFriendApplyRequest {
+//     string name = 1;
+//     string apply_desc = 2; 
+// }
+
+// message Response {
+//     string message = 1;
+// }
+
+// message CreateGroupApplyRequest {
+//     int32 group_id = 1;
+//     string apply_desc = 2;
+// }
 
 message CreateFriendGroupApplyRequest {
     int32 receiver_id = 1;

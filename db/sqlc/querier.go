@@ -23,6 +23,7 @@ type Querier interface {
 	GetFriend(ctx context.Context, arg *GetFriendParams) (Friend, error)
 	GetLastUserLoginLog(ctx context.Context, userID int32) (UserLoginLog, error)
 	GetUser(ctx context.Context, username string) (User, error)
+	GetUserById(ctx context.Context, id int32) (User, error)
 	ListFriendGroupApply(ctx context.Context, receiverID int32) ([]ListFriendGroupApplyRow, error)
 	ListFriends(ctx context.Context, id int32) ([]ListFriendsRow, error)
 	UpdateFriendGroupApply(ctx context.Context, arg *UpdateFriendGroupApplyParams) error

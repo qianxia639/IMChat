@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type ReplyFriendClusterApplyTxParams struct {
+type ReplyFriendGroupApplyTxParams struct {
 	UserID    int32  `json:"user_id"`
 	FriendID  int32  `json:"friend_id"`
 	Status    int32  `json:"status"`
@@ -12,7 +12,7 @@ type ReplyFriendClusterApplyTxParams struct {
 	Note      string `json:"note"`
 }
 
-func (store *SQLStore) ReplyFriendClusterApplyTx(ctx context.Context, arg *ReplyFriendClusterApplyTxParams) (friend Friend, err error) {
+func (store *SQLStore) ReplyFriendGroupApplyTx(ctx context.Context, arg *ReplyFriendGroupApplyTxParams) (friend Friend, err error) {
 	err = store.execTx(ctx, func(q *Queries) error {
 		if arg.Status == 2 { // 拒绝
 			// 更新申请表中的状态

@@ -23,7 +23,6 @@ func NewFriendGroupRequestService(server *Server) pb.FriendGroupApplyServiceServ
 	}
 }
 
-// CreateFriendGroupApply(context.Context, *pb.CreateFriendGroupApplyRequest) (*pb.CreateFriendGroupApplyResponse, error)
 func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGroupApply(ctx context.Context, req *pb.CreateFriendGroupApplyRequest) (*pb.CreateFriendGroupApplyResponse, error) {
 
 	// 身份校验并获取用户信息
@@ -32,37 +31,20 @@ func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGroupApply(c
 		return nil, err
 	}
 
-	if user.ID == req.ReceiverId && req.ApplyType == 0 {
+	if user.ID == req.ReceiverId && req.ApplyType == pb.ApplyType_FRIEND {
 		return nil, status.Error(codes.InvalidArgument, "无法添加自己")
 	}
 
 	switch req.ApplyType {
-	case 0: // 好友
-		// 判断是否已申请
-		count, _ := friendGroupApplyService.store.ExistsFriendGroupApply(ctx, &db.ExistsFriendGroupApplyParams{
-			SenderID:   user.ID,
-			ReceiverID: req.GetReceiverId(),
-			ApplyType:  int16(req.ApplyType),
-		})
-		if count > 0 {
-			return nil, status.Errorf(codes.InvalidArgument, "请勿重复申请")
+	case pb.ApplyType_FRIEND: // 好友
+		if err := friendGroupApplyService.createFriendApply(ctx, user.ID, req.ReceiverId); err != nil {
+			return nil, err
 		}
 
-		// 判断是否已经是好友
-		// TODO: 暂未完成
-		friend, _ := friendGroupApplyService.store.GetFriend(ctx, &db.GetFriendParams{
-			UserID:   user.ID,
-			FriendID: req.GetReceiverId(),
-		})
-
-		if friend.FriendID == req.ReceiverId {
-			return nil, status.Errorf(codes.Internal, "不能重复添加")
-		}
-	case 1: // 群组
+	case pb.ApplyType_CLUSTER: // 群组
 		// 判断是否已申请
 
 		// 判断是否已经在群组中
-		// TODO: 暂未完成
 
 	}
 
@@ -81,6 +63,37 @@ func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGroupApply(c
 	return &pb.CreateFriendGroupApplyResponse{
 		Message: "Create Successfully",
 	}, nil
+}
+
+func (friendGroupApplyService *FriendGroupApplyService) createFriendApply(ctx context.Context, senderId, receiverId int32) error {
+
+	// 判断用户是否存在
+	user, _ := friendGroupApplyService.store.GetUserById(ctx, receiverId)
+	if user.ID == 0 {
+		return errors.UserNotFoundErr
+	}
+
+	// 判断是否有未同意的申请记录
+	count, _ := friendGroupApplyService.store.ExistsFriendGroupApply(ctx, &db.ExistsFriendGroupApplyParams{
+		SenderID:   senderId,
+		ReceiverID: receiverId,
+		ApplyType:  int16(pb.ApplyType_FRIEND),
+	})
+	if count > 1 {
+		return status.Errorf(codes.InvalidArgument, "请勿重复申请")
+	}
+
+	// 不能重复添加
+	friend, _ := friendGroupApplyService.store.GetFriend(ctx, &db.GetFriendParams{
+		UserID:   senderId,
+		FriendID: receiverId,
+	})
+
+	if friend.ID != 0 {
+		return status.Errorf(codes.Internal, "不能重复添加")
+	}
+
+	return nil
 }
 
 func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ctx context.Context, req *pb.ReplyFriendGroupApplyRequest) (*pb.ReplyFriendGroupApplyResponse, error) {
@@ -124,7 +137,7 @@ func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ct
 		return nil, errors.DuplicakeErr
 	}
 
-	arg := &db.ReplyFriendClusterApplyTxParams{
+	arg := &db.ReplyFriendGroupApplyTxParams{
 		UserID:    user.ID,
 		FriendID:  req.GetFriendId(),
 		Status:    int32(req.GetStatus()),
@@ -132,7 +145,7 @@ func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ct
 		Note:      req.Note,
 	}
 
-	_, err = friendGroupApplyService.store.ReplyFriendClusterApplyTx(ctx, arg)
+	_, err = friendGroupApplyService.store.ReplyFriendGroupApplyTx(ctx, arg)
 	if err != nil {
 		// pgErr := db.ErrorCode(err)
 		// if pgErr == db.ForeignKeyViolation || pgErr == db.UniqueViolation {
