@@ -2,7 +2,6 @@ package service
 
 import (
 	db "IMChat/db/sqlc"
-	"IMChat/internal/email"
 	errDefine "IMChat/internal/errors"
 	"IMChat/internal/validator"
 	"IMChat/pb"
@@ -40,10 +39,10 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 	}
 
 	// 校验邮箱验证码
-	ok, _ := email.VerifyEmailCode(userService.cache, req.Email, req.EmailCode)
-	if !ok {
-		return nil, errDefine.EmailCodeErr
-	}
+	// ok, _ := email.VerifyEmailCode(userService.cache, req.Email, req.EmailCode)
+	// if !ok {
+	// 	return nil, errDefine.EmailCodeErr
+	// }
 
 	hashPassword, err := utils.Encrypt(req.Password)
 	if err != nil {

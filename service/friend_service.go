@@ -20,56 +20,58 @@ func NewFriendService(server *Server) pb.FriendServiceServer {
 	}
 }
 
-func (friendService *FriendService) AddFriend(ctx context.Context, req *pb.AddFriendRequest) (*pb.AddFriendResponse, error) {
+// func (friendService *FriendService) AddFriend(ctx context.Context, req *pb.AddFriendRequest) (*pb.AddFriendResponse, error) {
 
-	user, err := friendService.authorization(ctx)
-	if err != nil {
-		return nil, err
-	}
+// 	user, err := friendService.authorization(ctx)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	// 不能添加自己
-	if user.ID == req.GetFriendId() {
-		return nil, status.Error(codes.InvalidArgument, "不能添加自己为好友")
-	}
+// 	// 不能添加自己
+// 	if user.ID == req.GetFriendId() {
+// 		return nil, status.Error(codes.InvalidArgument, "不能添加自己为好友")
+// 	}
 
-	// 不能重复添加
-	friend, _ := friendService.store.GetFriend(ctx, &db.GetFriendParams{
-		UserID:   user.ID,
-		FriendID: req.FriendId,
-	})
+// 	// 不能重复添加
+// 	friend, _ := friendService.store.GetFriend(ctx, &db.GetFriendParams{
+// 		UserID:   user.ID,
+// 		FriendID: req.FriendId,
+// 	})
 
-	if friend.ID != 0 {
-		return nil, status.Error(codes.InvalidArgument, "不能重复添加")
-	}
+// 	if friend.ID != 0 {
+// 		return nil, status.Error(codes.InvalidArgument, "不能重复添加")
+// 	}
 
-	// // 判断是否是申请列表中的数据
-	// count, _ := friendService.store.ExistsFriendGroupApply(ctx, &db.ExistsFriendGroupApplyParams{
-	// 	ApplyID:    req.FriendId,
-	// 	ReceiverID: user.ID,
-	// 	Flag:       0,
-	// })
-	// if count < 1 {
-	// 	return nil, status.Errorf(codes.Internal, "数据不匹配")
-	// }
+// 	// friendService.store.A
 
-	// arg := &db.AddFriendTxParams{
-	// 	UserID:   user.ID,
-	// 	FriendID: req.GetFriendId(),
-	// 	Status:   req.GetStatus(),
-	// 	Note:     req.Note,
-	// }
+// 	// // 判断是否是申请列表中的数据
+// 	// count, _ := friendService.store.ExistsFriendGroupApply(ctx, &db.ExistsFriendGroupApplyParams{
+// 	// 	ApplyID:    req.FriendId,
+// 	// 	ReceiverID: user.ID,
+// 	// 	Flag:       0,
+// 	// })
+// 	// if count < 1 {
+// 	// 	return nil, status.Errorf(codes.Internal, "数据不匹配")
+// 	// }
 
-	// _, err = friendService.store.AddFriendTx(ctx, arg)
-	// if err != nil {
-	// 	pgErr := db.ErrorCode(err)
-	// 	if pgErr == db.ForeignKeyViolation || pgErr == db.UniqueViolation {
-	// 		return nil, status.Errorf(codes.AlreadyExists, "faile add friend error: %v", err)
-	// 	}
-	// 	return nil, status.Errorf(codes.Internal, "filaed to add friend: %v", err)
-	// }
+// 	// arg := &db.AddFriendTxParams{
+// 	// 	UserID:   user.ID,
+// 	// 	FriendID: req.GetFriendId(),
+// 	// 	Status:   req.GetStatus(),
+// 	// 	Note:     req.Note,
+// 	// }
 
-	return &pb.AddFriendResponse{Message: "Successfully..."}, nil
-}
+// 	// _, err = friendService.store.AddFriendTx(ctx, arg)
+// 	// if err != nil {
+// 	// 	pgErr := db.ErrorCode(err)
+// 	// 	if pgErr == db.ForeignKeyViolation || pgErr == db.UniqueViolation {
+// 	// 		return nil, status.Errorf(codes.AlreadyExists, "faile add friend error: %v", err)
+// 	// 	}
+// 	// 	return nil, status.Errorf(codes.Internal, "filaed to add friend: %v", err)
+// 	// }
+
+// 	return &pb.AddFriendResponse{Message: "Successfully..."}, nil
+// }
 
 func (friendService *FriendService) UpdateFriend(ctx context.Context, req *pb.UpdateFriendRequest) (*pb.UpdateFriendResponse, error) {
 	user, err := friendService.authorization(ctx)

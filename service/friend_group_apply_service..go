@@ -23,7 +23,8 @@ func NewFriendGroupRequestService(server *Server) pb.FriendGroupApplyServiceServ
 	}
 }
 
-func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGrpupApply(ctx context.Context, req *pb.CreateFriendGroupApplyRequest) (*pb.CreateFriendGroupApplyResponse, error) {
+// CreateFriendGroupApply(context.Context, *pb.CreateFriendGroupApplyRequest) (*pb.CreateFriendGroupApplyResponse, error)
+func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGroupApply(ctx context.Context, req *pb.CreateFriendGroupApplyRequest) (*pb.CreateFriendGroupApplyResponse, error) {
 
 	// 身份校验并获取用户信息
 	user, err := friendGroupApplyService.authorization(ctx)
@@ -84,17 +85,17 @@ func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGrpupApply(c
 
 func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ctx context.Context, req *pb.ReplyFriendGroupApplyRequest) (*pb.ReplyFriendGroupApplyResponse, error) {
 
-	if pb.Status_PENDING == req.Status {
-		return &pb.ReplyFriendGroupApplyResponse{Message: "Waiting..."}, nil
-	}
-
 	user, err := friendGroupApplyService.authorization(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	if user.ID == req.FriendId && req.ApplyType == pb.ApplyType_FRIEND {
-		return nil, status.Error(codes.InvalidArgument, "不能添加自己为好友")
+		return nil, status.Error(codes.InvalidArgument, "不能添加自己")
+	}
+
+	if pb.Status_PENDING == req.Status {
+		return &pb.ReplyFriendGroupApplyResponse{Message: "Waiting..."}, nil
 	}
 
 	// 判断是否是申请列表中的数据
@@ -108,6 +109,21 @@ func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ct
 		return nil, errors.ParamsErr
 	}
 
+	// 判断是否已经是好友或已在群组中
+	switch req.ApplyType {
+	case pb.ApplyType_FRIEND:
+		friend, _ := friendGroupApplyService.store.GetFriend(ctx, &db.GetFriendParams{
+			UserID:   user.ID,
+			FriendID: req.FriendId,
+		})
+		if friend.ID != 0 {
+			return nil, errors.DuplicakeErr
+		}
+	case pb.ApplyType_CLUSTER:
+		log.Error().Err(errors.DuplicakeErr).Msg("响应群组申请")
+		return nil, errors.DuplicakeErr
+	}
+
 	arg := &db.ReplyFriendClusterApplyTxParams{
 		UserID:    user.ID,
 		FriendID:  req.GetFriendId(),
@@ -115,8 +131,6 @@ func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ct
 		ApplyType: int32(req.GetApplyType()),
 		Note:      req.Note,
 	}
-
-	// 判断是否已经是好友或已在群组中
 
 	_, err = friendGroupApplyService.store.ReplyFriendClusterApplyTx(ctx, arg)
 	if err != nil {

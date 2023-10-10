@@ -16,4 +16,5 @@ var (
 	EmailExistErr        = NewError(AlreadyExists, "邮箱已存在")
 	PermissionDeniedErr  = NewError(PermissionDenied, "权限不足")
 	NicknameExistErr     = NewInvalidArgumentError("用户昵称已存在")
+	DuplicakeErr         = NewInternalError("不能重复添加")
 )
