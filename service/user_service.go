@@ -172,6 +172,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 
 	expireAt := time.Duration(utils.RandomInt(27, 30))
 	if err := userService.cache.Set(ctx, getUserInfoKey(user.Username), &user, expireAt*time.Minute).Err(); err != nil {
+		log.Error().Err(err).Msgf("LoginUser HSET error")
 		return nil, errDefine.ServerErr
 	}
 
@@ -182,6 +183,10 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 
 // 记录登录失败次数
 func (userService *UserService) recordLoginAttempts(ctx context.Context, loginAttemptsKey, lockedUsernameKey string) error {
+
+	err := userService.cache.SetNX(ctx, loginAttemptsKey, 0, time.Hour).Err()
+	log.Error().Err(err).Msgf("record login attempts setnx error")
+
 	// 累加失败次数
 	if err := userService.cache.Incr(ctx, loginAttemptsKey).Err(); err != nil {
 		return errDefine.ServerErr

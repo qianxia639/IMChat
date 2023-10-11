@@ -45,7 +45,7 @@ func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGroupApply(c
 		// 判断是否已申请
 
 		// 判断是否已经在群组中
-
+		return nil, status.Error(codes.Internal, "未实现")
 	}
 
 	arg := &db.CreateFriendGroupApplyParams{
@@ -90,7 +90,7 @@ func (friendGroupApplyService *FriendGroupApplyService) createFriendApply(ctx co
 	})
 
 	if friend.ID != 0 {
-		return status.Errorf(codes.Internal, "不能重复添加")
+		return errors.DuplicakeErr
 	}
 
 	return nil
@@ -108,7 +108,7 @@ func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ct
 	}
 
 	if pb.Status_PENDING == req.Status {
-		return &pb.ReplyFriendGroupApplyResponse{Message: "Waiting..."}, nil
+		return &pb.ReplyFriendGroupApplyResponse{Message: "Pending..."}, nil
 	}
 
 	// 判断是否是申请列表中的数据

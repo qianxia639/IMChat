@@ -10,20 +10,6 @@ import "google/protobuf/timestamp.proto";
 
 service FriendGroupApplyService {
 
-    // rpc CreateFriendApply (CreateFriendApplyRequest) returns (Response) {
-    //     option (google.api.http) = {
-    //         post: "/v1/create/friend/apply"
-    //         body: "*"
-    //     };
-    // };
-
-    // rpc CreateGroupApply (CreateGroupApplyRequest) returns (Response) {
-    //     option (google.api.http) = {
-    //         post: "/v1/create/group/apply"
-    //         body: "*"
-    //     };
-    // };
-
     rpc CreateFriendGroupApply (CreateFriendGroupApplyRequest) returns (CreateFriendGroupApplyResponse) {
         option (google.api.http) = {
             post: "/v1/friend/apply"
