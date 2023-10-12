@@ -15,7 +15,7 @@ func NewError(c codes.Code, msg string) error {
 	return status.Error(c, msg)
 }
 
-func NewInvalidArgumentError(msg string) error {
+func NewParamError(msg string) error {
 	return status.Error(codes.InvalidArgument, msg)
 }
 
