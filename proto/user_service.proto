@@ -5,9 +5,9 @@ package qianxia.IMChat;
 option go_package = "IMChat/pb";
 
 import "user.proto";
-import "command.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
 
 service UserService {
     rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {
@@ -43,7 +43,7 @@ service UserService {
         };
     };
 
-    rpc DeleteUser (EmptyRequest) returns (DeleteUserResponse) {
+    rpc DeleteUser (google.protobuf.Empty) returns (DeleteUserResponse) {
         option (google.api.http) = {
             delete: "/v1/user"
         };
@@ -56,7 +56,7 @@ service UserService {
         };
     };
 
-    rpc Logout (EmptyRequest) returns (LogoutResponse) {
+    rpc Logout (google.protobuf.Empty) returns (LogoutResponse) {
         option (google.api.http) = {
             delete: "/v1/user/logout"
         };

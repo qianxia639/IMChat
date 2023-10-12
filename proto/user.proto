@@ -8,8 +8,8 @@ import "google/protobuf/timestamp.proto";
 
 enum Gender {
     UNKNOWN = 0;
-    MAN = 1;
-    WOMAN = 2;
+    MALE = 1;
+    FEMALE = 2;
 }
 
 message User {

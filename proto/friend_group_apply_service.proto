@@ -4,7 +4,7 @@ package qianxia.IMChat;
 
 option go_package = "IMChat/pb";
 
-import "command.proto";
+import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -24,7 +24,7 @@ service FriendGroupApplyService {
         };
     };
 
-    rpc ListFriendGroupApply (EmptyRequest) returns (stream ListFriendGroupApplyResponse) {
+    rpc ListFriendGroupApply (google.protobuf.Empty) returns (stream ListFriendGroupApplyResponse) {
         option (google.api.http) = {
             get: "/v1/friend/apply"
         };

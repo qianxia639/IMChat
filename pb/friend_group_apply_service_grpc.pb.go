@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -24,7 +25,7 @@ const _ = grpc.SupportPackageIsVersion7
 type FriendGroupApplyServiceClient interface {
 	CreateFriendGroupApply(ctx context.Context, in *CreateFriendGroupApplyRequest, opts ...grpc.CallOption) (*CreateFriendGroupApplyResponse, error)
 	ReplyFriendGroupApply(ctx context.Context, in *ReplyFriendGroupApplyRequest, opts ...grpc.CallOption) (*ReplyFriendGroupApplyResponse, error)
-	ListFriendGroupApply(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (FriendGroupApplyService_ListFriendGroupApplyClient, error)
+	ListFriendGroupApply(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (FriendGroupApplyService_ListFriendGroupApplyClient, error)
 }
 
 type friendGroupApplyServiceClient struct {
@@ -53,7 +54,7 @@ func (c *friendGroupApplyServiceClient) ReplyFriendGroupApply(ctx context.Contex
 	return out, nil
 }
 
-func (c *friendGroupApplyServiceClient) ListFriendGroupApply(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (FriendGroupApplyService_ListFriendGroupApplyClient, error) {
+func (c *friendGroupApplyServiceClient) ListFriendGroupApply(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (FriendGroupApplyService_ListFriendGroupApplyClient, error) {
 	stream, err := c.cc.NewStream(ctx, &FriendGroupApplyService_ServiceDesc.Streams[0], "/qianxia.IMChat.FriendGroupApplyService/ListFriendGroupApply", opts...)
 	if err != nil {
 		return nil, err
@@ -91,7 +92,7 @@ func (x *friendGroupApplyServiceListFriendGroupApplyClient) Recv() (*ListFriendG
 type FriendGroupApplyServiceServer interface {
 	CreateFriendGroupApply(context.Context, *CreateFriendGroupApplyRequest) (*CreateFriendGroupApplyResponse, error)
 	ReplyFriendGroupApply(context.Context, *ReplyFriendGroupApplyRequest) (*ReplyFriendGroupApplyResponse, error)
-	ListFriendGroupApply(*EmptyRequest, FriendGroupApplyService_ListFriendGroupApplyServer) error
+	ListFriendGroupApply(*emptypb.Empty, FriendGroupApplyService_ListFriendGroupApplyServer) error
 	mustEmbedUnimplementedFriendGroupApplyServiceServer()
 }
 
@@ -105,7 +106,7 @@ func (UnimplementedFriendGroupApplyServiceServer) CreateFriendGroupApply(context
 func (UnimplementedFriendGroupApplyServiceServer) ReplyFriendGroupApply(context.Context, *ReplyFriendGroupApplyRequest) (*ReplyFriendGroupApplyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReplyFriendGroupApply not implemented")
 }
-func (UnimplementedFriendGroupApplyServiceServer) ListFriendGroupApply(*EmptyRequest, FriendGroupApplyService_ListFriendGroupApplyServer) error {
+func (UnimplementedFriendGroupApplyServiceServer) ListFriendGroupApply(*emptypb.Empty, FriendGroupApplyService_ListFriendGroupApplyServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListFriendGroupApply not implemented")
 }
 func (UnimplementedFriendGroupApplyServiceServer) mustEmbedUnimplementedFriendGroupApplyServiceServer() {
@@ -159,7 +160,7 @@ func _FriendGroupApplyService_ReplyFriendGroupApply_Handler(srv interface{}, ctx
 }
 
 func _FriendGroupApplyService_ListFriendGroupApply_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(EmptyRequest)
+	m := new(emptypb.Empty)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}

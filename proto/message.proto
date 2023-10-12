@@ -4,7 +4,7 @@ package qianxia.IMChat;
 
 option go_package = "IMChat/pb";
 
-import "google/protobuf/timestamp.proto";
+// import "google/protobuf/timestamp.proto";
 
 enum SendType {
     PRIVATE = 0;
@@ -17,6 +17,6 @@ message Message {
     int32 message_type = 3; // 消息类型
     string content = 4; // 发送的内容
     SendType send_type = 5; // 发送类型
-    google.protobuf.Timestamp sending_time = 6; // 发送时间
+    // google.protobuf.Timestamp sending_time = 6; // 发送时间
     // google.protobuf.Timestamp receiv_time = 7;
 }

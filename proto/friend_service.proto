@@ -4,7 +4,7 @@ package qianxia.IMChat;
 
 option go_package = "IMChat/pb";
 
-import "command.proto";
+import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
 service FriendService {
@@ -28,7 +28,7 @@ service FriendService {
         };
     };
 
-    rpc ListFriends (EmptyRequest) returns (stream ListFriendsResponse) {
+    rpc ListFriends (google.protobuf.Empty) returns (stream ListFriendsResponse) {
         option (google.api.http) = {
             get: "/v1/friend"
         };

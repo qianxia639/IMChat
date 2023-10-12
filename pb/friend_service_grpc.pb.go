@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -24,7 +25,7 @@ const _ = grpc.SupportPackageIsVersion7
 type FriendServiceClient interface {
 	UpdateFriend(ctx context.Context, in *UpdateFriendRequest, opts ...grpc.CallOption) (*UpdateFriendResponse, error)
 	DeleteFriend(ctx context.Context, in *DeleteFriendRequest, opts ...grpc.CallOption) (*DeleteFriendResponse, error)
-	ListFriends(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (FriendService_ListFriendsClient, error)
+	ListFriends(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (FriendService_ListFriendsClient, error)
 }
 
 type friendServiceClient struct {
@@ -53,7 +54,7 @@ func (c *friendServiceClient) DeleteFriend(ctx context.Context, in *DeleteFriend
 	return out, nil
 }
 
-func (c *friendServiceClient) ListFriends(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (FriendService_ListFriendsClient, error) {
+func (c *friendServiceClient) ListFriends(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (FriendService_ListFriendsClient, error) {
 	stream, err := c.cc.NewStream(ctx, &FriendService_ServiceDesc.Streams[0], "/qianxia.IMChat.FriendService/ListFriends", opts...)
 	if err != nil {
 		return nil, err
@@ -91,7 +92,7 @@ func (x *friendServiceListFriendsClient) Recv() (*ListFriendsResponse, error) {
 type FriendServiceServer interface {
 	UpdateFriend(context.Context, *UpdateFriendRequest) (*UpdateFriendResponse, error)
 	DeleteFriend(context.Context, *DeleteFriendRequest) (*DeleteFriendResponse, error)
-	ListFriends(*EmptyRequest, FriendService_ListFriendsServer) error
+	ListFriends(*emptypb.Empty, FriendService_ListFriendsServer) error
 	mustEmbedUnimplementedFriendServiceServer()
 }
 
@@ -105,7 +106,7 @@ func (UnimplementedFriendServiceServer) UpdateFriend(context.Context, *UpdateFri
 func (UnimplementedFriendServiceServer) DeleteFriend(context.Context, *DeleteFriendRequest) (*DeleteFriendResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFriend not implemented")
 }
-func (UnimplementedFriendServiceServer) ListFriends(*EmptyRequest, FriendService_ListFriendsServer) error {
+func (UnimplementedFriendServiceServer) ListFriends(*emptypb.Empty, FriendService_ListFriendsServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListFriends not implemented")
 }
 func (UnimplementedFriendServiceServer) mustEmbedUnimplementedFriendServiceServer() {}
@@ -158,7 +159,7 @@ func _FriendService_DeleteFriend_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _FriendService_ListFriends_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(EmptyRequest)
+	m := new(emptypb.Empty)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}

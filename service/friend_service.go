@@ -7,6 +7,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type FriendService struct {
@@ -113,7 +114,7 @@ func (friendService *FriendService) DeleteFriend(ctx context.Context, req *pb.De
 	return &pb.DeleteFriendResponse{Message: "Successfully..."}, nil
 }
 
-func (friendService *FriendService) ListFriends(req *pb.EmptyRequest, stream pb.FriendService_ListFriendsServer) error {
+func (friendService *FriendService) ListFriends(req *emptypb.Empty, stream pb.FriendService_ListFriendsServer) error {
 	ctx := stream.Context()
 	user, err := friendService.authorization(ctx)
 	if err != nil {

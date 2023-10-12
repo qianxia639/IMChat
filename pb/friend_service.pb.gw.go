@@ -21,6 +21,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // Suppress "imported and not used" errors
@@ -102,7 +103,7 @@ func local_request_FriendService_DeleteFriend_0(ctx context.Context, marshaler r
 }
 
 func request_FriendService_ListFriends_0(ctx context.Context, marshaler runtime.Marshaler, client FriendServiceClient, req *http.Request, pathParams map[string]string) (FriendService_ListFriendsClient, runtime.ServerMetadata, error) {
-	var protoReq EmptyRequest
+	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
 	stream, err := client.ListFriends(ctx, &protoReq)

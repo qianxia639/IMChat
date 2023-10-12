@@ -23,6 +23,11 @@ func NewChatService(server *Server) pb.ChatServiceServer {
 }
 
 func (chatService *ChatService) ChatMessage(stream pb.ChatService_ChatMessageServer) error {
+	ctx := stream.Context()
+	user, err := chatService.authorization(ctx)
+	if err != nil {
+		return err
+	}
 
 	for {
 		req, err := stream.Recv()
@@ -33,9 +38,16 @@ func (chatService *ChatService) ChatMessage(stream pb.ChatService_ChatMessageSer
 			return errDefine.ServerErr
 		}
 
-		// 判断发送者是否是当前的登录用户
-
 		// 判断发送类型是群发还是私聊
+		switch req.Message.SendType {
+		case pb.SendType_PRIVATE:
+			// 判断发送者是否是当前的登录用户
+			if req.Message.SenderId != user.ID {
+				return errDefine.PermissionDeniedErr
+			}
+		case pb.SendType_GROUP:
+			return status.Error(codes.Internal, "群聊暂未实现")
+		}
 
 		// 持久化消息
 		arg := &db.AddMessageTxParams{

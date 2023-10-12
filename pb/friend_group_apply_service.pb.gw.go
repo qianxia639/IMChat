@@ -21,6 +21,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // Suppress "imported and not used" errors
@@ -100,7 +101,7 @@ func local_request_FriendGroupApplyService_ReplyFriendGroupApply_0(ctx context.C
 }
 
 func request_FriendGroupApplyService_ListFriendGroupApply_0(ctx context.Context, marshaler runtime.Marshaler, client FriendGroupApplyServiceClient, req *http.Request, pathParams map[string]string) (FriendGroupApplyService_ListFriendGroupApplyClient, runtime.ServerMetadata, error) {
-	var protoReq EmptyRequest
+	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
 	stream, err := client.ListFriendGroupApply(ctx, &protoReq)

@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package qianxia.IMChat;
-
-option go_package = "IMChat/pb";
-
-message EmptyRequest {}

@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -158,7 +159,7 @@ func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ct
 	return &pb.ReplyFriendGroupApplyResponse{Message: "Successfully..."}, nil
 }
 
-func (friendGroupApplyService *FriendGroupApplyService) ListFriendGroupApply(req *pb.EmptyRequest, stream pb.FriendGroupApplyService_ListFriendGroupApplyServer) error {
+func (friendGroupApplyService *FriendGroupApplyService) ListFriendGroupApply(req *emptypb.Empty, stream pb.FriendGroupApplyService_ListFriendGroupApplyServer) error {
 	ctx := stream.Context()
 	user, err := friendGroupApplyService.authorization(ctx)
 	if err != nil {

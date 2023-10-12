@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type UserService struct {
@@ -309,7 +310,7 @@ func (userService *UserService) UpdateUser(ctx context.Context, req *pb.UpdateUs
 	return resp, nil
 }
 
-func (userService *UserService) DeleteUser(ctx context.Context, req *pb.EmptyRequest) (*pb.DeleteUserResponse, error) {
+func (userService *UserService) DeleteUser(ctx context.Context, req *emptypb.Empty) (*pb.DeleteUserResponse, error) {
 	user, err := userService.authorization(ctx)
 	if err != nil {
 		return nil, err
@@ -389,7 +390,7 @@ func (userService *UserService) UpdateUserPassword(ctx context.Context, req *pb.
 	return resp, nil
 }
 
-func (userService *UserService) Logout(ctx context.Context, req *pb.EmptyRequest) (*pb.LogoutResponse, error) {
+func (userService *UserService) Logout(ctx context.Context, req *emptypb.Empty) (*pb.LogoutResponse, error) {
 	user, err := userService.authorization(ctx)
 	if err != nil {
 		return nil, err
