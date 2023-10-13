@@ -36,18 +36,24 @@ func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGroupApply(c
 		return nil, status.Error(codes.InvalidArgument, "无法添加自己")
 	}
 
-	switch req.ApplyType {
-	case pb.ApplyType_FRIEND: // 好友
-		if err := friendGroupApplyService.createFriendApply(ctx, user.ID, req.ReceiverId); err != nil {
-			return nil, err
-		}
-
-	case pb.ApplyType_CLUSTER: // 群组
-		// 判断是否已申请
-
-		// 判断是否已经在群组中
-		return nil, status.Error(codes.Internal, "未实现")
+	friendGroupApply := CreateFriendGroupApply(req.ApplyType, friendGroupApplyService.store)
+	err = friendGroupApply.CreateFriendGroupApply(ctx, user.ID, req.ReceiverId)
+	if err != nil {
+		return nil, err
 	}
+
+	// switch req.ApplyType {
+	// case pb.ApplyType_FRIEND: // 好友
+	// 	if err := friendGroupApplyService.createFriendApply(ctx, user.ID, req.ReceiverId); err != nil {
+	// 		return nil, err
+	// 	}
+
+	// case pb.ApplyType_CLUSTER: // 群组
+	// 	// 判断是否已申请
+
+	// 	// 判断是否已经在群组中
+	// 	return nil, status.Error(codes.Internal, "未实现")
+	// }
 
 	arg := &db.CreateFriendGroupApplyParams{
 		SenderID:   user.ID,
@@ -64,37 +70,6 @@ func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGroupApply(c
 	return &pb.CreateFriendGroupApplyResponse{
 		Message: "Create Successfully",
 	}, nil
-}
-
-func (friendGroupApplyService *FriendGroupApplyService) createFriendApply(ctx context.Context, senderId, receiverId int32) error {
-
-	// 判断用户是否存在
-	user, _ := friendGroupApplyService.store.GetUserById(ctx, receiverId)
-	if user.ID == 0 {
-		return errors.UserNotFoundErr
-	}
-
-	// 判断是否有未同意的申请记录
-	count, _ := friendGroupApplyService.store.ExistsFriendGroupApply(ctx, &db.ExistsFriendGroupApplyParams{
-		SenderID:   senderId,
-		ReceiverID: receiverId,
-		ApplyType:  int16(pb.ApplyType_FRIEND),
-	})
-	if count > 1 {
-		return status.Errorf(codes.InvalidArgument, "请勿重复申请")
-	}
-
-	// 不能重复添加
-	friend, _ := friendGroupApplyService.store.GetFriend(ctx, &db.GetFriendParams{
-		UserID:   senderId,
-		FriendID: receiverId,
-	})
-
-	if friend.ID != 0 {
-		return errors.DuplicakeErr
-	}
-
-	return nil
 }
 
 func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ctx context.Context, req *pb.ReplyFriendGroupApplyRequest) (*pb.ReplyFriendGroupApplyResponse, error) {
