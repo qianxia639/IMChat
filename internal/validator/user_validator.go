@@ -65,5 +65,10 @@ func (*CreateUserValidator) Validate(param interface{}) error {
 		return err
 	}
 
+	// 判断gener
+	if _, ok := pb.Gender_name[int32(req.Gender)]; !ok {
+		return fmt.Errorf("invalid gender")
+	}
+
 	return nil
 }

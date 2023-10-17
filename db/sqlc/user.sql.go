@@ -14,17 +14,19 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-    username, password, nickname, email
+    username, password, nickname, email, gender, birthday
 ) VALUES (
-    $1, $2, $3, $4
-) RETURNING id, username, nickname, password, email, gender, profile_picture_url, status, password_changed_at, last_login_at, created_at, updated_at
+    $1, $2, $3, $4, $5, $6
+) RETURNING id, username, nickname, password, email, gender, birthday, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Nickname string `json:"nickname"`
-	Email    string `json:"email"`
+	Username string      `json:"username"`
+	Password string      `json:"password"`
+	Nickname string      `json:"nickname"`
+	Email    string      `json:"email"`
+	Gender   int16       `json:"gender"`
+	Birthday pgtype.Date `json:"birthday"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (User, error) {
@@ -33,6 +35,8 @@ func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (User, 
 		arg.Password,
 		arg.Nickname,
 		arg.Email,
+		arg.Gender,
+		arg.Birthday,
 	)
 	var i User
 	err := row.Scan(
@@ -42,8 +46,9 @@ func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (User, 
 		&i.Password,
 		&i.Email,
 		&i.Gender,
+		&i.Birthday,
 		&i.ProfilePictureUrl,
-		&i.Status,
+		&i.OnlineStatus,
 		&i.PasswordChangedAt,
 		&i.LastLoginAt,
 		&i.CreatedAt,
@@ -87,7 +92,7 @@ func (q *Queries) ExistNickname(ctx context.Context, nickname string) (int64, er
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, nickname, password, email, gender, profile_picture_url, status, password_changed_at, last_login_at, created_at, updated_at FROM users
+SELECT id, username, nickname, password, email, gender, birthday, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at FROM users
 WHERE username = $1
 LIMIT 1
 `
@@ -102,8 +107,9 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 		&i.Password,
 		&i.Email,
 		&i.Gender,
+		&i.Birthday,
 		&i.ProfilePictureUrl,
-		&i.Status,
+		&i.OnlineStatus,
 		&i.PasswordChangedAt,
 		&i.LastLoginAt,
 		&i.CreatedAt,
@@ -113,7 +119,7 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, username, nickname, password, email, gender, profile_picture_url, status, password_changed_at, last_login_at, created_at, updated_at FROM users
+SELECT id, username, nickname, password, email, gender, birthday, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at FROM users
 WHERE id = $1
 LIMIT 1
 `
@@ -128,8 +134,9 @@ func (q *Queries) GetUserById(ctx context.Context, id int32) (User, error) {
 		&i.Password,
 		&i.Email,
 		&i.Gender,
+		&i.Birthday,
 		&i.ProfilePictureUrl,
-		&i.Status,
+		&i.OnlineStatus,
 		&i.PasswordChangedAt,
 		&i.LastLoginAt,
 		&i.CreatedAt,
@@ -143,28 +150,28 @@ UPDATE users
 SET
     nickname = COALESCE($1, nickname),
     gender = COALESCE($2, gender),
-    status = COALESCE($3, status),
+    online_status = COALESCE($3, online_status),
     last_login_at = COALESCE($4, last_login_at),
     updated_at = $5
 WHERE
     username = $6
-RETURNING id, username, nickname, password, email, gender, profile_picture_url, status, password_changed_at, last_login_at, created_at, updated_at
+RETURNING id, username, nickname, password, email, gender, birthday, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at
 `
 
 type UpdateUserParams struct {
-	Nickname    pgtype.Text        `json:"nickname"`
-	Gender      pgtype.Int2        `json:"gender"`
-	Status      pgtype.Int2        `json:"status"`
-	LastLoginAt pgtype.Timestamptz `json:"last_login_at"`
-	UpdatedAt   time.Time          `json:"updated_at"`
-	Username    string             `json:"username"`
+	Nickname     pgtype.Text        `json:"nickname"`
+	Gender       pgtype.Int2        `json:"gender"`
+	OnlineStatus pgtype.Bool        `json:"online_status"`
+	LastLoginAt  pgtype.Timestamptz `json:"last_login_at"`
+	UpdatedAt    time.Time          `json:"updated_at"`
+	Username     string             `json:"username"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, updateUser,
 		arg.Nickname,
 		arg.Gender,
-		arg.Status,
+		arg.OnlineStatus,
 		arg.LastLoginAt,
 		arg.UpdatedAt,
 		arg.Username,
@@ -177,8 +184,9 @@ func (q *Queries) UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, 
 		&i.Password,
 		&i.Email,
 		&i.Gender,
+		&i.Birthday,
 		&i.ProfilePictureUrl,
-		&i.Status,
+		&i.OnlineStatus,
 		&i.PasswordChangedAt,
 		&i.LastLoginAt,
 		&i.CreatedAt,

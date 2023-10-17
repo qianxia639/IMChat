@@ -60,11 +60,31 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 		return nil, errDefine.EmailExistErr
 	}
 
+	t, err := utils.ParseInLocation(utils.DATE, req.Birthday)
+	if err != nil {
+		log.Error().Err(err).Msgf("字符串转时间格式失败")
+		return nil, errDefine.ServerErr
+	}
+
+	if t.After(time.Now()) {
+		return nil, status.Errorf(codes.OutOfRange, "parsing time %v: date out of range", t.Format("2006-01-02"))
+	}
+
+	var gender int16
+	if req.Gender == pb.Gender_UNKNOWN {
+		gender = 3
+	}
+
 	arg := &db.CreateUserParams{
 		Username: req.Username,
 		Password: hashPassword,
 		Email:    req.Email,
 		Nickname: req.Username,
+		Gender:   gender,
+		Birthday: pgtype.Date{
+			Time:  t,
+			Valid: true,
+		},
 	}
 
 	_, err = userService.store.CreateUser(ctx, arg)
@@ -161,8 +181,8 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	arg := &db.UpdateUserParams{
 		Username:  user.Username,
 		UpdatedAt: now,
-		Status: pgtype.Int2{
-			Int16: 1,
+		OnlineStatus: pgtype.Bool{
+			Bool:  true,
 			Valid: true,
 		},
 	}
@@ -401,8 +421,8 @@ func (userService *UserService) Logout(ctx context.Context, req *emptypb.Empty) 
 	arg := &db.UpdateUserParams{
 		Username:  user.Username,
 		UpdatedAt: now,
-		Status: pgtype.Int2{
-			Int16: 0,
+		OnlineStatus: pgtype.Bool{
+			Bool:  false,
 			Valid: true,
 		},
 		LastLoginAt: pgtype.Timestamptz{

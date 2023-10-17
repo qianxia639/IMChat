@@ -1,8 +1,8 @@
 -- name: CreateUser :one
 INSERT INTO users (
-    username, password, nickname, email
+    username, password, nickname, email, gender, birthday
 ) VALUES (
-    $1, $2, $3, $4
+    $1, $2, $3, $4, $5, $6
 ) RETURNING *;
 
 -- name: GetUser :one
@@ -20,7 +20,7 @@ UPDATE users
 SET
     nickname = COALESCE(sqlc.narg(nickname), nickname),
     gender = COALESCE(sqlc.narg(gender), gender),
-    status = COALESCE(sqlc.narg(status), status),
+    online_status = COALESCE(sqlc.narg(online_status), online_status),
     last_login_at = COALESCE(sqlc.narg(last_login_at), last_login_at),
     updated_at = sqlc.arg(updated_at)
 WHERE
