@@ -10,13 +10,14 @@ import (
 
 func converUser(user db.User) *pb.User {
 	return &pb.User{
-		Username:  user.Username,
-		Nickname:  user.Nickname,
-		Email:     utils.DesnsitizeEmail(user.Email),
-		Avatar:    user.ProfilePictureUrl,
-		Gender:    pb.Gender(user.Gender),
-		CreatedAt: timestamppb.New(user.CreatedAt),
-		UpdatedAt: timestamppb.New(user.UpdatedAt),
+		Username:          user.Username,
+		Nickname:          user.Nickname,
+		Email:             utils.DesnsitizeEmail(user.Email),
+		ProfilePictureUrl: user.ProfilePictureUrl,
+		Gender:            pb.Gender(user.Gender),
+		CreatedAt:         timestamppb.New(user.CreatedAt),
+		UpdatedAt:         timestamppb.New(user.UpdatedAt),
+		Birthday:          user.Birthday.Time.String(),
 	}
 }
 

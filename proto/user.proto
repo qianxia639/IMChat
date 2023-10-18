@@ -20,7 +20,7 @@ message User {
     // 用户邮箱
     string email = 3;
     // 头像
-    string avatar = 4;
+    string profile_picture_url = 4;
     // 性别 0 未知, 1 男, 2 女
     Gender gender = 5;
     // 密码更新时间
@@ -29,4 +29,5 @@ message User {
     google.protobuf.Timestamp created_at = 7;
     // 更新时间
     google.protobuf.Timestamp updated_at = 8;
+    string birthday = 9;
 }

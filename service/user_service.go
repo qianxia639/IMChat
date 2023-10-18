@@ -70,8 +70,8 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 		return nil, status.Errorf(codes.OutOfRange, "parsing time %v: date out of range", t.Format("2006-01-02"))
 	}
 
-	var gender int16
-	if req.Gender == pb.Gender_UNKNOWN {
+	gender := req.GetGender()
+	if gender == pb.Gender_UNKNOWN {
 		gender = 3
 	}
 
@@ -80,7 +80,7 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 		Password: hashPassword,
 		Email:    req.Email,
 		Nickname: req.Username,
-		Gender:   gender,
+		Gender:   int16(gender),
 		Birthday: pgtype.Date{
 			Time:  t,
 			Valid: true,
@@ -186,7 +186,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 			Valid: true,
 		},
 	}
-	_, err = userService.store.UpdateUser(ctx, arg)
+	user, err = userService.store.UpdateUser(ctx, arg)
 	if err != nil {
 		return nil, errDefine.ServerErr
 	}
