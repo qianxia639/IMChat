@@ -36,24 +36,12 @@ func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGroupApply(c
 		return nil, status.Error(codes.InvalidArgument, "无法添加自己")
 	}
 
+	// 好友或群组的逻辑判断
 	friendGroupApply := CreateFriendGroupApply(req.ApplyType, friendGroupApplyService.store)
 	err = friendGroupApply.CreateFriendGroupApply(ctx, user.ID, req.ReceiverId)
 	if err != nil {
 		return nil, err
 	}
-
-	// switch req.ApplyType {
-	// case pb.ApplyType_FRIEND: // 好友
-	// 	if err := friendGroupApplyService.createFriendApply(ctx, user.ID, req.ReceiverId); err != nil {
-	// 		return nil, err
-	// 	}
-
-	// case pb.ApplyType_CLUSTER: // 群组
-	// 	// 判断是否已申请
-
-	// 	// 判断是否已经在群组中
-	// 	return nil, status.Error(codes.Internal, "未实现")
-	// }
 
 	arg := &db.CreateFriendGroupApplyParams{
 		SenderID:   user.ID,
