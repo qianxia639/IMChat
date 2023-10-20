@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"github.com/dlclark/regexp2"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -33,7 +34,7 @@ func (*LoginUserValidator) Validate(param interface{}) error {
 	reg, _ := regexp2.Compile(passwordRegexp, 0)
 	_, err := reg.MatchString(req.Password)
 	if err != nil {
-		return err
+		return errors.PasswordFormatErr
 	}
 
 	return nil
@@ -53,16 +54,19 @@ func (*CreateUserValidator) Validate(param interface{}) error {
 	if !isValidUsername(req.Username) {
 		return errors.UsernameFormatErr
 	}
+
 	// 校验密码
 	reg, _ := regexp2.Compile(passwordRegexp, 0)
 	_, err := reg.MatchString(req.Password)
 	if err != nil {
-		return err
+		log.Error().Err(err).Msgf("密码格式匹配错误")
+		return errors.PasswordFormatErr
 	}
 
 	err = utils.ValidatorEmail(req.Email)
 	if err != nil {
-		return err
+		log.Error().Err(err).Msgf("is not a valid email address")
+		return errors.InvalidEmailAddrErr
 	}
 
 	// 判断gener

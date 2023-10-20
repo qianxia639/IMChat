@@ -69,7 +69,7 @@ message LoginUserRequest {
 }
 
 message LoginUserResponse {
-    string access_token = 1;
+    string access_token = 3;
 }
 
 message CreateUserRequest {

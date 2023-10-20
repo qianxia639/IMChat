@@ -7,8 +7,6 @@ import (
 	"context"
 
 	"github.com/rs/zerolog/log"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type FriendGroupApply interface {
@@ -34,7 +32,7 @@ func (f *Friend) CreateFriendGroupApply(ctx context.Context, senderId, receiverI
 		ApplyType:  int16(pb.ApplyType_FRIEND),
 	})
 	if count > 0 {
-		return status.Errorf(codes.InvalidArgument, "请勿重复申请")
+		return errors.DuplicakeErr
 	}
 
 	// 不能重复添加

@@ -36,7 +36,7 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 	createUserValidator := &validator.CreateUserValidator{}
 	if err := validator.NewValidateContext(createUserValidator).Validate(req); err != nil {
 		log.Err(err).Msg("Create User parmas validator")
-		return nil, errDefine.ParamsErr
+		return nil, err
 	}
 
 	// 校验邮箱验证码
