@@ -11,10 +11,10 @@ func (store *SQLStore) DeleteUserTx(ctx context.Context, userId int32) error {
 			return err
 		}
 		// 删除审核表中记录
-		err = q.DeleteFriendGroupApply(ctx, userId)
-		if err != nil {
-			return err
-		}
+		// err = q.DeleteFriendGroupApply(ctx, userId)
+		// if err != nil {
+		// 	return err
+		// }
 
 		return err
 	})

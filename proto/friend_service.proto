@@ -8,12 +8,13 @@ import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
 service FriendService {
-    // rpc AddFriend (AddFriendRequest) returns (AddFriendResponse) {
-    //     option (google.api.http) = {
-    //         post: "/v1/friend"
-    //         body: "*"
-    //     };
-    // };
+
+    rpc AddFriend (AddFriendRequest) returns (AddFriendResponse) {
+        option (google.api.http) = {
+            post: "/v1/friend"
+            body: "*"
+        };
+    };
 
     rpc UpdateFriend (UpdateFriendRequest) returns (UpdateFriendResponse) {
         option (google.api.http) = {
@@ -35,15 +36,15 @@ service FriendService {
     };
 }
 
-// message AddFriendRequest {
-//     int32 friend_id = 1;
-//     int32 status = 2;
-//     string note = 3;
-// }
+message AddFriendRequest {
+    int32 receiver_id = 1;
+    string apply_desc = 2;
+    string note = 3;
+}
 
-// message AddFriendResponse {
-//     string message = 1;
-// }
+message AddFriendResponse {
+    string message = 1;
+}
 
 message UpdateFriendRequest {
     int32 friend_id = 1;

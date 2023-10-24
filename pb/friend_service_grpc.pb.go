@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FriendServiceClient interface {
+	AddFriend(ctx context.Context, in *AddFriendRequest, opts ...grpc.CallOption) (*AddFriendResponse, error)
 	UpdateFriend(ctx context.Context, in *UpdateFriendRequest, opts ...grpc.CallOption) (*UpdateFriendResponse, error)
 	DeleteFriend(ctx context.Context, in *DeleteFriendRequest, opts ...grpc.CallOption) (*DeleteFriendResponse, error)
 	ListFriends(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (FriendService_ListFriendsClient, error)
@@ -34,6 +35,15 @@ type friendServiceClient struct {
 
 func NewFriendServiceClient(cc grpc.ClientConnInterface) FriendServiceClient {
 	return &friendServiceClient{cc}
+}
+
+func (c *friendServiceClient) AddFriend(ctx context.Context, in *AddFriendRequest, opts ...grpc.CallOption) (*AddFriendResponse, error) {
+	out := new(AddFriendResponse)
+	err := c.cc.Invoke(ctx, "/qianxia.IMChat.FriendService/AddFriend", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *friendServiceClient) UpdateFriend(ctx context.Context, in *UpdateFriendRequest, opts ...grpc.CallOption) (*UpdateFriendResponse, error) {
@@ -90,6 +100,7 @@ func (x *friendServiceListFriendsClient) Recv() (*ListFriendsResponse, error) {
 // All implementations must embed UnimplementedFriendServiceServer
 // for forward compatibility
 type FriendServiceServer interface {
+	AddFriend(context.Context, *AddFriendRequest) (*AddFriendResponse, error)
 	UpdateFriend(context.Context, *UpdateFriendRequest) (*UpdateFriendResponse, error)
 	DeleteFriend(context.Context, *DeleteFriendRequest) (*DeleteFriendResponse, error)
 	ListFriends(*emptypb.Empty, FriendService_ListFriendsServer) error
@@ -100,6 +111,9 @@ type FriendServiceServer interface {
 type UnimplementedFriendServiceServer struct {
 }
 
+func (UnimplementedFriendServiceServer) AddFriend(context.Context, *AddFriendRequest) (*AddFriendResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddFriend not implemented")
+}
 func (UnimplementedFriendServiceServer) UpdateFriend(context.Context, *UpdateFriendRequest) (*UpdateFriendResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateFriend not implemented")
 }
@@ -120,6 +134,24 @@ type UnsafeFriendServiceServer interface {
 
 func RegisterFriendServiceServer(s grpc.ServiceRegistrar, srv FriendServiceServer) {
 	s.RegisterService(&FriendService_ServiceDesc, srv)
+}
+
+func _FriendService_AddFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddFriendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FriendServiceServer).AddFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/qianxia.IMChat.FriendService/AddFriend",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FriendServiceServer).AddFriend(ctx, req.(*AddFriendRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _FriendService_UpdateFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -186,6 +218,10 @@ var FriendService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "qianxia.IMChat.FriendService",
 	HandlerType: (*FriendServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AddFriend",
+			Handler:    _FriendService_AddFriend_Handler,
+		},
 		{
 			MethodName: "UpdateFriend",
 			Handler:    _FriendService_UpdateFriend_Handler,

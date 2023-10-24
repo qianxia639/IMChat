@@ -14,19 +14,18 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-    username, password, nickname, email, gender, birthday
+    username, password, nickname, email, gender
 ) VALUES (
-    $1, $2, $3, $4, $5, $6
-) RETURNING id, username, nickname, password, email, gender, birthday, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at
+    $1, $2, $3, $4, $5
+) RETURNING id, username, nickname, password, email, gender, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	Username string      `json:"username"`
-	Password string      `json:"password"`
-	Nickname string      `json:"nickname"`
-	Email    string      `json:"email"`
-	Gender   int16       `json:"gender"`
-	Birthday pgtype.Date `json:"birthday"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
+	Gender   int16  `json:"gender"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (User, error) {
@@ -36,7 +35,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (User, 
 		arg.Nickname,
 		arg.Email,
 		arg.Gender,
-		arg.Birthday,
 	)
 	var i User
 	err := row.Scan(
@@ -46,7 +44,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (User, 
 		&i.Password,
 		&i.Email,
 		&i.Gender,
-		&i.Birthday,
 		&i.ProfilePictureUrl,
 		&i.OnlineStatus,
 		&i.PasswordChangedAt,
@@ -92,7 +89,7 @@ func (q *Queries) ExistNickname(ctx context.Context, nickname string) (int64, er
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, nickname, password, email, gender, birthday, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at FROM users
+SELECT id, username, nickname, password, email, gender, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at FROM users
 WHERE username = $1
 LIMIT 1
 `
@@ -107,7 +104,6 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 		&i.Password,
 		&i.Email,
 		&i.Gender,
-		&i.Birthday,
 		&i.ProfilePictureUrl,
 		&i.OnlineStatus,
 		&i.PasswordChangedAt,
@@ -119,7 +115,7 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, username, nickname, password, email, gender, birthday, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at FROM users
+SELECT id, username, nickname, password, email, gender, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at FROM users
 WHERE id = $1
 LIMIT 1
 `
@@ -134,7 +130,6 @@ func (q *Queries) GetUserById(ctx context.Context, id int32) (User, error) {
 		&i.Password,
 		&i.Email,
 		&i.Gender,
-		&i.Birthday,
 		&i.ProfilePictureUrl,
 		&i.OnlineStatus,
 		&i.PasswordChangedAt,
@@ -155,7 +150,7 @@ SET
     updated_at = $5
 WHERE
     username = $6
-RETURNING id, username, nickname, password, email, gender, birthday, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at
+RETURNING id, username, nickname, password, email, gender, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at
 `
 
 type UpdateUserParams struct {
@@ -184,7 +179,6 @@ func (q *Queries) UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, 
 		&i.Password,
 		&i.Email,
 		&i.Gender,
-		&i.Birthday,
 		&i.ProfilePictureUrl,
 		&i.OnlineStatus,
 		&i.PasswordChangedAt,

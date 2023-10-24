@@ -17,12 +17,11 @@ func converUser(user db.User) *pb.User {
 		Gender:            pb.Gender(user.Gender),
 		CreatedAt:         timestamppb.New(user.CreatedAt),
 		UpdatedAt:         timestamppb.New(user.UpdatedAt),
-		Birthday:          user.Birthday.Time.String(),
 	}
 }
 
-func converMesagge(message db.Message) *pb.Message {
-	return &pb.Message{
+func converMesagge(message db.Message) *pb.ChatMeg {
+	return &pb.ChatMeg{
 		SenderId:    message.SenderID,
 		ReceiverId:  message.ReceiverID,
 		Content:     message.Content,

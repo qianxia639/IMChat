@@ -60,16 +60,6 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 		return nil, errDefine.EmailExistErr
 	}
 
-	t, err := utils.ParseInLocation(utils.DATE, req.Birthday)
-	if err != nil {
-		log.Error().Err(err).Msgf("字符串转时间格式失败")
-		return nil, errDefine.ServerErr
-	}
-
-	if t.After(time.Now()) {
-		return nil, status.Errorf(codes.OutOfRange, "parsing time %v: date out of range", t.Format("2006-01-02"))
-	}
-
 	gender := req.GetGender()
 	if gender == pb.Gender_UNKNOWN {
 		gender = 3
@@ -81,10 +71,6 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 		Email:    req.Email,
 		Nickname: req.Username,
 		Gender:   int16(gender),
-		Birthday: pgtype.Date{
-			Time:  t,
-			Valid: true,
-		},
 	}
 
 	_, err = userService.store.CreateUser(ctx, arg)

@@ -78,7 +78,6 @@ message CreateUserRequest {
     string email = 3;
     string email_code = 4;
     Gender gender = 5;
-    string birthday = 6; 
 }
 
 message CreateUserResponse {

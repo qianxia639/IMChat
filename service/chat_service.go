@@ -23,11 +23,11 @@ func NewChatService(server *Server) pb.ChatServiceServer {
 }
 
 func (chatService *ChatService) ChatMessage(stream pb.ChatService_ChatMessageServer) error {
-	ctx := stream.Context()
-	user, err := chatService.authorization(ctx)
-	if err != nil {
-		return err
-	}
+	// ctx := stream.Context()
+	// user, err := chatService.authorization(ctx)
+	// if err != nil {
+	// 	return err
+	// }
 
 	for {
 		req, err := stream.Recv()
@@ -39,12 +39,15 @@ func (chatService *ChatService) ChatMessage(stream pb.ChatService_ChatMessageSer
 		}
 
 		// 判断发送类型是群发还是私聊
-		switch req.Message.SendType {
+		switch req.SendType {
 		case pb.SendType_PRIVATE:
 			// 判断发送者是否是当前的登录用户
-			if req.Message.SenderId != user.ID {
-				return errDefine.PermissionDeniedErr
-			}
+			// if req.Message.SenderId != user.ID {
+			// 	return errDefine.PermissionDeniedErr
+			// }
+			log.Info().Msgf("私聊成功")
+			//
+
 		case pb.SendType_GROUP:
 			return status.Error(codes.Internal, "群聊暂未实现")
 		}
@@ -52,17 +55,16 @@ func (chatService *ChatService) ChatMessage(stream pb.ChatService_ChatMessageSer
 		// 持久化消息
 		arg := &db.AddMessageTxParams{
 			AddMessageParams: db.AddMessageParams{
-				SenderID:    req.Message.SenderId,
-				ReceiverID:  req.Message.ReceiverId,
-				MessageType: int16(req.Message.MessageType),
-				Content:     req.Message.Content,
-				SendType:    int16(req.Message.SendType),
+				SenderID:    req.SenderId,
+				ReceiverID:  req.ReceiverId,
+				MessageType: int16(req.MessageType),
+				Content:     req.Content,
+				SendType:    int16(req.SendType),
 				SendingTime: time.Now(),
 			},
 			AfterFunc: func(message db.Message) error {
 				msgPb := converMesagge(message)
-				resp := &pb.ChatMessagg{Message: msgPb}
-				return stream.Send(resp)
+				return stream.Send(msgPb)
 			},
 		}
 
@@ -119,9 +121,9 @@ func (chatService *ChatService) SenderMessage(stream pb.ChatService_SenderMessag
 				SendingTime: time.Now(),
 			},
 			AfterFunc: func(message db.Message) error {
-				msgPb := converMesagge(message)
-				resp := &pb.SenderMessageResponse{Message: msgPb}
-				return stream.Send(resp)
+				// msgPb := converMesagge(message)
+				// resp := &pb.SenderMessageResponse{Message: msgPb}
+				return stream.Send(nil)
 			},
 		}
 		_, err = chatService.store.AddMessageTx(ctx, arg)

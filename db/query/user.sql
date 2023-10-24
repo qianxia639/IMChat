@@ -1,8 +1,8 @@
 -- name: CreateUser :one
 INSERT INTO users (
-    username, password, nickname, email, gender, birthday
+    username, password, nickname, email, gender
 ) VALUES (
-    $1, $2, $3, $4, $5, $6
+    $1, $2, $3, $4, $5
 ) RETURNING *;
 
 -- name: GetUser :one

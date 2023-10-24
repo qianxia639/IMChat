@@ -8,7 +8,7 @@ import "message.proto";
 
 service ChatService {
 
-    rpc ChatMessage(stream ChatMessagg) returns (stream ChatMessagg) {}
+    rpc ChatMessage(stream ChatMeg) returns (stream ChatMeg) {}
 
     rpc SenderMessage(stream SenderMessageRequest) returns (stream SenderMessageResponse) {}
 
@@ -16,8 +16,12 @@ service ChatService {
 
 }
 
-message ChatMessagg {
-    Message message = 1;
+message ChatMeg {
+    int32 sender_id = 1;    //  发送者Id
+    int32 receiver_id = 2;  // 接收者Id
+    int32 message_type = 3; // 消息类型
+    string content = 4; // 发送的内容
+    SendType send_type = 5; // 发送类型
 }
 
 message SenderMessageRequest {

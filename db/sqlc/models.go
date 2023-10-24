@@ -6,8 +6,6 @@ package db
 
 import (
 	"time"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Friend struct {
@@ -21,25 +19,6 @@ type Friend struct {
 	Note string `json:"note"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
-}
-
-type FriendGroupApply struct {
-	// 主键Id
-	ID int64 `json:"id"`
-	// 申请者的用户Id
-	SenderID int32 `json:"sender_id"`
-	// 接收者的用户Id或群组Id
-	ReceiverID int32 `json:"receiver_id"`
-	// 申请描述
-	ApplyDesc string `json:"apply_desc"`
-	// 申请状态, 0: 待确定, 1: 同意, 2: 拒绝
-	Status int16 `json:"status"`
-	// 申请类型, 0: 好友, 1: 群组
-	ApplyType int16 `json:"apply_type"`
-	// 申请时间
-	ApplyTime time.Time `json:"apply_time"`
-	// 响应时间
-	ReplyTime time.Time `json:"reply_time"`
 }
 
 type Group struct {
@@ -75,12 +54,14 @@ type Message struct {
 	SenderID int32 `json:"sender_id"`
 	// 消息接收者Id
 	ReceiverID int32 `json:"receiver_id"`
-	// 消息类型, 0: 文字
+	// 消息类型, 1: 文字, 2: 图片, 3: 文件, 4: 语音, 5: 视频, 6: 语音通话, 7: 视频通话
 	MessageType int16 `json:"message_type"`
 	// 消息内容
 	Content string `json:"content"`
-	// 发送类型, 0: 私聊, 1: 群聊
+	// 发送类型, 1: 私聊, 2: 群聊
 	SendType int16 `json:"send_type"`
+	// 消息状态, 1: 发送失败, 2: 发送成功, 3: 已读, 4: 未读
+	MessageStatus int16 `json:"message_status"`
 	// 消息发送时间
 	SendingTime time.Time `json:"sending_time"`
 	// 消息读取时间
@@ -100,8 +81,6 @@ type User struct {
 	Email string `json:"email"`
 	// 性别, 1 男, 2 女, 3 未知
 	Gender int16 `json:"gender"`
-	// 生日
-	Birthday pgtype.Date `json:"birthday"`
 	// 头像图片路径或链接
 	ProfilePictureUrl string `json:"profile_picture_url"`
 	// 在线状态(在线/离线)
