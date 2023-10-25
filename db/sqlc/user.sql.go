@@ -17,7 +17,7 @@ INSERT INTO users (
     username, password, nickname, email, gender
 ) VALUES (
     $1, $2, $3, $4, $5
-) RETURNING id, username, nickname, password, email, gender, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at
+) RETURNING id, username, nickname, password, email, gender, profile_picture_url, password_changed_at, last_login_at, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -45,7 +45,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (User, 
 		&i.Email,
 		&i.Gender,
 		&i.ProfilePictureUrl,
-		&i.OnlineStatus,
 		&i.PasswordChangedAt,
 		&i.LastLoginAt,
 		&i.CreatedAt,
@@ -89,7 +88,7 @@ func (q *Queries) ExistNickname(ctx context.Context, nickname string) (int64, er
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, nickname, password, email, gender, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at FROM users
+SELECT id, username, nickname, password, email, gender, profile_picture_url, password_changed_at, last_login_at, created_at, updated_at FROM users
 WHERE username = $1
 LIMIT 1
 `
@@ -105,7 +104,6 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 		&i.Email,
 		&i.Gender,
 		&i.ProfilePictureUrl,
-		&i.OnlineStatus,
 		&i.PasswordChangedAt,
 		&i.LastLoginAt,
 		&i.CreatedAt,
@@ -115,7 +113,7 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, username, nickname, password, email, gender, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at FROM users
+SELECT id, username, nickname, password, email, gender, profile_picture_url, password_changed_at, last_login_at, created_at, updated_at FROM users
 WHERE id = $1
 LIMIT 1
 `
@@ -131,7 +129,6 @@ func (q *Queries) GetUserById(ctx context.Context, id int32) (User, error) {
 		&i.Email,
 		&i.Gender,
 		&i.ProfilePictureUrl,
-		&i.OnlineStatus,
 		&i.PasswordChangedAt,
 		&i.LastLoginAt,
 		&i.CreatedAt,
@@ -145,28 +142,25 @@ UPDATE users
 SET
     nickname = COALESCE($1, nickname),
     gender = COALESCE($2, gender),
-    online_status = COALESCE($3, online_status),
-    last_login_at = COALESCE($4, last_login_at),
-    updated_at = $5
+    last_login_at = COALESCE($3, last_login_at),
+    updated_at = $4
 WHERE
-    username = $6
-RETURNING id, username, nickname, password, email, gender, profile_picture_url, online_status, password_changed_at, last_login_at, created_at, updated_at
+    username = $5
+RETURNING id, username, nickname, password, email, gender, profile_picture_url, password_changed_at, last_login_at, created_at, updated_at
 `
 
 type UpdateUserParams struct {
-	Nickname     pgtype.Text        `json:"nickname"`
-	Gender       pgtype.Int2        `json:"gender"`
-	OnlineStatus pgtype.Bool        `json:"online_status"`
-	LastLoginAt  pgtype.Timestamptz `json:"last_login_at"`
-	UpdatedAt    time.Time          `json:"updated_at"`
-	Username     string             `json:"username"`
+	Nickname    pgtype.Text        `json:"nickname"`
+	Gender      pgtype.Int2        `json:"gender"`
+	LastLoginAt pgtype.Timestamptz `json:"last_login_at"`
+	UpdatedAt   time.Time          `json:"updated_at"`
+	Username    string             `json:"username"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, updateUser,
 		arg.Nickname,
 		arg.Gender,
-		arg.OnlineStatus,
 		arg.LastLoginAt,
 		arg.UpdatedAt,
 		arg.Username,
@@ -180,7 +174,6 @@ func (q *Queries) UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, 
 		&i.Email,
 		&i.Gender,
 		&i.ProfilePictureUrl,
-		&i.OnlineStatus,
 		&i.PasswordChangedAt,
 		&i.LastLoginAt,
 		&i.CreatedAt,

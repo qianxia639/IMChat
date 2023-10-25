@@ -12,7 +12,7 @@ import (
 const addFriend = `-- name: AddFriend :one
 INSERT INTO friends (user_id, friend_id, note)
 VALUEs ($1, $2, $3) 
-RETURNING id, user_id, friend_id, note, created_at
+RETURNING user_id, friend_id, note, created_at
 `
 
 type AddFriendParams struct {
@@ -25,7 +25,6 @@ func (q *Queries) AddFriend(ctx context.Context, arg *AddFriendParams) (Friend, 
 	row := q.db.QueryRow(ctx, addFriend, arg.UserID, arg.FriendID, arg.Note)
 	var i Friend
 	err := row.Scan(
-		&i.ID,
 		&i.UserID,
 		&i.FriendID,
 		&i.Note,
@@ -51,7 +50,7 @@ func (q *Queries) DeleteFriend(ctx context.Context, arg *DeleteFriendParams) err
 }
 
 const getFriend = `-- name: GetFriend :one
-SELECT id, user_id, friend_id, note, created_at FROM friends
+SELECT user_id, friend_id, note, created_at FROM friends
 WHERE 
     user_id = $1 AND friend_id = $2
 `
@@ -65,7 +64,6 @@ func (q *Queries) GetFriend(ctx context.Context, arg *GetFriendParams) (Friend, 
 	row := q.db.QueryRow(ctx, getFriend, arg.UserID, arg.FriendID)
 	var i Friend
 	err := row.Scan(
-		&i.ID,
 		&i.UserID,
 		&i.FriendID,
 		&i.Note,
@@ -112,7 +110,7 @@ SET
     note = $1
 WHERE
     user_id = $2 AND friend_id = $3
-RETURNING id, user_id, friend_id, note, created_at
+RETURNING user_id, friend_id, note, created_at
 `
 
 type UpdateFriendNoteParams struct {
@@ -125,7 +123,6 @@ func (q *Queries) UpdateFriendNote(ctx context.Context, arg *UpdateFriendNotePar
 	row := q.db.QueryRow(ctx, updateFriendNote, arg.Note, arg.UserID, arg.FriendID)
 	var i Friend
 	err := row.Scan(
-		&i.ID,
 		&i.UserID,
 		&i.FriendID,
 		&i.Note,

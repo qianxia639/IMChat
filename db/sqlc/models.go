@@ -9,8 +9,6 @@ import (
 )
 
 type Friend struct {
-	// 主键Id
-	ID int64 `json:"id"`
 	// 用户Id
 	UserID int32 `json:"user_id"`
 	// 好友Id
@@ -83,8 +81,6 @@ type User struct {
 	Gender int16 `json:"gender"`
 	// 头像图片路径或链接
 	ProfilePictureUrl string `json:"profile_picture_url"`
-	// 在线状态(在线/离线)
-	OnlineStatus bool `json:"online_status"`
 	// 密码更新时间
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	// 最后在线时间

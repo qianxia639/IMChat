@@ -45,7 +45,7 @@ func (friendService *FriendService) AddFriend(ctx context.Context, req *pb.AddFr
 		UserID:   user.ID,
 		FriendID: req.ReceiverId,
 	})
-	if friend.ID != 0 {
+	if friend.UserID != 0 {
 		return nil, errors.DuplicakeErr
 	}
 

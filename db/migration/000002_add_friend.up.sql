@@ -1,13 +1,13 @@
 -- 好友表
 CREATE TABLE friends (
-    id BIGSERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
-    friend_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+    user_id INTEGER NOT NULL,
+    friend_id INTEGER NOT NULL,
     note VARCHAR(60) NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT (now())
+    created_at TIMESTAMPTZ NOT NULL DEFAULT (now()),
+    PRIMARY KEY (user_id, friend_id),
+    FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE,
+    FOREIGN KEY (friend_id) REFERENCES users ON DELETE CASCADE
 );
-
-COMMENT ON COLUMN friends.id IS '主键Id';
 
 COMMENT ON COLUMN friends.user_id IS '用户Id';
 

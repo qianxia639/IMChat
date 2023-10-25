@@ -16,7 +16,6 @@ func converUser(user db.User) *pb.User {
 		ProfilePictureUrl: user.ProfilePictureUrl,
 		Gender:            pb.Gender(user.Gender),
 		CreatedAt:         timestamppb.New(user.CreatedAt),
-		UpdatedAt:         timestamppb.New(user.UpdatedAt),
 	}
 }
 

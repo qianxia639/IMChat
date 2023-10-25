@@ -27,7 +27,4 @@ message User {
     google.protobuf.Timestamp password_change_at = 6;
     // 创建时间
     google.protobuf.Timestamp created_at = 7;
-    // 更新时间
-    google.protobuf.Timestamp updated_at = 8;
-    string birthday = 9;
 }

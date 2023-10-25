@@ -7,7 +7,6 @@ CREATE TABLE "users" (
   "email" VARCHAR(64) UNIQUE NOT NULL,
   "gender" SMALLINT NOT NULL DEFAULT 1,
   "profile_picture_url" VARCHAR(255) NOT NULL DEFAULT 'default.jpg',
-  "online_status" BOOLEAN NOT NULL DEFAULT FALSE,
   "password_changed_at" TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z',
   "last_login_at" TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z',
   "created_at" TIMESTAMPTZ NOT NULL DEFAULT (now()),
@@ -27,8 +26,6 @@ COMMENT ON COLUMN "users"."email" IS '邮箱';
 COMMENT ON COLUMN "users"."gender" IS '性别, 1 男, 2 女, 3 未知';
 
 COMMENT ON COLUMN "users"."profile_picture_url" IS '头像图片路径或链接';
-
-COMMENT ON COLUMN "users"."online_status" IS '在线状态(在线/离线)';
 
 COMMENT ON COLUMN "users"."password_changed_at" IS '密码更新时间';
 

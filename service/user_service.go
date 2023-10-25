@@ -162,21 +162,6 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 		log.Warn().Msgf("failed to add user login log: %v", err)
 	}
 
-	// 更改在线状态
-	now := time.Now()
-	arg := &db.UpdateUserParams{
-		Username:  user.Username,
-		UpdatedAt: now,
-		OnlineStatus: pgtype.Bool{
-			Bool:  true,
-			Valid: true,
-		},
-	}
-	user, err = userService.store.UpdateUser(ctx, arg)
-	if err != nil {
-		return nil, errDefine.ServerErr
-	}
-
 	expireAt := time.Duration(utils.RandomInt(27, 30))
 	if err := userService.cache.Set(ctx, getUserInfoKey(user.Username), &user, expireAt*time.Minute).Err(); err != nil {
 		log.Error().Err(err).Msgf("LoginUser HSET error")
@@ -402,15 +387,11 @@ func (userService *UserService) Logout(ctx context.Context, req *emptypb.Empty) 
 		return nil, err
 	}
 
-	// 更改在线状态为离线并更新最后在线时间
+	// 更新最后在线时间
 	now := time.Now()
 	arg := &db.UpdateUserParams{
 		Username:  user.Username,
 		UpdatedAt: now,
-		OnlineStatus: pgtype.Bool{
-			Bool:  false,
-			Valid: true,
-		},
 		LastLoginAt: pgtype.Timestamptz{
 			Time:  now,
 			Valid: true,
