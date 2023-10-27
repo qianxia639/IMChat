@@ -43,4 +43,7 @@ mock:
 test:
 	go test -cover -race -short -count=1 ./... 
 
-.PHONY: proto server postgres createdb migrateup migrateup1 migratedown migratedown1 new_migrate sqlc evans mock test
+vet:
+	go vet main.go
+
+.PHONY: proto server postgres createdb migrateup migrateup1 migratedown migratedown1 new_migrate sqlc evans mock test vet
