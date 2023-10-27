@@ -88,7 +88,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	// 参数校验
 	loginUserValidator := &validator.LoginUserValidator{}
 	if err := validator.NewValidateContext(loginUserValidator).Validate(req); err != nil {
-		return nil, errDefine.ParamsErr
+		return nil, err
 	}
 
 	// 校验账户是否锁定
@@ -144,7 +144,8 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 	// 创建token
 	accessToken, err := userService.maker.CreateToken(user.Username)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "failed to create access token")
+		log.Error().Err(err).Msg("failed to create access token")
+		return nil, errDefine.ServerErr
 	}
 
 	region, _ := utils.GetRegion(mtdt.ClientIp)
