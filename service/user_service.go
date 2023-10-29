@@ -128,39 +128,11 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 		return nil, errDefine.ServerErr
 	}
 
-	// 查询最新登录日志
-	userLoginLog, _ := userService.store.GetLastUserLoginLog(ctx, user.ID)
-
-	isLoginExcptional := false
-	mtdt := extractMetadata(ctx)
-
-	// 异地登录
-	// TODO: 出现异地登录时需要发送消息告知用户(系统消息发送)
-	if userLoginLog.ID > 0 && userLoginLog.LoginIp != mtdt.ClientIp {
-		log.Print("异地登录,非本人操作请及时修改密码")
-		isLoginExcptional = true
-	}
-
 	// 创建token
 	accessToken, err := userService.maker.CreateToken(user.Username)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to create access token")
 		return nil, errDefine.ServerErr
-	}
-
-	region, _ := utils.GetRegion(mtdt.ClientIp)
-
-	// 添加登录日志
-	_, err = userService.store.AddUserLoginLog(ctx, &db.AddUserLoginLogParams{
-		UserID:             user.ID,
-		LoginIp:            mtdt.ClientIp,
-		LoginIpRegion:      region,
-		IsLoginExceptional: isLoginExcptional,
-		Platform:           "",
-		UserAgent:          mtdt.UserAgent,
-	})
-	if err != nil {
-		log.Warn().Msgf("failed to add user login log: %v", err)
 	}
 
 	expireAt := time.Duration(utils.RandomInt(27, 30))

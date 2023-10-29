@@ -95,21 +95,6 @@ func (mr *MockStoreMockRecorder) AddMessageTx(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMessageTx", reflect.TypeOf((*MockStore)(nil).AddMessageTx), arg0, arg1)
 }
 
-// AddUserLoginLog mocks base method.
-func (m *MockStore) AddUserLoginLog(arg0 context.Context, arg1 *db.AddUserLoginLogParams) (db.UserLoginLog, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddUserLoginLog", arg0, arg1)
-	ret0, _ := ret[0].(db.UserLoginLog)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AddUserLoginLog indicates an expected call of AddUserLoginLog.
-func (mr *MockStoreMockRecorder) AddUserLoginLog(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddUserLoginLog", reflect.TypeOf((*MockStore)(nil).AddUserLoginLog), arg0, arg1)
-}
-
 // CreateUser mocks base method.
 func (m *MockStore) CreateUser(arg0 context.Context, arg1 *db.CreateUserParams) (db.User, error) {
 	m.ctrl.T.Helper()
@@ -226,21 +211,6 @@ func (mr *MockStoreMockRecorder) GetFriend(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriend", reflect.TypeOf((*MockStore)(nil).GetFriend), arg0, arg1)
 }
 
-// GetLastUserLoginLog mocks base method.
-func (m *MockStore) GetLastUserLoginLog(arg0 context.Context, arg1 int32) (db.UserLoginLog, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLastUserLoginLog", arg0, arg1)
-	ret0, _ := ret[0].(db.UserLoginLog)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetLastUserLoginLog indicates an expected call of GetLastUserLoginLog.
-func (mr *MockStoreMockRecorder) GetLastUserLoginLog(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastUserLoginLog", reflect.TypeOf((*MockStore)(nil).GetLastUserLoginLog), arg0, arg1)
-}
-
 // GetUser mocks base method.
 func (m *MockStore) GetUser(arg0 context.Context, arg1 string) (db.User, error) {
 	m.ctrl.T.Helper()
@@ -299,20 +269,6 @@ func (m *MockStore) UpdateFriendNote(arg0 context.Context, arg1 *db.UpdateFriend
 func (mr *MockStoreMockRecorder) UpdateFriendNote(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFriendNote", reflect.TypeOf((*MockStore)(nil).UpdateFriendNote), arg0, arg1)
-}
-
-// UpdateLastUserLoginLog mocks base method.
-func (m *MockStore) UpdateLastUserLoginLog(arg0 context.Context, arg1 int32) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateLastUserLoginLog", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdateLastUserLoginLog indicates an expected call of UpdateLastUserLoginLog.
-func (mr *MockStoreMockRecorder) UpdateLastUserLoginLog(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateLastUserLoginLog", reflect.TypeOf((*MockStore)(nil).UpdateLastUserLoginLog), arg0, arg1)
 }
 
 // UpdateUser mocks base method.

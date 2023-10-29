@@ -33,13 +33,13 @@ func extractMetadata(ctx context.Context) *Metadata {
 			mtdt.UserAgent = userAgents[0]
 		}
 
-		// // 获取HTTP IP
+		// 获取HTTP IP
 		if clientIp := md.Get(xForwardedForHeader); len(clientIp) > 0 {
 			mtdt.ClientIp = clientIp[0]
 		}
 	}
 
-	// // 获取客户端Ip
+	// 获取客户端Ip
 	if p, ok := peer.FromContext(ctx); ok {
 		host, _, _ := net.SplitHostPort(p.Addr.String())
 		mtdt.ClientIp = host

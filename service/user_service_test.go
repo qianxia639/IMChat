@@ -83,6 +83,14 @@ func TestCreateUser(t *testing.T) {
 					Nickname: user.Username,
 				}
 				store.EXPECT().
+					GetUser(gomock.Any(), user.Username).
+					Times(1).
+					Return(user, nil)
+				store.EXPECT().
+					ExistEmail(gomock.Any(), user.Email).
+					Times(1).
+					Return(int64(0), nil)
+				store.EXPECT().
 					CreateUser(gomock.Any(), EqCreateUserParams(arg, password, user)).
 					Times(1).
 					Return(user, nil)
@@ -225,14 +233,6 @@ func TestLoginUser(t *testing.T) {
 					GetUser(gomock.Any(), gomock.Eq(user.Username)).
 					Times(1).
 					Return(user, nil)
-				store.EXPECT().
-					GetLastUserLoginLog(gomock.Any(), user.ID).
-					Times(1).
-					Return(db.UserLoginLog{}, nil)
-				store.EXPECT().
-					AddUserLoginLog(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(db.UserLoginLog{}, nil)
 			},
 			checkResponse: func(t *testing.T, res *pb.LoginUserResponse, err error) {
 				require.NoError(t, err)

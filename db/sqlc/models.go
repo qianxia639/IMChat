@@ -90,22 +90,3 @@ type User struct {
 	// 更新时间
 	UpdatedAt time.Time `json:"updated_at"`
 }
-
-type UserLoginLog struct {
-	// 日志Id
-	ID int64 `json:"id"`
-	// 用户id
-	UserID int32 `json:"user_id"`
-	// 登录时间
-	LoginTime time.Time `json:"login_time"`
-	// 登录ip
-	LoginIp string `json:"login_ip"`
-	// 登录ip所在地
-	LoginIpRegion string `json:"login_ip_region"`
-	// 是否登录异常, t: 异常, f: 非异常
-	IsLoginExceptional bool `json:"is_login_exceptional"`
-	// 登录平台
-	Platform string `json:"platform"`
-	// user_agent
-	UserAgent string `json:"user_agent"`
-}
