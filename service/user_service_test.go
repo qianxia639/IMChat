@@ -67,7 +67,7 @@ func TestCreateUser(t *testing.T) {
 		name          string
 		req           *pb.CreateUserRequest
 		buildStubs    func(store *mockdb.MockStore)
-		checkResponse func(t *testing.T, res *pb.CreateUserResponse, err error)
+		checkResponse func(t *testing.T, res *pb.Response, err error)
 	}{
 		{
 			name: "OK",
@@ -95,7 +95,7 @@ func TestCreateUser(t *testing.T) {
 					Times(1).
 					Return(user, nil)
 			},
-			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
+			checkResponse: func(t *testing.T, res *pb.Response, err error) {
 				require.NoError(t, err)
 			},
 		},
@@ -112,7 +112,7 @@ func TestCreateUser(t *testing.T) {
 					Times(1).
 					Return(db.User{}, sql.ErrConnDone)
 			},
-			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
+			checkResponse: func(t *testing.T, res *pb.Response, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -132,7 +132,7 @@ func TestCreateUser(t *testing.T) {
 					Times(1).
 					Return(db.User{}, db.ErrUniqueViolation)
 			},
-			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
+			checkResponse: func(t *testing.T, res *pb.Response, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -151,7 +151,7 @@ func TestCreateUser(t *testing.T) {
 					CreateUser(gomock.Any(), gomock.Any()).
 					Times(0)
 			},
-			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
+			checkResponse: func(t *testing.T, res *pb.Response, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -170,7 +170,7 @@ func TestCreateUser(t *testing.T) {
 					CreateUser(gomock.Any(), gomock.Any()).
 					Times(0)
 			},
-			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
+			checkResponse: func(t *testing.T, res *pb.Response, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)
@@ -189,7 +189,7 @@ func TestCreateUser(t *testing.T) {
 					CreateUser(gomock.Any(), gomock.Any()).
 					Times(0)
 			},
-			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
+			checkResponse: func(t *testing.T, res *pb.Response, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.True(t, ok)

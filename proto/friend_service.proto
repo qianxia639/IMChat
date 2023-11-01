@@ -4,26 +4,27 @@ package qianxia.IMChat;
 
 option go_package = "IMChat/pb";
 
+import "response.proto";
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
 service FriendService {
 
-    rpc AddFriend (AddFriendRequest) returns (AddFriendResponse) {
+    rpc AddFriend (AddFriendRequest) returns (Response) {
         option (google.api.http) = {
             post: "/v1/friend"
             body: "*"
         };
     };
 
-    rpc UpdateFriend (UpdateFriendRequest) returns (UpdateFriendResponse) {
+    rpc UpdateFriend (UpdateFriendRequest) returns (Response) {
         option (google.api.http) = {
             put: "/v1/friend"
             body: "*"
         };
     };
 
-    rpc DeleteFriend (DeleteFriendRequest) returns (DeleteFriendResponse) {
+    rpc DeleteFriend (DeleteFriendRequest) returns (Response) {
         option (google.api.http) = {
             delete: "/v1/friend"
         };
@@ -42,25 +43,13 @@ message AddFriendRequest {
     string note = 3;
 }
 
-message AddFriendResponse {
-    string message = 1;
-}
-
 message UpdateFriendRequest {
     int32 friend_id = 1;
     string note = 2;
 }
 
-message UpdateFriendResponse {
-    string message = 1;
-}
-
 message DeleteFriendRequest {
     int32 friend_id = 1;
-}
-
-message DeleteFriendResponse {
-    string message = 1;
 }
 
 message ListFriendsResponse {

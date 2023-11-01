@@ -31,7 +31,7 @@ func NewUserService(server *Server) pb.UserServiceServer {
 	}
 }
 
-func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.Response, error) {
 
 	createUserValidator := &validator.CreateUserValidator{}
 	if err := validator.NewValidateContext(createUserValidator).Validate(req); err != nil {
@@ -78,7 +78,7 @@ func (userService *UserService) CreateUser(ctx context.Context, req *pb.CreateUs
 		return nil, errDefine.ServerErr
 	}
 
-	return &pb.CreateUserResponse{
+	return &pb.Response{
 		Message: "Create User Succeddfully",
 	}, nil
 }
@@ -274,7 +274,7 @@ func (userService *UserService) UpdateUser(ctx context.Context, req *pb.UpdateUs
 	return resp, nil
 }
 
-func (userService *UserService) DeleteUser(ctx context.Context, req *emptypb.Empty) (*pb.DeleteUserResponse, error) {
+func (userService *UserService) DeleteUser(ctx context.Context, req *emptypb.Empty) (*pb.Response, error) {
 	user, err := userService.authorization(ctx)
 	if err != nil {
 		return nil, err
@@ -293,7 +293,7 @@ func (userService *UserService) DeleteUser(ctx context.Context, req *emptypb.Emp
 	userInfoKey := getUserInfoKey(user.Username)
 	_ = userService.cache.Del(ctx, userInfoKey).Err()
 
-	resp := &pb.DeleteUserResponse{
+	resp := &pb.Response{
 		Message: "Delete Successfully...",
 	}
 
@@ -354,7 +354,7 @@ func (userService *UserService) UpdateUserPassword(ctx context.Context, req *pb.
 	return resp, nil
 }
 
-func (userService *UserService) Logout(ctx context.Context, req *emptypb.Empty) (*pb.LogoutResponse, error) {
+func (userService *UserService) Logout(ctx context.Context, req *emptypb.Empty) (*pb.Response, error) {
 	user, err := userService.authorization(ctx)
 	if err != nil {
 		return nil, err
@@ -378,7 +378,7 @@ func (userService *UserService) Logout(ctx context.Context, req *emptypb.Empty) 
 	userInfoKey := getUserInfoKey(user.Username)
 	_ = userService.cache.Del(ctx, userInfoKey).Err()
 
-	resp := &pb.LogoutResponse{
+	resp := &pb.Response{
 		Message: "Logout Successfully...",
 	}
 

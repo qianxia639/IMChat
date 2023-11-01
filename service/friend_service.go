@@ -22,7 +22,7 @@ func NewFriendService(server *Server) pb.FriendServiceServer {
 	}
 }
 
-func (friendService *FriendService) AddFriend(ctx context.Context, req *pb.AddFriendRequest) (*pb.AddFriendResponse, error) {
+func (friendService *FriendService) AddFriend(ctx context.Context, req *pb.AddFriendRequest) (*pb.Response, error) {
 
 	user, err := friendService.authorization(ctx)
 	if err != nil {
@@ -58,10 +58,10 @@ func (friendService *FriendService) AddFriend(ctx context.Context, req *pb.AddFr
 		return nil, errors.ServerErr
 	}
 
-	return &pb.AddFriendResponse{Message: "Successfully..."}, nil
+	return &pb.Response{Message: "Successfully..."}, nil
 }
 
-func (friendService *FriendService) UpdateFriend(ctx context.Context, req *pb.UpdateFriendRequest) (*pb.UpdateFriendResponse, error) {
+func (friendService *FriendService) UpdateFriend(ctx context.Context, req *pb.UpdateFriendRequest) (*pb.Response, error) {
 	user, err := friendService.authorization(ctx)
 	if err != nil {
 		return nil, err
@@ -80,10 +80,10 @@ func (friendService *FriendService) UpdateFriend(ctx context.Context, req *pb.Up
 		return nil, status.Errorf(codes.Internal, "faile to update friend note: %v", err)
 	}
 
-	return &pb.UpdateFriendResponse{Message: "Successfully..."}, nil
+	return &pb.Response{Message: "Successfully..."}, nil
 }
 
-func (friendService *FriendService) DeleteFriend(ctx context.Context, req *pb.DeleteFriendRequest) (*pb.DeleteFriendResponse, error) {
+func (friendService *FriendService) DeleteFriend(ctx context.Context, req *pb.DeleteFriendRequest) (*pb.Response, error) {
 	user, err := friendService.authorization(ctx)
 	if err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func (friendService *FriendService) DeleteFriend(ctx context.Context, req *pb.De
 		return nil, status.Errorf(codes.Internal, "failed to delete friend?: %v", err)
 	}
 
-	return &pb.DeleteFriendResponse{Message: "Successfully..."}, nil
+	return &pb.Response{Message: "Successfully..."}, nil
 }
 
 func (friendService *FriendService) ListFriends(req *emptypb.Empty, stream pb.FriendService_ListFriendsServer) error {
