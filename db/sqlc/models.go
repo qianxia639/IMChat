@@ -58,12 +58,10 @@ type Message struct {
 	Content string `json:"content"`
 	// 发送类型, 1: 私聊, 2: 群聊
 	SendType int16 `json:"send_type"`
-	// 消息状态, 1: 发送失败, 2: 发送成功, 3: 已读, 4: 未读
-	MessageStatus int16 `json:"message_status"`
 	// 消息发送时间
 	SendingTime time.Time `json:"sending_time"`
 	// 消息读取时间
-	ReceivTime time.Time `json:"receiv_time"`
+	ReceiveTime time.Time `json:"receive_time"`
 }
 
 type User struct {

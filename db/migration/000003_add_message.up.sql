@@ -6,9 +6,9 @@ CREATE TABLE messages (
     message_type SMALLINT NOT NULL,
     content VARCHAR(255) NOT NULL,
     send_type SMALLINT NOT NULl,
-    message_status SMALLINT NOT NUll,
+    -- message_status SMALLINT NOT NUll,
     sending_time TIMESTAMPTZ NOT NULL DEFAULT now(),
-    receiv_time TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z'
+    receive_time TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z'
 );
 
 COMMENT ON COLUMN messages.id IS '主键Id';
@@ -23,11 +23,11 @@ COMMENT ON COLUMN messages.content IS '消息内容';
 
 COMMENT ON COLUMN messages.send_type IS '发送类型, 1: 私聊, 2: 群聊';
 
-COMMENT ON COLUMN messages.message_status IS '消息状态, 1: 发送失败, 2: 发送成功, 3: 已读, 4: 未读';
+-- COMMENT ON COLUMN messages.message_status IS '消息状态, 1: 发送失败, 2: 发送成功, 3: 已读, 4: 未读';
 
 COMMENT ON COLUMN messages.sending_time IS '消息发送时间';
 
-COMMENT ON COLUMN messages.receiv_time IS '消息读取时间';
+COMMENT ON COLUMN messages.receive_time IS '消息读取时间';
 
 CREATE INDEX messages_sender_id_index ON messages (sender_id);
 

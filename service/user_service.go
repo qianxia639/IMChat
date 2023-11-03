@@ -314,17 +314,17 @@ func (userService *UserService) UpdateUserPassword(ctx context.Context, req *pb.
 
 	// 校验两次密码是否一致
 	if req.UserPassword != req.UserConfirmPassword {
-		return nil, errDefine.RestPwdNotSame
+		return nil, errDefine.RestPwdNotSameErr
 	}
 
 	// 判断新旧密码是否一致
 	if err := utils.Decrypt(req.UserConfirmPassword, user.Password); err == nil {
-		return nil, errDefine.NewPwdIsSame
+		return nil, errDefine.NewPwdIsSameErr
 	}
 
 	// 校验上次密码更新时间与当前时间差
 	if !time.Now().After(user.PasswordChangedAt.Add(7 * 24 * time.Hour)) {
-		return nil, errDefine.NewPwdBelowInterval
+		return nil, errDefine.NewPwdBelowIntervalErr
 	}
 
 	hashPassword, err := utils.Encrypt(req.GetUserConfirmPassword())

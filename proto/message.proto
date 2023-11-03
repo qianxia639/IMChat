@@ -7,7 +7,7 @@ option go_package = "IMChat/pb";
 // import "google/protobuf/timestamp.proto";
 
 enum SendType {
-    PRIVATE = 0;
+    USER = 0;
     GROUP = 1;
 }
 

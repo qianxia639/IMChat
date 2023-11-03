@@ -23,8 +23,6 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ChatServiceClient interface {
 	ChatMessage(ctx context.Context, opts ...grpc.CallOption) (ChatService_ChatMessageClient, error)
-	SenderMessage(ctx context.Context, opts ...grpc.CallOption) (ChatService_SenderMessageClient, error)
-	ReceiverMessage(ctx context.Context, opts ...grpc.CallOption) (ChatService_ReceiverMessageClient, error)
 }
 
 type chatServiceClient struct {
@@ -66,75 +64,11 @@ func (x *chatServiceChatMessageClient) Recv() (*ChatMeg, error) {
 	return m, nil
 }
 
-func (c *chatServiceClient) SenderMessage(ctx context.Context, opts ...grpc.CallOption) (ChatService_SenderMessageClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ChatService_ServiceDesc.Streams[1], "/qianxia.IMChat.ChatService/SenderMessage", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &chatServiceSenderMessageClient{stream}
-	return x, nil
-}
-
-type ChatService_SenderMessageClient interface {
-	Send(*SenderMessageRequest) error
-	Recv() (*SenderMessageResponse, error)
-	grpc.ClientStream
-}
-
-type chatServiceSenderMessageClient struct {
-	grpc.ClientStream
-}
-
-func (x *chatServiceSenderMessageClient) Send(m *SenderMessageRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *chatServiceSenderMessageClient) Recv() (*SenderMessageResponse, error) {
-	m := new(SenderMessageResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *chatServiceClient) ReceiverMessage(ctx context.Context, opts ...grpc.CallOption) (ChatService_ReceiverMessageClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ChatService_ServiceDesc.Streams[2], "/qianxia.IMChat.ChatService/ReceiverMessage", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &chatServiceReceiverMessageClient{stream}
-	return x, nil
-}
-
-type ChatService_ReceiverMessageClient interface {
-	Send(*SenderMessageResponse) error
-	Recv() (*ReceiverMessageRequest, error)
-	grpc.ClientStream
-}
-
-type chatServiceReceiverMessageClient struct {
-	grpc.ClientStream
-}
-
-func (x *chatServiceReceiverMessageClient) Send(m *SenderMessageResponse) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *chatServiceReceiverMessageClient) Recv() (*ReceiverMessageRequest, error) {
-	m := new(ReceiverMessageRequest)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 // ChatServiceServer is the server API for ChatService service.
 // All implementations must embed UnimplementedChatServiceServer
 // for forward compatibility
 type ChatServiceServer interface {
 	ChatMessage(ChatService_ChatMessageServer) error
-	SenderMessage(ChatService_SenderMessageServer) error
-	ReceiverMessage(ChatService_ReceiverMessageServer) error
 	mustEmbedUnimplementedChatServiceServer()
 }
 
@@ -144,12 +78,6 @@ type UnimplementedChatServiceServer struct {
 
 func (UnimplementedChatServiceServer) ChatMessage(ChatService_ChatMessageServer) error {
 	return status.Errorf(codes.Unimplemented, "method ChatMessage not implemented")
-}
-func (UnimplementedChatServiceServer) SenderMessage(ChatService_SenderMessageServer) error {
-	return status.Errorf(codes.Unimplemented, "method SenderMessage not implemented")
-}
-func (UnimplementedChatServiceServer) ReceiverMessage(ChatService_ReceiverMessageServer) error {
-	return status.Errorf(codes.Unimplemented, "method ReceiverMessage not implemented")
 }
 func (UnimplementedChatServiceServer) mustEmbedUnimplementedChatServiceServer() {}
 
@@ -190,58 +118,6 @@ func (x *chatServiceChatMessageServer) Recv() (*ChatMeg, error) {
 	return m, nil
 }
 
-func _ChatService_SenderMessage_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ChatServiceServer).SenderMessage(&chatServiceSenderMessageServer{stream})
-}
-
-type ChatService_SenderMessageServer interface {
-	Send(*SenderMessageResponse) error
-	Recv() (*SenderMessageRequest, error)
-	grpc.ServerStream
-}
-
-type chatServiceSenderMessageServer struct {
-	grpc.ServerStream
-}
-
-func (x *chatServiceSenderMessageServer) Send(m *SenderMessageResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *chatServiceSenderMessageServer) Recv() (*SenderMessageRequest, error) {
-	m := new(SenderMessageRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func _ChatService_ReceiverMessage_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ChatServiceServer).ReceiverMessage(&chatServiceReceiverMessageServer{stream})
-}
-
-type ChatService_ReceiverMessageServer interface {
-	Send(*ReceiverMessageRequest) error
-	Recv() (*SenderMessageResponse, error)
-	grpc.ServerStream
-}
-
-type chatServiceReceiverMessageServer struct {
-	grpc.ServerStream
-}
-
-func (x *chatServiceReceiverMessageServer) Send(m *ReceiverMessageRequest) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *chatServiceReceiverMessageServer) Recv() (*SenderMessageResponse, error) {
-	m := new(SenderMessageResponse)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 // ChatService_ServiceDesc is the grpc.ServiceDesc for ChatService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -253,18 +129,6 @@ var ChatService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "ChatMessage",
 			Handler:       _ChatService_ChatMessage_Handler,
-			ServerStreams: true,
-			ClientStreams: true,
-		},
-		{
-			StreamName:    "SenderMessage",
-			Handler:       _ChatService_SenderMessage_Handler,
-			ServerStreams: true,
-			ClientStreams: true,
-		},
-		{
-			StreamName:    "ReceiverMessage",
-			Handler:       _ChatService_ReceiverMessage_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
