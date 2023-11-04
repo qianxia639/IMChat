@@ -12,7 +12,7 @@ import (
 const addFriend = `-- name: AddFriend :one
 INSERT INTO friendships (user_id, friend_id, comment)
 VALUEs ($1, $2, $3) 
-RETURNING id, user_id, friend_id, comment, status, created_at, updated_at
+RETURNING user_id, friend_id, comment, created_at
 `
 
 type AddFriendParams struct {
@@ -25,13 +25,10 @@ func (q *Queries) AddFriend(ctx context.Context, arg *AddFriendParams) (Friendsh
 	row := q.db.QueryRow(ctx, addFriend, arg.UserID, arg.FriendID, arg.Comment)
 	var i Friendship
 	err := row.Scan(
-		&i.ID,
 		&i.UserID,
 		&i.FriendID,
 		&i.Comment,
-		&i.Status,
 		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -53,7 +50,7 @@ func (q *Queries) DeleteFriend(ctx context.Context, arg *DeleteFriendParams) err
 }
 
 const getFriend = `-- name: GetFriend :one
-SELECT id, user_id, friend_id, comment, status, created_at, updated_at FROM friendships
+SELECT user_id, friend_id, comment, created_at FROM friendships
 WHERE 
     user_id = $1 AND friend_id = $2
 `
@@ -67,13 +64,10 @@ func (q *Queries) GetFriend(ctx context.Context, arg *GetFriendParams) (Friendsh
 	row := q.db.QueryRow(ctx, getFriend, arg.UserID, arg.FriendID)
 	var i Friendship
 	err := row.Scan(
-		&i.ID,
 		&i.UserID,
 		&i.FriendID,
 		&i.Comment,
-		&i.Status,
 		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -110,47 +104,13 @@ func (q *Queries) ListFriends(ctx context.Context, id int32) ([]ListFriendsRow, 
 	return items, nil
 }
 
-const listFriendshipPending = `-- name: ListFriendshipPending :many
-SELECT f.status, f.user_id, u.nickname
-FROM friendships f
-JOIN users u ON f.user_id = u.id
-WHERE
-    friend_id = $1 AND status = 1
-`
-
-type ListFriendshipPendingRow struct {
-	Status   int16  `json:"status"`
-	UserID   int32  `json:"user_id"`
-	Nickname string `json:"nickname"`
-}
-
-func (q *Queries) ListFriendshipPending(ctx context.Context, friendID int32) ([]ListFriendshipPendingRow, error) {
-	rows, err := q.db.Query(ctx, listFriendshipPending, friendID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ListFriendshipPendingRow
-	for rows.Next() {
-		var i ListFriendshipPendingRow
-		if err := rows.Scan(&i.Status, &i.UserID, &i.Nickname); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const updateFriendComment = `-- name: UpdateFriendComment :one
 UPDATE friendships
 SET
     comment = $1
 WHERE
     user_id = $2 AND friend_id = $3
-RETURNING id, user_id, friend_id, comment, status, created_at, updated_at
+RETURNING user_id, friend_id, comment, created_at
 `
 
 type UpdateFriendCommentParams struct {
@@ -163,13 +123,10 @@ func (q *Queries) UpdateFriendComment(ctx context.Context, arg *UpdateFriendComm
 	row := q.db.QueryRow(ctx, updateFriendComment, arg.Comment, arg.UserID, arg.FriendID)
 	var i Friendship
 	err := row.Scan(
-		&i.ID,
 		&i.UserID,
 		&i.FriendID,
 		&i.Comment,
-		&i.Status,
 		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
 }

@@ -10,29 +10,6 @@ import "google/api/annotations.proto";
 
 service FriendshipService {
 
-    // 发送好友请求
-    rpc ApplyFriendship (ApplyFriendshipRequest) returns (Response) {
-        option (google.api.http) = {
-            post: "/v1/friendship"
-            body: "*"
-        };
-    };
-
-
-    rpc AddFriend (AddFriendRequest) returns (Response) {
-        option (google.api.http) = {
-            post: "/v1/friendship/add"
-            body: "*"
-        };
-    };
-
-    // 获取好友请求列表
-    rpc ListFriendshipPending (google.protobuf.Empty) returns (stream ListFriendshipPendingResponse) {
-        option (google.api.http) = {
-            get: "/v1/friendship/pending"
-        };
-    };
-
     // 更新好友信息
     rpc UpdateFriend (UpdateFriendRequest) returns (Response) {
         option (google.api.http) = {
@@ -54,23 +31,6 @@ service FriendshipService {
             get: "/v1/friendship"
         };
     };
-}
-
-message ApplyFriendshipRequest {
-    int32 target_id = 1;
-    string comment = 2;
-}
-
-message AddFriendRequest {
-    int32 receiver_id = 1;
-    string apply_desc = 2;
-    string comment = 3;
-}
-
-message ListFriendshipPendingResponse {
-    int32 user_id = 1;
-    int32 status = 2;
-    string nickname = 3;
 }
 
 message UpdateFriendRequest {

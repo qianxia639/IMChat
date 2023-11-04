@@ -66,6 +66,7 @@ func runGrpcServer(conf config.Config, store db.Store) {
 	friendService := service.NewFriendService(server)
 	chatService := service.NewChatService(server)
 	emailService := service.NewEmailService(server)
+	friennGroupApplyService := service.NewFriendGroupRequestService(server)
 
 	grpcLogger := grpc.UnaryInterceptor(interceptor.GrpcUnaryLogger)
 	grpcServer := grpc.NewServer(
@@ -77,6 +78,7 @@ func runGrpcServer(conf config.Config, store db.Store) {
 	pb.RegisterFriendshipServiceServer(grpcServer, friendService)
 	pb.RegisterChatServiceServer(grpcServer, chatService)
 	pb.RegisterEmailServiceServer(grpcServer, emailService)
+	pb.RegisterFriendGroupApplyServiceServer(grpcServer, friennGroupApplyService)
 	reflection.Register(grpcServer)
 
 	listener, err := net.Listen("tcp", conf.Server.GrpcServerAddress)

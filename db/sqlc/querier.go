@@ -11,17 +11,21 @@ import (
 type Querier interface {
 	AddFriend(ctx context.Context, arg *AddFriendParams) (Friendship, error)
 	AddMessage(ctx context.Context, arg *AddMessageParams) (Message, error)
+	CreateFriendGroupApply(ctx context.Context, arg *CreateFriendGroupApplyParams) (FriendGroupApply, error)
 	CreateUser(ctx context.Context, arg *CreateUserParams) (User, error)
 	DeleteFriend(ctx context.Context, arg *DeleteFriendParams) error
+	DeleteFriendGroupApply(ctx context.Context, userID int32) error
 	DeleteUser(ctx context.Context, id int32) error
 	ExistEmail(ctx context.Context, email string) (int64, error)
 	ExistNickname(ctx context.Context, nickname string) (int64, error)
+	ExistsFriendGroupApply(ctx context.Context, arg *ExistsFriendGroupApplyParams) (int64, error)
 	GetFriend(ctx context.Context, arg *GetFriendParams) (Friendship, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	GetUserById(ctx context.Context, id int32) (User, error)
+	ListFriendGroupApply(ctx context.Context, targetID int32) ([]ListFriendGroupApplyRow, error)
 	ListFriends(ctx context.Context, id int32) ([]ListFriendsRow, error)
-	ListFriendshipPending(ctx context.Context, friendID int32) ([]ListFriendshipPendingRow, error)
 	UpdateFriendComment(ctx context.Context, arg *UpdateFriendCommentParams) (Friendship, error)
+	UpdateFriendGroupApply(ctx context.Context, arg *UpdateFriendGroupApplyParams) error
 	UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, error)
 	UpdateUserPassword(ctx context.Context, arg *UpdateUserPasswordParams) error
 }

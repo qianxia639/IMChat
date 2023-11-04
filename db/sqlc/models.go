@@ -8,21 +8,34 @@ import (
 	"time"
 )
 
-type Friendship struct {
+type FriendGroupApply struct {
 	// 主键Id
 	ID int64 `json:"id"`
+	// 申请者用户Id
+	UserID int32 `json:"user_id"`
+	// 响应者Id(好友/群组Id)
+	TargetID int32 `json:"target_id"`
+	// 申请描述
+	Description string `json:"description"`
+	// 申请类型, 1: 好友, 2: 群组
+	ApplyType int16 `json:"apply_type"`
+	// 申请状态, 1: 待确认, 2: 已确认, 3: 已拒绝
+	Status int16 `json:"status"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
+	// 响应时间
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type Friendship struct {
 	// 用户Id
 	UserID int32 `json:"user_id"`
 	// 好友Id
 	FriendID int32 `json:"friend_id"`
 	// 好友备注
 	Comment string `json:"comment"`
-	// 好友状态, 1: 待确认, 2: 已确认, 3: 已拒绝
-	Status int16 `json:"status"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
-	// 更新时间
-	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Group struct {

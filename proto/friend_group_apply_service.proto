@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package qianxia.IMChat;
+
+option go_package = "IMChat/pb";
+
+import "response.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service FriendGroupApplyService {
+
+    rpc CreateFriendGroupApply (CreateFriendGroupApplyRequest) returns (Response) {
+        option (google.api.http) = {
+            post: "/v1/friend/apply"
+            body: "*"
+        };
+    };
+
+    rpc ReplyFriendGroupApply (ReplyFriendGroupApplyRequest) returns (Response) {
+        option (google.api.http) = {
+            post: "/v1/friend/reply"
+            body: "*"
+        };
+    };
+
+    rpc ListFriendGroupApply (google.protobuf.Empty) returns (stream ListFriendGroupApplyResponse) {
+        option (google.api.http) = {
+            get: "/v1/friend/apply"
+        };
+    };
+}
+
+enum ApplyType {
+    FRIEND = 0;     // 好友
+    CLUSTER = 1;    // 群组
+}
+
+enum Status {
+    PENDING = 0;    // 等待中
+    ACCEPTEd = 1;   // 接受
+    REJECTED = 2;   // 拒绝
+}
+
+message CreateFriendGroupApplyRequest {
+    int32 target_id = 1;
+    string description = 2;
+    int32 apply_type = 3;
+}
+
+message ReplyFriendGroupApplyRequest {
+    int32 friend_id = 1;
+    int32 status = 2;
+    int32 apply_type = 3;
+    string comment = 4;
+}
+
+message ListFriendGroupApplyResponse {
+    int32 apply_id = 1;
+    string nickname = 2;
+    string description = 3;
+    int32 apply_type = 4;
+    google.protobuf.Timestamp created_at = 5;
+}

@@ -4,14 +4,25 @@ import (
 	"context"
 )
 
-type AddFriendTxParams struct {
-	UserID   int32  `json:"user_id"`
-	FriendID int32  `json:"friend_id"`
-	Comment  string `json:"comment"`
+type ReplyFriendGroupApplyTxParams struct {
+	UserID    int32  `json:"user_id"`
+	FriendID  int32  `json:"friend_id"`
+	Status    int32  `json:"status"`
+	ApplyType int32  `json:"apply_type"`
+	Comment   string `json:"comment"`
 }
 
-func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) (friend Friendship, err error) {
+func (store *SQLStore) ReplyFriendGroupApplyTx(ctx context.Context, arg *ReplyFriendGroupApplyTxParams) (friend Friendship, err error) {
 	err = store.execTx(ctx, func(q *Queries) error {
+		if arg.Status == 3 { // 拒绝
+			// 更新申请表中的状态
+			return q.UpdateFriendGroupApply(ctx, &UpdateFriendGroupApplyParams{
+				Status:    int16(arg.Status),
+				UserID:    arg.UserID,
+				TargetID:  arg.FriendID,
+				ApplyType: int16(arg.ApplyType),
+			})
+		}
 		var err error
 		friend, err = q.AddFriend(ctx, &AddFriendParams{
 			UserID:   arg.UserID,
@@ -26,6 +37,17 @@ func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) 
 			UserID:   arg.FriendID,
 			FriendID: arg.UserID,
 			Comment:  arg.Comment,
+		})
+		if err != nil {
+			return err
+		}
+
+		// 更新申请表中的状态
+		err = q.UpdateFriendGroupApply(ctx, &UpdateFriendGroupApplyParams{
+			Status:    int16(arg.Status),
+			UserID:    arg.UserID,
+			TargetID:  arg.FriendID,
+			ApplyType: int16(arg.ApplyType),
 		})
 		if err != nil {
 			return err
