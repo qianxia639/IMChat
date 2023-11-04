@@ -25,3 +25,10 @@ WHERE
 SELECT f.friend_id, f.comment, u.profile_picture_url FROM friendships AS f
 JOIN users AS u ON f.user_id = u.id
 WHERE u.id = $1;
+
+-- name: ListFriendshipPending :many
+SELECT f.status, f.user_id, u.nickname
+FROM friendships f
+JOIN users u ON f.user_id = u.id
+WHERE
+    friend_id = $1 AND status = 1;

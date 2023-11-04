@@ -1,3 +1,10 @@
+-- name: ListFriendGroupApplyPending :many
+-- SELECT u.id, u.nickname, fga.description, fga.apply_type, fga.created_at, g.group_name
+-- FROM friend_group_applys fga
+-- JOIN users u ON fga.user_id = u.id
+-- JOIN groups g ON fga.user_id = g.id
+-- WHERE fga.target_id = $1 AND fga.status = 1;
+
 -- name: CreateFriendGroupApply :one
 -- INSERT INTO friend_group_applys(
 --     sender_id, receiver_id, apply_desc, apply_type
@@ -9,12 +16,6 @@
 -- SELECT COUNT(*) FROM friend_group_applys
 -- WHERE
 --     sender_id = $1 AND receiver_id = $2 AND status = 0 AND apply_type = $3;
-
--- name: ListFriendGroupApply :many
--- SELECT fca.sender_id, u.nickname, fca.apply_desc,  fca.apply_type, fca.apply_time
--- FROM friend_group_applys fca
--- JOIN users u ON fca.sender_id = u.id
--- WHERE fca.receiver_id = $1 AND fca.status = 0;
 
 -- name: UpdateFriendGroupApply :exec
 -- UPDATE friend_group_applys

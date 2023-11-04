@@ -32,6 +32,40 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
+func request_FriendshipService_ApplyFriendship_0(ctx context.Context, marshaler runtime.Marshaler, client FriendshipServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq ApplyFriendshipRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.ApplyFriendship(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_FriendshipService_ApplyFriendship_0(ctx context.Context, marshaler runtime.Marshaler, server FriendshipServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq ApplyFriendshipRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.ApplyFriendship(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_FriendshipService_AddFriend_0(ctx context.Context, marshaler runtime.Marshaler, client FriendshipServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq AddFriendRequest
 	var metadata runtime.ServerMetadata
@@ -63,6 +97,23 @@ func local_request_FriendshipService_AddFriend_0(ctx context.Context, marshaler 
 
 	msg, err := server.AddFriend(ctx, &protoReq)
 	return msg, metadata, err
+
+}
+
+func request_FriendshipService_ListFriendshipPending_0(ctx context.Context, marshaler runtime.Marshaler, client FriendshipServiceClient, req *http.Request, pathParams map[string]string) (FriendshipService_ListFriendshipPendingClient, runtime.ServerMetadata, error) {
+	var protoReq emptypb.Empty
+	var metadata runtime.ServerMetadata
+
+	stream, err := client.ListFriendshipPending(ctx, &protoReq)
+	if err != nil {
+		return nil, metadata, err
+	}
+	header, err := stream.Header()
+	if err != nil {
+		return nil, metadata, err
+	}
+	metadata.HeaderMD = header
+	return stream, metadata, nil
 
 }
 
@@ -136,11 +187,11 @@ func local_request_FriendshipService_DeleteFriend_0(ctx context.Context, marshal
 
 }
 
-func request_FriendshipService_ListFriends_0(ctx context.Context, marshaler runtime.Marshaler, client FriendshipServiceClient, req *http.Request, pathParams map[string]string) (FriendshipService_ListFriendsClient, runtime.ServerMetadata, error) {
+func request_FriendshipService_ListFriend_0(ctx context.Context, marshaler runtime.Marshaler, client FriendshipServiceClient, req *http.Request, pathParams map[string]string) (FriendshipService_ListFriendClient, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
-	stream, err := client.ListFriends(ctx, &protoReq)
+	stream, err := client.ListFriend(ctx, &protoReq)
 	if err != nil {
 		return nil, metadata, err
 	}
@@ -159,6 +210,31 @@ func request_FriendshipService_ListFriends_0(ctx context.Context, marshaler runt
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterFriendshipServiceHandlerFromEndpoint instead.
 func RegisterFriendshipServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server FriendshipServiceServer) error {
 
+	mux.Handle("POST", pattern_FriendshipService_ApplyFriendship_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/ApplyFriendship", runtime.WithHTTPPathPattern("/v1/friendship"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_FriendshipService_ApplyFriendship_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_FriendshipService_ApplyFriendship_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("POST", pattern_FriendshipService_AddFriend_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -167,7 +243,7 @@ func RegisterFriendshipServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/AddFriend", runtime.WithHTTPPathPattern("/v1/friend"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/AddFriend", runtime.WithHTTPPathPattern("/v1/friendship/add"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -184,6 +260,13 @@ func RegisterFriendshipServiceHandlerServer(ctx context.Context, mux *runtime.Se
 
 	})
 
+	mux.Handle("GET", pattern_FriendshipService_ListFriendshipPending_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
+		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+		return
+	})
+
 	mux.Handle("PUT", pattern_FriendshipService_UpdateFriend_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -192,7 +275,7 @@ func RegisterFriendshipServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/UpdateFriend", runtime.WithHTTPPathPattern("/v1/friend"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/UpdateFriend", runtime.WithHTTPPathPattern("/v1/friendship"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -217,7 +300,7 @@ func RegisterFriendshipServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/DeleteFriend", runtime.WithHTTPPathPattern("/v1/friend"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/DeleteFriend", runtime.WithHTTPPathPattern("/v1/friendship"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -234,7 +317,7 @@ func RegisterFriendshipServiceHandlerServer(ctx context.Context, mux *runtime.Se
 
 	})
 
-	mux.Handle("GET", pattern_FriendshipService_ListFriends_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_FriendshipService_ListFriend_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
 		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -282,13 +365,35 @@ func RegisterFriendshipServiceHandler(ctx context.Context, mux *runtime.ServeMux
 // "FriendshipServiceClient" to call the correct interceptors.
 func RegisterFriendshipServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client FriendshipServiceClient) error {
 
+	mux.Handle("POST", pattern_FriendshipService_ApplyFriendship_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/ApplyFriendship", runtime.WithHTTPPathPattern("/v1/friendship"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_FriendshipService_ApplyFriendship_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_FriendshipService_ApplyFriendship_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("POST", pattern_FriendshipService_AddFriend_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/AddFriend", runtime.WithHTTPPathPattern("/v1/friend"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/AddFriend", runtime.WithHTTPPathPattern("/v1/friendship/add"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -304,13 +409,35 @@ func RegisterFriendshipServiceHandlerClient(ctx context.Context, mux *runtime.Se
 
 	})
 
+	mux.Handle("GET", pattern_FriendshipService_ListFriendshipPending_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/ListFriendshipPending", runtime.WithHTTPPathPattern("/v1/friendship/pending"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_FriendshipService_ListFriendshipPending_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_FriendshipService_ListFriendshipPending_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("PUT", pattern_FriendshipService_UpdateFriend_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/UpdateFriend", runtime.WithHTTPPathPattern("/v1/friend"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/UpdateFriend", runtime.WithHTTPPathPattern("/v1/friendship"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -332,7 +459,7 @@ func RegisterFriendshipServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/DeleteFriend", runtime.WithHTTPPathPattern("/v1/friend"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/DeleteFriend", runtime.WithHTTPPathPattern("/v1/friendship"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -348,25 +475,25 @@ func RegisterFriendshipServiceHandlerClient(ctx context.Context, mux *runtime.Se
 
 	})
 
-	mux.Handle("GET", pattern_FriendshipService_ListFriends_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_FriendshipService_ListFriend_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/ListFriends", runtime.WithHTTPPathPattern("/v1/friend"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/qianxia.IMChat.FriendshipService/ListFriend", runtime.WithHTTPPathPattern("/v1/friendship"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_FriendshipService_ListFriends_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_FriendshipService_ListFriend_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_FriendshipService_ListFriends_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+		forward_FriendshipService_ListFriend_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -374,21 +501,29 @@ func RegisterFriendshipServiceHandlerClient(ctx context.Context, mux *runtime.Se
 }
 
 var (
-	pattern_FriendshipService_AddFriend_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "friend"}, ""))
+	pattern_FriendshipService_ApplyFriendship_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "friendship"}, ""))
 
-	pattern_FriendshipService_UpdateFriend_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "friend"}, ""))
+	pattern_FriendshipService_AddFriend_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "friendship", "add"}, ""))
 
-	pattern_FriendshipService_DeleteFriend_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "friend"}, ""))
+	pattern_FriendshipService_ListFriendshipPending_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "friendship", "pending"}, ""))
 
-	pattern_FriendshipService_ListFriends_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "friend"}, ""))
+	pattern_FriendshipService_UpdateFriend_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "friendship"}, ""))
+
+	pattern_FriendshipService_DeleteFriend_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "friendship"}, ""))
+
+	pattern_FriendshipService_ListFriend_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "friendship"}, ""))
 )
 
 var (
+	forward_FriendshipService_ApplyFriendship_0 = runtime.ForwardResponseMessage
+
 	forward_FriendshipService_AddFriend_0 = runtime.ForwardResponseMessage
+
+	forward_FriendshipService_ListFriendshipPending_0 = runtime.ForwardResponseStream
 
 	forward_FriendshipService_UpdateFriend_0 = runtime.ForwardResponseMessage
 
 	forward_FriendshipService_DeleteFriend_0 = runtime.ForwardResponseMessage
 
-	forward_FriendshipService_ListFriends_0 = runtime.ForwardResponseStream
+	forward_FriendshipService_ListFriend_0 = runtime.ForwardResponseStream
 )

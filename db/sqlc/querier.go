@@ -20,6 +20,7 @@ type Querier interface {
 	GetUser(ctx context.Context, username string) (User, error)
 	GetUserById(ctx context.Context, id int32) (User, error)
 	ListFriends(ctx context.Context, id int32) ([]ListFriendsRow, error)
+	ListFriendshipPending(ctx context.Context, friendID int32) ([]ListFriendshipPendingRow, error)
 	UpdateFriendComment(ctx context.Context, arg *UpdateFriendCommentParams) (Friendship, error)
 	UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, error)
 	UpdateUserPassword(ctx context.Context, arg *UpdateUserPasswordParams) error

@@ -23,10 +23,17 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FriendshipServiceClient interface {
+	// 发送好友请求
+	ApplyFriendship(ctx context.Context, in *ApplyFriendshipRequest, opts ...grpc.CallOption) (*Response, error)
 	AddFriend(ctx context.Context, in *AddFriendRequest, opts ...grpc.CallOption) (*Response, error)
+	// 获取好友请求列表
+	ListFriendshipPending(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (FriendshipService_ListFriendshipPendingClient, error)
+	// 更新好友信息
 	UpdateFriend(ctx context.Context, in *UpdateFriendRequest, opts ...grpc.CallOption) (*Response, error)
+	// 删除好友
 	DeleteFriend(ctx context.Context, in *DeleteFriendRequest, opts ...grpc.CallOption) (*Response, error)
-	ListFriends(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (FriendshipService_ListFriendsClient, error)
+	// 获取好友列表
+	ListFriend(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (FriendshipService_ListFriendClient, error)
 }
 
 type friendshipServiceClient struct {
@@ -37,6 +44,15 @@ func NewFriendshipServiceClient(cc grpc.ClientConnInterface) FriendshipServiceCl
 	return &friendshipServiceClient{cc}
 }
 
+func (c *friendshipServiceClient) ApplyFriendship(ctx context.Context, in *ApplyFriendshipRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/qianxia.IMChat.FriendshipService/ApplyFriendship", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *friendshipServiceClient) AddFriend(ctx context.Context, in *AddFriendRequest, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
 	err := c.cc.Invoke(ctx, "/qianxia.IMChat.FriendshipService/AddFriend", in, out, opts...)
@@ -44,6 +60,38 @@ func (c *friendshipServiceClient) AddFriend(ctx context.Context, in *AddFriendRe
 		return nil, err
 	}
 	return out, nil
+}
+
+func (c *friendshipServiceClient) ListFriendshipPending(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (FriendshipService_ListFriendshipPendingClient, error) {
+	stream, err := c.cc.NewStream(ctx, &FriendshipService_ServiceDesc.Streams[0], "/qianxia.IMChat.FriendshipService/ListFriendshipPending", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &friendshipServiceListFriendshipPendingClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type FriendshipService_ListFriendshipPendingClient interface {
+	Recv() (*ListFriendshipPendingResponse, error)
+	grpc.ClientStream
+}
+
+type friendshipServiceListFriendshipPendingClient struct {
+	grpc.ClientStream
+}
+
+func (x *friendshipServiceListFriendshipPendingClient) Recv() (*ListFriendshipPendingResponse, error) {
+	m := new(ListFriendshipPendingResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *friendshipServiceClient) UpdateFriend(ctx context.Context, in *UpdateFriendRequest, opts ...grpc.CallOption) (*Response, error) {
@@ -64,12 +112,12 @@ func (c *friendshipServiceClient) DeleteFriend(ctx context.Context, in *DeleteFr
 	return out, nil
 }
 
-func (c *friendshipServiceClient) ListFriends(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (FriendshipService_ListFriendsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &FriendshipService_ServiceDesc.Streams[0], "/qianxia.IMChat.FriendshipService/ListFriends", opts...)
+func (c *friendshipServiceClient) ListFriend(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (FriendshipService_ListFriendClient, error) {
+	stream, err := c.cc.NewStream(ctx, &FriendshipService_ServiceDesc.Streams[1], "/qianxia.IMChat.FriendshipService/ListFriend", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &friendshipServiceListFriendsClient{stream}
+	x := &friendshipServiceListFriendClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -79,17 +127,17 @@ func (c *friendshipServiceClient) ListFriends(ctx context.Context, in *emptypb.E
 	return x, nil
 }
 
-type FriendshipService_ListFriendsClient interface {
-	Recv() (*ListFriendsResponse, error)
+type FriendshipService_ListFriendClient interface {
+	Recv() (*ListFriendResponse, error)
 	grpc.ClientStream
 }
 
-type friendshipServiceListFriendsClient struct {
+type friendshipServiceListFriendClient struct {
 	grpc.ClientStream
 }
 
-func (x *friendshipServiceListFriendsClient) Recv() (*ListFriendsResponse, error) {
-	m := new(ListFriendsResponse)
+func (x *friendshipServiceListFriendClient) Recv() (*ListFriendResponse, error) {
+	m := new(ListFriendResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -100,10 +148,17 @@ func (x *friendshipServiceListFriendsClient) Recv() (*ListFriendsResponse, error
 // All implementations must embed UnimplementedFriendshipServiceServer
 // for forward compatibility
 type FriendshipServiceServer interface {
+	// 发送好友请求
+	ApplyFriendship(context.Context, *ApplyFriendshipRequest) (*Response, error)
 	AddFriend(context.Context, *AddFriendRequest) (*Response, error)
+	// 获取好友请求列表
+	ListFriendshipPending(*emptypb.Empty, FriendshipService_ListFriendshipPendingServer) error
+	// 更新好友信息
 	UpdateFriend(context.Context, *UpdateFriendRequest) (*Response, error)
+	// 删除好友
 	DeleteFriend(context.Context, *DeleteFriendRequest) (*Response, error)
-	ListFriends(*emptypb.Empty, FriendshipService_ListFriendsServer) error
+	// 获取好友列表
+	ListFriend(*emptypb.Empty, FriendshipService_ListFriendServer) error
 	mustEmbedUnimplementedFriendshipServiceServer()
 }
 
@@ -111,8 +166,14 @@ type FriendshipServiceServer interface {
 type UnimplementedFriendshipServiceServer struct {
 }
 
+func (UnimplementedFriendshipServiceServer) ApplyFriendship(context.Context, *ApplyFriendshipRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyFriendship not implemented")
+}
 func (UnimplementedFriendshipServiceServer) AddFriend(context.Context, *AddFriendRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddFriend not implemented")
+}
+func (UnimplementedFriendshipServiceServer) ListFriendshipPending(*emptypb.Empty, FriendshipService_ListFriendshipPendingServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListFriendshipPending not implemented")
 }
 func (UnimplementedFriendshipServiceServer) UpdateFriend(context.Context, *UpdateFriendRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateFriend not implemented")
@@ -120,8 +181,8 @@ func (UnimplementedFriendshipServiceServer) UpdateFriend(context.Context, *Updat
 func (UnimplementedFriendshipServiceServer) DeleteFriend(context.Context, *DeleteFriendRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFriend not implemented")
 }
-func (UnimplementedFriendshipServiceServer) ListFriends(*emptypb.Empty, FriendshipService_ListFriendsServer) error {
-	return status.Errorf(codes.Unimplemented, "method ListFriends not implemented")
+func (UnimplementedFriendshipServiceServer) ListFriend(*emptypb.Empty, FriendshipService_ListFriendServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListFriend not implemented")
 }
 func (UnimplementedFriendshipServiceServer) mustEmbedUnimplementedFriendshipServiceServer() {}
 
@@ -134,6 +195,24 @@ type UnsafeFriendshipServiceServer interface {
 
 func RegisterFriendshipServiceServer(s grpc.ServiceRegistrar, srv FriendshipServiceServer) {
 	s.RegisterService(&FriendshipService_ServiceDesc, srv)
+}
+
+func _FriendshipService_ApplyFriendship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplyFriendshipRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FriendshipServiceServer).ApplyFriendship(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/qianxia.IMChat.FriendshipService/ApplyFriendship",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FriendshipServiceServer).ApplyFriendship(ctx, req.(*ApplyFriendshipRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _FriendshipService_AddFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -152,6 +231,27 @@ func _FriendshipService_AddFriend_Handler(srv interface{}, ctx context.Context, 
 		return srv.(FriendshipServiceServer).AddFriend(ctx, req.(*AddFriendRequest))
 	}
 	return interceptor(ctx, in, info, handler)
+}
+
+func _FriendshipService_ListFriendshipPending_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(emptypb.Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(FriendshipServiceServer).ListFriendshipPending(m, &friendshipServiceListFriendshipPendingServer{stream})
+}
+
+type FriendshipService_ListFriendshipPendingServer interface {
+	Send(*ListFriendshipPendingResponse) error
+	grpc.ServerStream
+}
+
+type friendshipServiceListFriendshipPendingServer struct {
+	grpc.ServerStream
+}
+
+func (x *friendshipServiceListFriendshipPendingServer) Send(m *ListFriendshipPendingResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _FriendshipService_UpdateFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -190,24 +290,24 @@ func _FriendshipService_DeleteFriend_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _FriendshipService_ListFriends_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _FriendshipService_ListFriend_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(emptypb.Empty)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(FriendshipServiceServer).ListFriends(m, &friendshipServiceListFriendsServer{stream})
+	return srv.(FriendshipServiceServer).ListFriend(m, &friendshipServiceListFriendServer{stream})
 }
 
-type FriendshipService_ListFriendsServer interface {
-	Send(*ListFriendsResponse) error
+type FriendshipService_ListFriendServer interface {
+	Send(*ListFriendResponse) error
 	grpc.ServerStream
 }
 
-type friendshipServiceListFriendsServer struct {
+type friendshipServiceListFriendServer struct {
 	grpc.ServerStream
 }
 
-func (x *friendshipServiceListFriendsServer) Send(m *ListFriendsResponse) error {
+func (x *friendshipServiceListFriendServer) Send(m *ListFriendResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -218,6 +318,10 @@ var FriendshipService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "qianxia.IMChat.FriendshipService",
 	HandlerType: (*FriendshipServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ApplyFriendship",
+			Handler:    _FriendshipService_ApplyFriendship_Handler,
+		},
 		{
 			MethodName: "AddFriend",
 			Handler:    _FriendshipService_AddFriend_Handler,
@@ -233,8 +337,13 @@ var FriendshipService_ServiceDesc = grpc.ServiceDesc{
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "ListFriends",
-			Handler:       _FriendshipService_ListFriends_Handler,
+			StreamName:    "ListFriendshipPending",
+			Handler:       _FriendshipService_ListFriendshipPending_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "ListFriend",
+			Handler:       _FriendshipService_ListFriend_Handler,
 			ServerStreams: true,
 		},
 	},
