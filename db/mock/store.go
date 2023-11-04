@@ -36,10 +36,10 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 }
 
 // AddFriend mocks base method.
-func (m *MockStore) AddFriend(arg0 context.Context, arg1 *db.AddFriendParams) (db.Friend, error) {
+func (m *MockStore) AddFriend(arg0 context.Context, arg1 *db.AddFriendParams) (db.Friendship, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddFriend", arg0, arg1)
-	ret0, _ := ret[0].(db.Friend)
+	ret0, _ := ret[0].(db.Friendship)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -51,10 +51,10 @@ func (mr *MockStoreMockRecorder) AddFriend(arg0, arg1 interface{}) *gomock.Call 
 }
 
 // AddFriendTx mocks base method.
-func (m *MockStore) AddFriendTx(arg0 context.Context, arg1 *db.AddFriendTxParams) (db.Friend, error) {
+func (m *MockStore) AddFriendTx(arg0 context.Context, arg1 *db.AddFriendTxParams) (db.Friendship, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddFriendTx", arg0, arg1)
-	ret0, _ := ret[0].(db.Friend)
+	ret0, _ := ret[0].(db.Friendship)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -197,10 +197,10 @@ func (mr *MockStoreMockRecorder) ExistNickname(arg0, arg1 interface{}) *gomock.C
 }
 
 // GetFriend mocks base method.
-func (m *MockStore) GetFriend(arg0 context.Context, arg1 *db.GetFriendParams) (db.Friend, error) {
+func (m *MockStore) GetFriend(arg0 context.Context, arg1 *db.GetFriendParams) (db.Friendship, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFriend", arg0, arg1)
-	ret0, _ := ret[0].(db.Friend)
+	ret0, _ := ret[0].(db.Friendship)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -256,19 +256,19 @@ func (mr *MockStoreMockRecorder) ListFriends(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFriends", reflect.TypeOf((*MockStore)(nil).ListFriends), arg0, arg1)
 }
 
-// UpdateFriendNote mocks base method.
-func (m *MockStore) UpdateFriendNote(arg0 context.Context, arg1 *db.UpdateFriendNoteParams) (db.Friend, error) {
+// UpdateFriendComment mocks base method.
+func (m *MockStore) UpdateFriendComment(arg0 context.Context, arg1 *db.UpdateFriendCommentParams) (db.Friendship, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateFriendNote", arg0, arg1)
-	ret0, _ := ret[0].(db.Friend)
+	ret := m.ctrl.Call(m, "UpdateFriendComment", arg0, arg1)
+	ret0, _ := ret[0].(db.Friendship)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UpdateFriendNote indicates an expected call of UpdateFriendNote.
-func (mr *MockStoreMockRecorder) UpdateFriendNote(arg0, arg1 interface{}) *gomock.Call {
+// UpdateFriendComment indicates an expected call of UpdateFriendComment.
+func (mr *MockStoreMockRecorder) UpdateFriendComment(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFriendNote", reflect.TypeOf((*MockStore)(nil).UpdateFriendNote), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFriendComment", reflect.TypeOf((*MockStore)(nil).UpdateFriendComment), arg0, arg1)
 }
 
 // UpdateUser mocks base method.

@@ -9,18 +9,18 @@ import (
 )
 
 type Querier interface {
-	AddFriend(ctx context.Context, arg *AddFriendParams) (Friend, error)
+	AddFriend(ctx context.Context, arg *AddFriendParams) (Friendship, error)
 	AddMessage(ctx context.Context, arg *AddMessageParams) (Message, error)
 	CreateUser(ctx context.Context, arg *CreateUserParams) (User, error)
 	DeleteFriend(ctx context.Context, arg *DeleteFriendParams) error
 	DeleteUser(ctx context.Context, id int32) error
 	ExistEmail(ctx context.Context, email string) (int64, error)
 	ExistNickname(ctx context.Context, nickname string) (int64, error)
-	GetFriend(ctx context.Context, arg *GetFriendParams) (Friend, error)
+	GetFriend(ctx context.Context, arg *GetFriendParams) (Friendship, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	GetUserById(ctx context.Context, id int32) (User, error)
 	ListFriends(ctx context.Context, id int32) ([]ListFriendsRow, error)
-	UpdateFriendNote(ctx context.Context, arg *UpdateFriendNoteParams) (Friend, error)
+	UpdateFriendComment(ctx context.Context, arg *UpdateFriendCommentParams) (Friendship, error)
 	UpdateUser(ctx context.Context, arg *UpdateUserParams) (User, error)
 	UpdateUserPassword(ctx context.Context, arg *UpdateUserPasswordParams) error
 }

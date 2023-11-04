@@ -1,29 +1,39 @@
 -- 好友表
-CREATE TABLE friends (
+CREATE TABLE friendships (
+    id BIGSERIAL PRIMARY KEy,
     user_id INTEGER NOT NULL,
     friend_id INTEGER NOT NULL,
-    note VARCHAR(60) NOT NULL,
+    comment VARCHAR(60) NOT NULL,
+    status SMALLINT NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT (now()),
-    PRIMARY KEY (user_id, friend_id),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z',
     FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE,
     FOREIGN KEY (friend_id) REFERENCES users ON DELETE CASCADE
 );
 
-COMMENT ON COLUMN friends.user_id IS '用户Id';
+COMMENT ON COLUMN friendships.id IS '主键Id';
 
-COMMENT ON COLUMN friends.friend_id IS '好友Id';
+COMMENT ON COLUMN friendships.user_id IS '用户Id';
 
-COMMENT ON COLUMN friends.note IS '好友备注';
+COMMENT ON COLUMN friendships.friend_id IS '好友Id';
 
-COMMENT ON COLUMN friends.created_at IS '创建时间';
+COMMENT ON COLUMN friendships.comment IS '好友备注';
+
+COMMENT ON COLUMN friendships.status IS '好友状态, 1: 待确认, 2: 已确认, 3: 以拒绝';
+
+COMMENT ON COLUMN friendships.created_at IS '创建时间';
+
+COMMENT ON COLUMN friendships.updated_at IS '更新时间';
 
 -- 群组表
 CREATE TABLE groups (
     id BIGSERIAL PRIMARY KEY,
     creator_id INTEGER NOT NULL,
     group_name VARCHAR(100) NOT NULL UNIQUE,
-    current_quantity INTEGER NOT NULL DEFAULT 1,
+    group_member_quantity INTEGER NOT NULL DEFAULT 1,
+    description VARCHAR(255) NOT NULL DEFAULT '',
     created_at TIMESTAMPTZ NOT NULL DEFAULT (now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z',
     FOREIGN KEY (creator_id) REFERENCES users ON DELETE CASCADE
 );
 
@@ -33,34 +43,37 @@ COMMENT ON COLUMN groups.creator_id IS '创建者Id';
 
 COMMENT ON COLUMN groups.group_name IS '群组名';
 
-COMMENT ON COLUMN groups.current_quantity IS '群员人数';
+COMMENT ON COLUMN groups.group_member_quantity IS '群员人数';
+
+COMMENT ON COLUMN groups.description IS '群组描述';
 
 COMMENT ON COLUMN groups.created_at IS '创建时间';
 
--- 好友/群组申请表
--- CREATE TABLE friend_group_applys (
---     id BIGSERIAL PRIMARY KEY,
---     sender_id INTEGER NOT NULL,
---     receiver_id INTEGER NOT NULL,
---     apply_desc VARCHAR(30) NOT NULL,
---     status SMALLINT NOT NULL DEFAULT 0,
---     apply_type SMALLINT NOT NULL,
---     apply_time TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     reply_time TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z'
--- );
+COMMENT ON COLUMN groups.updated_at IS '更新时间';
 
--- COMMENT ON COLUMN friend_group_applys.id IS '主键Id';
+-- 群组成员关系表
+CREATE TABLE group_member_ships (
+    id BIGSERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    group_id INTEGER NOT NULL,
+    role SMALLINT NOT NULL DEFAULT 3,
+    status SMALLINT NOT NULL DEFAULT 1,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT (now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z',
+    FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE,
+    FOREIGN KEY (group_id) REFERENCES groups ON DELETE CASCADE
+);
 
--- COMMENT ON COLUMN friend_group_applys.sender_id IS '申请者的用户Id';
+COMMENT ON COLUMN group_member_ships.id IS '主键Id';
 
--- COMMENT ON COLUMN friend_group_applys.receiver_id IS '接收者的用户Id或群组Id';
+COMMENT ON COLUMN group_member_ships.user_id IS '用户Id';
 
--- COMMENT ON COLUMN friend_group_applys.apply_desc IS '申请描述';
+COMMENT ON COLUMN group_member_ships.group_id IS '群组Id';
 
--- COMMENT ON COLUMN friend_group_applys.status IS '申请状态, 0: 待确定, 1: 同意, 2: 拒绝';
+COMMENT ON COLUMN group_member_ships.role IS '群员角色, 1: 群主, 2: 管理员, 3: 普通成员';
 
--- COMMENT ON COLUMN friend_group_applys.apply_type IS '申请类型, 0: 好友, 1: 群组';
+COMMENT ON COLUMN group_member_ships.status IS '成员状态, 1: 待确认, 2: 已确认, 3: 已拒绝';
 
--- COMMENT ON COLUMN friend_group_applys.apply_time IS '申请时间';
+COMMENT ON COLUMN group_member_ships.created_at IS '创建时间';
 
--- COMMENT ON COLUMN friend_group_applys.reply_time IS '响应时间';
+COMMENT ON COLUMN group_member_ships.updated_at IS '更新时间';

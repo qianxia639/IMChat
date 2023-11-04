@@ -12,11 +12,11 @@ import (
 )
 
 type FriendService struct {
-	pb.UnimplementedFriendServiceServer
+	pb.UnimplementedFriendshipServiceServer
 	*Server
 }
 
-func NewFriendService(server *Server) pb.FriendServiceServer {
+func NewFriendService(server *Server) pb.FriendshipServiceServer {
 	return &FriendService{
 		Server: server,
 	}
@@ -52,7 +52,7 @@ func (friendService *FriendService) AddFriend(ctx context.Context, req *pb.AddFr
 	_, err = friendService.store.AddFriendTx(ctx, &db.AddFriendTxParams{
 		UserID:   user.ID,
 		FriendID: req.ReceiverId,
-		Note:     req.Note,
+		Comment:  req.Note,
 	})
 	if err != nil {
 		return nil, errors.ServerErr
@@ -71,8 +71,8 @@ func (friendService *FriendService) UpdateFriend(ctx context.Context, req *pb.Up
 		return nil, status.Errorf(codes.InvalidArgument, "invalid argument")
 	}
 
-	_, err = friendService.store.UpdateFriendNote(ctx, &db.UpdateFriendNoteParams{
-		Note:     req.Note,
+	_, err = friendService.store.UpdateFriendComment(ctx, &db.UpdateFriendCommentParams{
+		Comment:  req.Note,
 		UserID:   user.ID,
 		FriendID: req.FriendId,
 	})
@@ -101,7 +101,7 @@ func (friendService *FriendService) DeleteFriend(ctx context.Context, req *pb.De
 	return &pb.Response{Message: "Successfully..."}, nil
 }
 
-func (friendService *FriendService) ListFriends(req *emptypb.Empty, stream pb.FriendService_ListFriendsServer) error {
+func (friendService *FriendService) ListFriends(req *emptypb.Empty, stream pb.FriendshipService_ListFriendsServer) error {
 	ctx := stream.Context()
 	user, err := friendService.authorization(ctx)
 	if err != nil {
@@ -112,7 +112,7 @@ func (friendService *FriendService) ListFriends(req *emptypb.Empty, stream pb.Fr
 	for _, friend := range friends {
 		res := &pb.ListFriendsResponse{
 			FriendId: friend.FriendID,
-			Note:     friend.Note,
+			Note:     friend.Comment,
 			Avatar:   friend.ProfilePictureUrl,
 		}
 		if err := stream.Send(res); err != nil {

@@ -7,16 +7,16 @@ import (
 type AddFriendTxParams struct {
 	UserID   int32  `json:"user_id"`
 	FriendID int32  `json:"friend_id"`
-	Note     string `json:"note"`
+	Comment  string `json:"comment"`
 }
 
-func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) (friend Friend, err error) {
+func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) (friend Friendship, err error) {
 	err = store.execTx(ctx, func(q *Queries) error {
 		var err error
 		friend, err = q.AddFriend(ctx, &AddFriendParams{
 			UserID:   arg.UserID,
 			FriendID: arg.FriendID,
-			Note:     arg.Note,
+			Comment:  arg.Comment,
 		})
 		if err != nil {
 			return err
@@ -25,7 +25,7 @@ func (store *SQLStore) AddFriendTx(ctx context.Context, arg *AddFriendTxParams) 
 		friend, err = q.AddFriend(ctx, &AddFriendParams{
 			UserID:   arg.FriendID,
 			FriendID: arg.UserID,
-			Note:     arg.Note,
+			Comment:  arg.Comment,
 		})
 		if err != nil {
 			return err

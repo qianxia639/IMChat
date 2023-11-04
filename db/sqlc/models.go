@@ -8,15 +8,21 @@ import (
 	"time"
 )
 
-type Friend struct {
+type Friendship struct {
+	// 主键Id
+	ID int64 `json:"id"`
 	// 用户Id
 	UserID int32 `json:"user_id"`
 	// 好友Id
 	FriendID int32 `json:"friend_id"`
 	// 好友备注
-	Note string `json:"note"`
+	Comment string `json:"comment"`
+	// 好友状态, 1: 待确认, 2: 已确认, 3: 以拒绝
+	Status int16 `json:"status"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Group struct {
@@ -27,22 +33,30 @@ type Group struct {
 	// 群组名
 	GroupName string `json:"group_name"`
 	// 群员人数
-	CurrentQuantity int32 `json:"current_quantity"`
+	GroupMemberQuantity int32 `json:"group_member_quantity"`
+	// 群组描述
+	Description string `json:"description"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type GroupMemberShip struct {
-	// 群组成员的唯一标识符
+	// 主键Id
 	ID int64 `json:"id"`
 	// 用户Id
 	UserID int32 `json:"user_id"`
 	// 群组Id
 	GroupID int32 `json:"group_id"`
-	// 角色, 0: 管理员, 1: 普通成员
-	Role int32 `json:"role"`
-	// 加入时间
-	JoinedAt time.Time `json:"joined_at"`
+	// 群员角色, 1: 群主, 2: 管理员, 3: 普通成员
+	Role int16 `json:"role"`
+	// 成员状态, 1: 待确认, 2: 已确认, 3: 已拒绝
+	Status int16 `json:"status"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Message struct {

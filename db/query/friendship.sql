@@ -1,27 +1,27 @@
 -- name: AddFriend :one
-INSERT INTO friends (user_id, friend_id, note)
+INSERT INTO friendships (user_id, friend_id, comment)
 VALUEs ($1, $2, $3) 
 RETURNING *;
 
 -- name: GetFriend :one
-SELECT * FROM friends
+SELECT * FROM friendships
 WHERE 
     user_id = $1 AND friend_id = $2;
 
--- name: UpdateFriendNote :one
-UPDATE friends
+-- name: UpdateFriendComment :one
+UPDATE friendships
 SET
-    note = @note
+    comment = @comment
 WHERE
     user_id = @user_id AND friend_id = @friend_id
 RETURNING *;
 
 -- name: DeleteFriend :exec
-DELETE FROM friends
+DELETE FROM friendships
 WHERE
     user_id = $1 AND friend_id = $2;
 
 -- name: ListFriends :many
-SELECT f.friend_id, f.note, u.profile_picture_url FROM friends AS f
+SELECT f.friend_id, f.comment, u.profile_picture_url FROM friendships AS f
 JOIN users AS u ON f.user_id = u.id
 WHERE u.id = $1;

@@ -74,7 +74,7 @@ func runGrpcServer(conf config.Config, store db.Store) {
 	)
 
 	pb.RegisterUserServiceServer(grpcServer, userService)
-	pb.RegisterFriendServiceServer(grpcServer, friendService)
+	pb.RegisterFriendshipServiceServer(grpcServer, friendService)
 	pb.RegisterChatServiceServer(grpcServer, chatService)
 	pb.RegisterEmailServiceServer(grpcServer, emailService)
 	reflection.Register(grpcServer)
@@ -109,7 +109,7 @@ func runGatewayServer(conf config.Config, store db.Store) {
 		log.Fatal().Err(err).Msg("cannot register handler server")
 	}
 
-	pb.RegisterFriendServiceHandlerServer(ctx, grpcMux, service.NewFriendService(server))
+	pb.RegisterFriendshipServiceHandlerServer(ctx, grpcMux, service.NewFriendService(server))
 
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux) // 覆盖所有路由

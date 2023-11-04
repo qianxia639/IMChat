@@ -8,7 +8,7 @@ import "response.proto";
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
-service FriendService {
+service FriendshipService {
 
     rpc AddFriend (AddFriendRequest) returns (Response) {
         option (google.api.http) = {
