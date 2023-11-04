@@ -12,7 +12,7 @@ import (
 const addFriend = `-- name: AddFriend :one
 INSERT INTO friendships (user_id, friend_id, comment)
 VALUEs ($1, $2, $3) 
-RETURNING id, user_id, friend_id, comment, status, created_at, updated_at
+RETURNING id, user_id, friend_id, comment, created_at, updated_at
 `
 
 type AddFriendParams struct {
@@ -29,7 +29,6 @@ func (q *Queries) AddFriend(ctx context.Context, arg *AddFriendParams) (Friendsh
 		&i.UserID,
 		&i.FriendID,
 		&i.Comment,
-		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -53,7 +52,7 @@ func (q *Queries) DeleteFriend(ctx context.Context, arg *DeleteFriendParams) err
 }
 
 const getFriend = `-- name: GetFriend :one
-SELECT id, user_id, friend_id, comment, status, created_at, updated_at FROM friendships
+SELECT id, user_id, friend_id, comment, created_at, updated_at FROM friendships
 WHERE 
     user_id = $1 AND friend_id = $2
 `
@@ -71,7 +70,6 @@ func (q *Queries) GetFriend(ctx context.Context, arg *GetFriendParams) (Friendsh
 		&i.UserID,
 		&i.FriendID,
 		&i.Comment,
-		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -116,7 +114,7 @@ SET
     comment = $1
 WHERE
     user_id = $2 AND friend_id = $3
-RETURNING id, user_id, friend_id, comment, status, created_at, updated_at
+RETURNING id, user_id, friend_id, comment, created_at, updated_at
 `
 
 type UpdateFriendCommentParams struct {
@@ -133,7 +131,6 @@ func (q *Queries) UpdateFriendComment(ctx context.Context, arg *UpdateFriendComm
 		&i.UserID,
 		&i.FriendID,
 		&i.Comment,
-		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

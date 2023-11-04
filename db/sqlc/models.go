@@ -8,6 +8,25 @@ import (
 	"time"
 )
 
+type FriendGroupApply struct {
+	// 主键Id
+	ID int64 `json:"id"`
+	// 申请者用户Id
+	UserID int32 `json:"user_id"`
+	// 响应者Id(好友/群组Id)
+	TargetID int32 `json:"target_id"`
+	// 申请描述
+	Description string `json:"description"`
+	// 申请类型, 1: 好友, 2: 群组
+	ApplyType int16 `json:"apply_type"`
+	// 申请状态, 1: 待确认, 2: 已确认, 3: 已拒绝
+	Status int16 `json:"status"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
+	// 响应时间
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 type Friendship struct {
 	// 主键Id
 	ID int64 `json:"id"`
@@ -17,8 +36,6 @@ type Friendship struct {
 	FriendID int32 `json:"friend_id"`
 	// 好友备注
 	Comment string `json:"comment"`
-	// 好友状态, 1: 待确认, 2: 已确认, 3: 以拒绝
-	Status int16 `json:"status"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
 	// 更新时间
@@ -51,8 +68,6 @@ type GroupMemberShip struct {
 	GroupID int32 `json:"group_id"`
 	// 群员角色, 1: 群主, 2: 管理员, 3: 普通成员
 	Role int16 `json:"role"`
-	// 成员状态, 1: 待确认, 2: 已确认, 3: 已拒绝
-	Status int16 `json:"status"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
 	// 更新时间

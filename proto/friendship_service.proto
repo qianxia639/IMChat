@@ -10,29 +10,43 @@ import "google/api/annotations.proto";
 
 service FriendshipService {
 
+    // 发送好友请求
     rpc AddFriend (AddFriendRequest) returns (Response) {
         option (google.api.http) = {
-            post: "/v1/friend"
+            post: "/v1/friendship"
             body: "*"
         };
     };
 
+    // 获取好友请求列表
+    rpc ListFriendshipPending (google.protobuf.Empty) returns (Response) {
+        option (google.api.http) = {
+            get: "/v1/friendship/pending"
+        };
+    };
+
+    // 响应好友请求
+    // rpc MethodName (Request) returns (Response);
+
+    // 更新好友信息
     rpc UpdateFriend (UpdateFriendRequest) returns (Response) {
         option (google.api.http) = {
-            put: "/v1/friend"
+            put: "/v1/friendship"
             body: "*"
         };
     };
 
+    // 删除好友
     rpc DeleteFriend (DeleteFriendRequest) returns (Response) {
         option (google.api.http) = {
-            delete: "/v1/friend"
+            delete: "/v1/friendship"
         };
     };
 
-    rpc ListFriends (google.protobuf.Empty) returns (stream ListFriendsResponse) {
+    // 获取好友列表
+    rpc ListFriend (google.protobuf.Empty) returns (stream ListFriendResponse) {
         option (google.api.http) = {
-            get: "/v1/friend"
+            get: "/v1/friendship"
         };
     };
 }
@@ -41,6 +55,11 @@ message AddFriendRequest {
     int32 receiver_id = 1;
     string apply_desc = 2;
     string note = 3;
+}
+
+message ListFriendshipPendingResponse {
+    int32 id = 1;
+    string m = 2;
 }
 
 message UpdateFriendRequest {
@@ -52,7 +71,7 @@ message DeleteFriendRequest {
     int32 friend_id = 1;
 }
 
-message ListFriendsResponse {
+message ListFriendResponse {
     int32 friend_id = 1;
     string note = 2;
     string avatar = 3;
