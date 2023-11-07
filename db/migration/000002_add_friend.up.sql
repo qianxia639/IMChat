@@ -22,11 +22,12 @@ CREATE TABLE groups (
     id BIGSERIAL PRIMARY KEY,
     creator_id INTEGER NOT NULL,
     group_name VARCHAR(100) NOT NULL UNIQUE,
-    group_member_quantity INTEGER NOT NULL DEFAULT 1,
+    avatar VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL DEFAULT '',
+    notice VARCHAR(255) NOT NULL,
+    group_member_quantity INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT (now()),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z',
-    FOREIGN KEY (creator_id) REFERENCES users ON DELETE CASCADE
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z'
 );
 
 COMMENT ON COLUMN groups.id IS '主键Id';
@@ -35,21 +36,28 @@ COMMENT ON COLUMN groups.creator_id IS '创建者Id';
 
 COMMENT ON COLUMN groups.group_name IS '群组名';
 
-COMMENT ON COLUMN groups.group_member_quantity IS '群员人数';
+COMMENT ON COLUMN groups.avatar IS '群头像';
 
 COMMENT ON COLUMN groups.description IS '群组描述';
+
+COMMENT ON COLUMN groups.notice IS '群公告';
+
+COMMENT ON COLUMN groups.group_member_quantity IS '群员人数';
 
 COMMENT ON COLUMN groups.created_at IS '创建时间';
 
 COMMENT ON COLUMN groups.updated_at IS '更新时间';
+
+CREATE INDEX groups_creator_id_index ON groups (creator_id);
 
 -- 群组成员关系表
 CREATE TABLE group_member_ships (
     id BIGSERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     group_id INTEGER NOT NULL,
+    nickname VARCHAR(30) NOT  NULL,
     role SMALLINT NOT NULL DEFAULT 3,
-    status SMALLINT NOT NULL DEFAULT 1,
+    mute SMALLINT NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT (now()),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z',
     FOREIGN KEY (user_id) REFERENCES users ON DELETE CASCADE,
@@ -62,9 +70,11 @@ COMMENT ON COLUMN group_member_ships.user_id IS '用户Id';
 
 COMMENT ON COLUMN group_member_ships.group_id IS '群组Id';
 
+COMMENT ON COLUMN group_member_ships.nickname IS '群员昵称';
+
 COMMENT ON COLUMN group_member_ships.role IS '群员角色, 1: 群主, 2: 管理员, 3: 普通成员';
 
-COMMENT ON COLUMN group_member_ships.status IS '群员状态, 1: 待确认, 2: 已确认, 3: 已拒绝';
+COMMENT ON COLUMN group_member_ships.mute IS '是否禁言, 1: 否, 2: 是';
 
 COMMENT ON COLUMN group_member_ships.created_at IS '创建时间';
 

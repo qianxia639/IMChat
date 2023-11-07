@@ -16,7 +16,7 @@ INSERT INTO messages (
 ) VALUES (
     $1, $2, $3, $4, $5, $6
 )
-RETURNING id, sender_id, receiver_id, message_type, content, send_type, sending_time, receive_time
+RETURNING id, sender_id, receiver_id, message_type, content, send_type, pic, url, sending_time, receive_time
 `
 
 type AddMessageParams struct {
@@ -45,6 +45,8 @@ func (q *Queries) AddMessage(ctx context.Context, arg *AddMessageParams) (Messag
 		&i.MessageType,
 		&i.Content,
 		&i.SendType,
+		&i.Pic,
+		&i.Url,
 		&i.SendingTime,
 		&i.ReceiveTime,
 	)

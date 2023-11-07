@@ -45,10 +45,14 @@ type Group struct {
 	CreatorID int32 `json:"creator_id"`
 	// 群组名
 	GroupName string `json:"group_name"`
-	// 群员人数
-	GroupMemberQuantity int32 `json:"group_member_quantity"`
+	// 群头像
+	Avatar string `json:"avatar"`
 	// 群组描述
 	Description string `json:"description"`
+	// 群公告
+	Notice string `json:"notice"`
+	// 群员人数
+	GroupMemberQuantity int32 `json:"group_member_quantity"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
 	// 更新时间
@@ -62,10 +66,12 @@ type GroupMemberShip struct {
 	UserID int32 `json:"user_id"`
 	// 群组Id
 	GroupID int32 `json:"group_id"`
+	// 群员昵称
+	Nickname string `json:"nickname"`
 	// 群员角色, 1: 群主, 2: 管理员, 3: 普通成员
 	Role int16 `json:"role"`
-	// 群员状态, 1: 待确认, 2: 已确认, 3: 已拒绝
-	Status int16 `json:"status"`
+	// 是否禁言, 1: 否, 2: 是
+	Mute int16 `json:"mute"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
 	// 更新时间
@@ -85,6 +91,10 @@ type Message struct {
 	Content string `json:"content"`
 	// 发送类型, 1: 私聊, 2: 群聊
 	SendType int16 `json:"send_type"`
+	// 缩略图
+	Pic string `json:"pic"`
+	// 文件或图片地址
+	Url string `json:"url"`
 	// 消息发送时间
 	SendingTime time.Time `json:"sending_time"`
 	// 消息读取时间
