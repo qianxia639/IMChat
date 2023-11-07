@@ -40,19 +40,17 @@ type Friendship struct {
 
 type Group struct {
 	// 主键Id
-	ID int64 `json:"id"`
+	ID int32 `json:"id"`
 	// 创建者Id
 	CreatorID int32 `json:"creator_id"`
 	// 群组名
 	GroupName string `json:"group_name"`
 	// 群头像
-	Avatar string `json:"avatar"`
+	Icon string `json:"icon"`
 	// 群组描述
 	Description string `json:"description"`
 	// 群公告
 	Notice string `json:"notice"`
-	// 群员人数
-	GroupMemberQuantity int32 `json:"group_member_quantity"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
 	// 更新时间

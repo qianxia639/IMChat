@@ -67,6 +67,7 @@ func runGrpcServer(conf config.Config, store db.Store) {
 	chatService := service.NewChatService(server)
 	emailService := service.NewEmailService(server)
 	friennGroupApplyService := service.NewFriendGroupRequestService(server)
+	groupService := service.NewGroupService(server)
 
 	grpcLogger := grpc.UnaryInterceptor(interceptor.GrpcUnaryLogger)
 	grpcServer := grpc.NewServer(
@@ -79,6 +80,7 @@ func runGrpcServer(conf config.Config, store db.Store) {
 	pb.RegisterChatServiceServer(grpcServer, chatService)
 	pb.RegisterEmailServiceServer(grpcServer, emailService)
 	pb.RegisterFriendGroupApplyServiceServer(grpcServer, friennGroupApplyService)
+	pb.RegisterGroupServiceServer(grpcServer, groupService)
 	reflection.Register(grpcServer)
 
 	listener, err := net.Listen("tcp", conf.Server.GrpcServerAddress)
@@ -112,6 +114,8 @@ func runGatewayServer(conf config.Config, store db.Store) {
 	}
 
 	pb.RegisterFriendshipServiceHandlerServer(ctx, grpcMux, service.NewFriendService(server))
+
+	pb.RegisterGroupServiceHandlerServer(ctx, grpcMux, service.NewGroupService(server))
 
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux) // 覆盖所有路由

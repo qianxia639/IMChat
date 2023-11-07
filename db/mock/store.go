@@ -50,6 +50,21 @@ func (mr *MockStoreMockRecorder) AddFriend(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddFriend", reflect.TypeOf((*MockStore)(nil).AddFriend), arg0, arg1)
 }
 
+// AddGroupMember mocks base method.
+func (m *MockStore) AddGroupMember(arg0 context.Context, arg1 *db.AddGroupMemberParams) (db.GroupMemberShip, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddGroupMember", arg0, arg1)
+	ret0, _ := ret[0].(db.GroupMemberShip)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddGroupMember indicates an expected call of AddGroupMember.
+func (mr *MockStoreMockRecorder) AddGroupMember(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddGroupMember", reflect.TypeOf((*MockStore)(nil).AddGroupMember), arg0, arg1)
+}
+
 // AddMessage mocks base method.
 func (m *MockStore) AddMessage(arg0 context.Context, arg1 *db.AddMessageParams) (db.Message, error) {
 	m.ctrl.T.Helper()
@@ -93,6 +108,35 @@ func (m *MockStore) CreateFriendGroupApply(arg0 context.Context, arg1 *db.Create
 func (mr *MockStoreMockRecorder) CreateFriendGroupApply(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFriendGroupApply", reflect.TypeOf((*MockStore)(nil).CreateFriendGroupApply), arg0, arg1)
+}
+
+// CreateGroup mocks base method.
+func (m *MockStore) CreateGroup(arg0 context.Context, arg1 *db.CreateGroupParams) (db.Group, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateGroup", arg0, arg1)
+	ret0, _ := ret[0].(db.Group)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateGroup indicates an expected call of CreateGroup.
+func (mr *MockStoreMockRecorder) CreateGroup(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGroup", reflect.TypeOf((*MockStore)(nil).CreateGroup), arg0, arg1)
+}
+
+// CreateGroupTx mocks base method.
+func (m *MockStore) CreateGroupTx(arg0 context.Context, arg1 *db.CreateGroupTxParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateGroupTx", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateGroupTx indicates an expected call of CreateGroupTx.
+func (mr *MockStoreMockRecorder) CreateGroupTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGroupTx", reflect.TypeOf((*MockStore)(nil).CreateGroupTx), arg0, arg1)
 }
 
 // CreateUser mocks base method.

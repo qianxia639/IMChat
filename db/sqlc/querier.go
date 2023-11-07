@@ -10,8 +10,10 @@ import (
 
 type Querier interface {
 	AddFriend(ctx context.Context, arg *AddFriendParams) (Friendship, error)
+	AddGroupMember(ctx context.Context, arg *AddGroupMemberParams) (GroupMemberShip, error)
 	AddMessage(ctx context.Context, arg *AddMessageParams) (Message, error)
 	CreateFriendGroupApply(ctx context.Context, arg *CreateFriendGroupApplyParams) (FriendGroupApply, error)
+	CreateGroup(ctx context.Context, arg *CreateGroupParams) (Group, error)
 	CreateUser(ctx context.Context, arg *CreateUserParams) (User, error)
 	DeleteFriend(ctx context.Context, arg *DeleteFriendParams) error
 	DeleteFriendGroupApply(ctx context.Context, userID int32) error

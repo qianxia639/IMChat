@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package qianxia.IMChat;
+
+option go_package = "IMChat/pb";
+
+import "response.proto";
+import "google/api/annotations.proto";
+
+service GroupService {
+
+    // 创建群组
+    rpc CreateGroup(CreateGroupRequest) returns (Response) {
+        option (google.api.http) = {
+            post: "/v1/group"
+            body: "*"
+        };
+    };
+
+    // 
+
+}
+
+message CreateGroupRequest {
+    int32 creator_id = 1;
+    string group_name = 2;
+    string icon = 3;
+    string description = 4;
+}

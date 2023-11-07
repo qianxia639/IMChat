@@ -13,6 +13,11 @@ type Store interface {
 	DeleteFriendTx(ctx context.Context, arg *DeleteFriendTxParams) error
 	AddMessageTx(ctx context.Context, arg *AddMessageTxParams) (AddMessageTxResult, error)
 	DeleteUserTx(ctx context.Context, userId int32) error
+	GroupTx
+}
+
+type GroupTx interface {
+	CreateGroupTx(ctx context.Context, arg *CreateGroupTxParams) error
 }
 
 type SQLStore struct {

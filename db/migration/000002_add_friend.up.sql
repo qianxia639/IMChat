@@ -19,13 +19,12 @@ COMMENT ON COLUMN friendships.created_at IS '创建时间';
 
 -- 群组表
 CREATE TABLE groups (
-    id BIGSERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     creator_id INTEGER NOT NULL,
     group_name VARCHAR(100) NOT NULL UNIQUE,
-    avatar VARCHAR(255) NOT NULL,
+    icon VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL DEFAULT '',
-    notice VARCHAR(255) NOT NULL,
-    group_member_quantity INTEGER NOT NULL DEFAULT 1,
+    notice VARCHAR(255) NOT NULL DEFAULT '',
     created_at TIMESTAMPTZ NOT NULL DEFAULT (now()),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT '0001-01-01 00:00:00Z'
 );
@@ -36,13 +35,11 @@ COMMENT ON COLUMN groups.creator_id IS '创建者Id';
 
 COMMENT ON COLUMN groups.group_name IS '群组名';
 
-COMMENT ON COLUMN groups.avatar IS '群头像';
+COMMENT ON COLUMN groups.icon IS '群头像';
 
 COMMENT ON COLUMN groups.description IS '群组描述';
 
 COMMENT ON COLUMN groups.notice IS '群公告';
-
-COMMENT ON COLUMN groups.group_member_quantity IS '群员人数';
 
 COMMENT ON COLUMN groups.created_at IS '创建时间';
 
