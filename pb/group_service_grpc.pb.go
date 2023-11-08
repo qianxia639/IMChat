@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -24,6 +25,8 @@ const _ = grpc.SupportPackageIsVersion7
 type GroupServiceClient interface {
 	// 创建群组
 	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...grpc.CallOption) (*Response, error)
+	// 群组列表
+	ListGroup(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (GroupService_ListGroupClient, error)
 }
 
 type groupServiceClient struct {
@@ -43,12 +46,46 @@ func (c *groupServiceClient) CreateGroup(ctx context.Context, in *CreateGroupReq
 	return out, nil
 }
 
+func (c *groupServiceClient) ListGroup(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (GroupService_ListGroupClient, error) {
+	stream, err := c.cc.NewStream(ctx, &GroupService_ServiceDesc.Streams[0], "/qianxia.IMChat.GroupService/ListGroup", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &groupServiceListGroupClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type GroupService_ListGroupClient interface {
+	Recv() (*ListGroupResponse, error)
+	grpc.ClientStream
+}
+
+type groupServiceListGroupClient struct {
+	grpc.ClientStream
+}
+
+func (x *groupServiceListGroupClient) Recv() (*ListGroupResponse, error) {
+	m := new(ListGroupResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // GroupServiceServer is the server API for GroupService service.
 // All implementations must embed UnimplementedGroupServiceServer
 // for forward compatibility
 type GroupServiceServer interface {
 	// 创建群组
 	CreateGroup(context.Context, *CreateGroupRequest) (*Response, error)
+	// 群组列表
+	ListGroup(*emptypb.Empty, GroupService_ListGroupServer) error
 	mustEmbedUnimplementedGroupServiceServer()
 }
 
@@ -58,6 +95,9 @@ type UnimplementedGroupServiceServer struct {
 
 func (UnimplementedGroupServiceServer) CreateGroup(context.Context, *CreateGroupRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateGroup not implemented")
+}
+func (UnimplementedGroupServiceServer) ListGroup(*emptypb.Empty, GroupService_ListGroupServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListGroup not implemented")
 }
 func (UnimplementedGroupServiceServer) mustEmbedUnimplementedGroupServiceServer() {}
 
@@ -90,6 +130,27 @@ func _GroupService_CreateGroup_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GroupService_ListGroup_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(emptypb.Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GroupServiceServer).ListGroup(m, &groupServiceListGroupServer{stream})
+}
+
+type GroupService_ListGroupServer interface {
+	Send(*ListGroupResponse) error
+	grpc.ServerStream
+}
+
+type groupServiceListGroupServer struct {
+	grpc.ServerStream
+}
+
+func (x *groupServiceListGroupServer) Send(m *ListGroupResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // GroupService_ServiceDesc is the grpc.ServiceDesc for GroupService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +163,12 @@ var GroupService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GroupService_CreateGroup_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "ListGroup",
+			Handler:       _GroupService_ListGroup_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "group_service.proto",
 }

@@ -6,6 +6,7 @@ option go_package = "IMChat/pb";
 
 import "response.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
 service GroupService {
 
@@ -17,7 +18,12 @@ service GroupService {
         };
     };
 
-    // 
+    // 群组列表
+    rpc ListGroup (google.protobuf.Empty) returns (stream ListGroupResponse) {
+        option (google.api.http) = {
+            get: "/v1/group"
+        };
+    };
 
 }
 
@@ -27,3 +33,12 @@ message CreateGroupRequest {
     string icon = 3;
     string description = 4;
 }
+
+message ListGroupResponse {
+    int32 group_id = 1;
+    int32 user_id = 2;
+    string group_name = 3;
+    string username = 4;
+    string nickname = 5;
+    string icon = 6;
+}   

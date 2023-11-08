@@ -344,6 +344,21 @@ func (mr *MockStoreMockRecorder) ListFriends(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFriends", reflect.TypeOf((*MockStore)(nil).ListFriends), arg0, arg1)
 }
 
+// ListGroup mocks base method.
+func (m *MockStore) ListGroup(arg0 context.Context, arg1 int32) ([]db.ListGroupRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListGroup", arg0, arg1)
+	ret0, _ := ret[0].([]db.ListGroupRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListGroup indicates an expected call of ListGroup.
+func (mr *MockStoreMockRecorder) ListGroup(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroup", reflect.TypeOf((*MockStore)(nil).ListGroup), arg0, arg1)
+}
+
 // ReplyFriendGroupApplyTx mocks base method.
 func (m *MockStore) ReplyFriendGroupApplyTx(arg0 context.Context, arg1 *db.ReplyFriendGroupApplyTxParams) (db.Friendship, error) {
 	m.ctrl.T.Helper()

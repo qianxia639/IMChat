@@ -45,3 +45,47 @@ func (q *Queries) CreateGroup(ctx context.Context, arg *CreateGroupParams) (Grou
 	)
 	return i, err
 }
+
+const listGroup = `-- name: ListGroup :many
+SELECT g.id AS group_id, g.group_name, g.icon, u.id AS user_id, u.username, u.nickname
+FROM groups g
+JOIN users u ON g.creator_id = u.id
+WHERE
+    u.id = $1
+`
+
+type ListGroupRow struct {
+	GroupID   int32  `json:"group_id"`
+	GroupName string `json:"group_name"`
+	Icon      string `json:"icon"`
+	UserID    int32  `json:"user_id"`
+	Username  string `json:"username"`
+	Nickname  string `json:"nickname"`
+}
+
+func (q *Queries) ListGroup(ctx context.Context, id int32) ([]ListGroupRow, error) {
+	rows, err := q.db.Query(ctx, listGroup, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListGroupRow
+	for rows.Next() {
+		var i ListGroupRow
+		if err := rows.Scan(
+			&i.GroupID,
+			&i.GroupName,
+			&i.Icon,
+			&i.UserID,
+			&i.Username,
+			&i.Nickname,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

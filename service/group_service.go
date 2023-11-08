@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type GroupService struct {
@@ -52,4 +53,30 @@ func (groupService *GroupService) CreateGroup(ctx context.Context, req *pb.Creat
 	}
 
 	return &pb.Response{Message: "Successfully..."}, nil
+}
+
+func (groupService *GroupService) ListGroup(empty *emptypb.Empty, stream pb.GroupService_ListGroupServer) error {
+	ctx := stream.Context()
+	user, err := groupService.authorization(ctx)
+	if err != nil {
+		return err
+	}
+
+	groups, _ := groupService.store.ListGroup(ctx, user.ID)
+	for _, group := range groups {
+		res := &pb.ListGroupResponse{
+			GroupId:   group.GroupID,
+			UserId:    group.UserID,
+			GroupName: group.GroupName,
+			Username:  group.Username,
+			Nickname:  group.Nickname,
+			Icon:      group.Icon,
+		}
+
+		if err := stream.Send(res); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
