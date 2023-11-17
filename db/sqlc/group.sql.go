@@ -46,6 +46,27 @@ func (q *Queries) CreateGroup(ctx context.Context, arg *CreateGroupParams) (Grou
 	return i, err
 }
 
+const getGroupById = `-- name: GetGroupById :one
+SELECT id, creator_id, group_name, icon, description, notice, created_at, updated_at FROM groups
+WHERE id = $1
+`
+
+func (q *Queries) GetGroupById(ctx context.Context, id int32) (Group, error) {
+	row := q.db.QueryRow(ctx, getGroupById, id)
+	var i Group
+	err := row.Scan(
+		&i.ID,
+		&i.CreatorID,
+		&i.GroupName,
+		&i.Icon,
+		&i.Description,
+		&i.Notice,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const listGroup = `-- name: ListGroup :many
 SELECT g.id AS group_id, g.group_name, g.icon, u.id AS user_id, u.username, u.nickname
 FROM groups g

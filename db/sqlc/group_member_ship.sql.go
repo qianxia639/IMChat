@@ -46,3 +46,30 @@ func (q *Queries) AddGroupMember(ctx context.Context, arg *AddGroupMemberParams)
 	)
 	return i, err
 }
+
+const getGroup = `-- name: GetGroup :one
+SELECT id, user_id, group_id, nickname, role, mute, created_at, updated_at FROM group_member_ships
+WHERE
+    user_id = $1 AND group_id = $2
+`
+
+type GetGroupParams struct {
+	UserID  int32 `json:"user_id"`
+	GroupID int32 `json:"group_id"`
+}
+
+func (q *Queries) GetGroup(ctx context.Context, arg *GetGroupParams) (GroupMemberShip, error) {
+	row := q.db.QueryRow(ctx, getGroup, arg.UserID, arg.GroupID)
+	var i GroupMemberShip
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.GroupID,
+		&i.Nickname,
+		&i.Role,
+		&i.Mute,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}

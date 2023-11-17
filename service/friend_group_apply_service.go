@@ -32,6 +32,7 @@ func (friendGroupApplyService *FriendGroupApplyService) CreateFriendGroupApply(c
 		return nil, err
 	}
 
+	// 判断是否是添加自己
 	if user.ID == req.TargetId && req.ApplyType == USER {
 		return nil, status.Error(codes.InvalidArgument, "无法添加自己")
 	}
@@ -107,8 +108,13 @@ func (friendGroupApplyService *FriendGroupApplyService) ReplyFriendGroupApply(ct
 			return nil, errors.DuplicakeErr
 		}
 	case GROUP:
-		log.Error().Err(errors.DuplicakeErr).Msg("响应群组申请")
-		return nil, errors.DuplicakeErr
+		group, _ := friendGroupApplyService.store.GetGroup(ctx, &db.GetGroupParams{
+			UserID:  user.ID,
+			GroupID: req.FriendId,
+		})
+		if group.ID != 0 {
+			return nil, errors.DuplicakeErr
+		}
 	}
 
 	arg := &db.ReplyFriendGroupApplyTxParams{

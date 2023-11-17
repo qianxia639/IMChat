@@ -284,6 +284,36 @@ func (mr *MockStoreMockRecorder) GetFriend(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriend", reflect.TypeOf((*MockStore)(nil).GetFriend), arg0, arg1)
 }
 
+// GetGroup mocks base method.
+func (m *MockStore) GetGroup(arg0 context.Context, arg1 *db.GetGroupParams) (db.GroupMemberShip, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetGroup", arg0, arg1)
+	ret0, _ := ret[0].(db.GroupMemberShip)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetGroup indicates an expected call of GetGroup.
+func (mr *MockStoreMockRecorder) GetGroup(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroup", reflect.TypeOf((*MockStore)(nil).GetGroup), arg0, arg1)
+}
+
+// GetGroupById mocks base method.
+func (m *MockStore) GetGroupById(arg0 context.Context, arg1 int32) (db.Group, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetGroupById", arg0, arg1)
+	ret0, _ := ret[0].(db.Group)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetGroupById indicates an expected call of GetGroupById.
+func (mr *MockStoreMockRecorder) GetGroupById(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupById", reflect.TypeOf((*MockStore)(nil).GetGroupById), arg0, arg1)
+}
+
 // GetUser mocks base method.
 func (m *MockStore) GetUser(arg0 context.Context, arg1 string) (db.User, error) {
 	m.ctrl.T.Helper()

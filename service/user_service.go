@@ -137,7 +137,7 @@ func (userService *UserService) LoginUser(ctx context.Context, req *pb.LoginUser
 
 	expireAt := time.Duration(utils.RandomInt(27, 30))
 	if err := userService.cache.Set(ctx, getUserInfoKey(user.Username), &user, expireAt*time.Minute).Err(); err != nil {
-		log.Error().Err(err).Msgf("LoginUser HSET error")
+		log.Error().Err(err).Msgf("LoginUser SET error")
 		return nil, errDefine.ServerErr
 	}
 

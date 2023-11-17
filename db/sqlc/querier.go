@@ -22,6 +22,8 @@ type Querier interface {
 	ExistNickname(ctx context.Context, nickname string) (int64, error)
 	ExistsFriendGroupApply(ctx context.Context, arg *ExistsFriendGroupApplyParams) (int64, error)
 	GetFriend(ctx context.Context, arg *GetFriendParams) (Friendship, error)
+	GetGroup(ctx context.Context, arg *GetGroupParams) (GroupMemberShip, error)
+	GetGroupById(ctx context.Context, id int32) (Group, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	GetUserById(ctx context.Context, id int32) (User, error)
 	ListFriendGroupApply(ctx context.Context, targetID int32) ([]ListFriendGroupApplyRow, error)

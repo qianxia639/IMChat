@@ -1,6 +1,8 @@
 package db
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 func (u *User) MarshalBinary() (data []byte, err error) {
 	return json.Marshal(u)

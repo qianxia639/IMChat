@@ -12,3 +12,7 @@ FROM groups g
 JOIN users u ON g.creator_id = u.id
 WHERE
     u.id = $1;
+
+-- name: GetGroupById :one
+SELECT * FROM groups
+WHERE id = $1;
